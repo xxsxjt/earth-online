@@ -332,6 +332,22 @@ pet_resin: translucent pale blue PET resin pellets
 synthetic_rubber: a black synthetic rubber sheet roll
 caprolactam: pale caprolactam crystals
 nylon_fiber: off-white nylon fibers bundled like thread
+graphite_dust: dark gray flaky graphite powder
+activated_carbon: porous black activated carbon granules
+battery_carbon: fine conductive black battery carbon powder
+manganese_oxide_dust: dark brown manganese oxide powder
+nickel_precursor: green nickel battery precursor crystals
+lithium_salt: pale white lithium salt crystals
+electrolyte: clear blue electrolyte vial for batteries
+electrode_sheet: thin layered black and copper battery electrode sheet
+simple_battery_cell: small cylindrical battery cell with metal caps
+hard_water_sample: cloudy mineral rich water sample vial
+softened_water: clear softened water vial with pale blue tint
+sludge_cake: dark brown pressed industrial sludge cake
+neutral_salt: mixed white gray neutralization salt crystals
+activated_carbon_filter: black activated carbon filter cartridge
+lime_treatment_residue: off-white chalky lime treatment residue clump
+stabilized_tailings: gray stabilized tailings aggregate blocky lump
 ```
 
 ### 气体单元

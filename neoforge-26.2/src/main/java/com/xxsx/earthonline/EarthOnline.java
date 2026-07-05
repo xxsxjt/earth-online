@@ -176,6 +176,22 @@ public class EarthOnline {
     public static final DeferredItem<Item> SYNTHETIC_RUBBER = item("synthetic_rubber");
     public static final DeferredItem<Item> CAPROLACTAM = item("caprolactam");
     public static final DeferredItem<Item> NYLON_FIBER = item("nylon_fiber");
+    public static final DeferredItem<Item> GRAPHITE_DUST = item("graphite_dust");
+    public static final DeferredItem<Item> ACTIVATED_CARBON = item("activated_carbon");
+    public static final DeferredItem<Item> BATTERY_CARBON = item("battery_carbon");
+    public static final DeferredItem<Item> MANGANESE_OXIDE_DUST = item("manganese_oxide_dust");
+    public static final DeferredItem<Item> NICKEL_PRECURSOR = item("nickel_precursor");
+    public static final DeferredItem<Item> LITHIUM_SALT = item("lithium_salt");
+    public static final DeferredItem<Item> ELECTROLYTE = item("electrolyte");
+    public static final DeferredItem<Item> ELECTRODE_SHEET = item("electrode_sheet");
+    public static final DeferredItem<Item> SIMPLE_BATTERY_CELL = item("simple_battery_cell");
+    public static final DeferredItem<Item> HARD_WATER_SAMPLE = item("hard_water_sample");
+    public static final DeferredItem<Item> SOFTENED_WATER = item("softened_water");
+    public static final DeferredItem<Item> SLUDGE_CAKE = item("sludge_cake");
+    public static final DeferredItem<Item> NEUTRAL_SALT = item("neutral_salt");
+    public static final DeferredItem<Item> ACTIVATED_CARBON_FILTER = item("activated_carbon_filter");
+    public static final DeferredItem<Item> LIME_TREATMENT_RESIDUE = item("lime_treatment_residue");
+    public static final DeferredItem<Item> STABILIZED_TAILINGS = item("stabilized_tailings");
     public static final DeferredItem<FieldGeologyNotebookItem> FIELD_GEOLOGY_NOTEBOOK = notebookItem("field_geology_notebook");
 
     public EarthOnline(IEventBus modBus) {

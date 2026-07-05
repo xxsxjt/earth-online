@@ -141,5 +141,21 @@
   "item.earth_online.pvc_resin": "PVC Resin",
   "item.earth_online.steel_bloom": "Steel Bloom",
   "item.earth_online.ferrosilicon": "Ferrosilicon FeSi",
-  "item.earth_online.aluminum_ingot": "Aluminum Ingot Al"
+  "item.earth_online.aluminum_ingot": "Aluminum Ingot Al",
+  "item.earth_online.graphite_dust": "Graphite Dust C",
+  "item.earth_online.activated_carbon": "Activated Carbon",
+  "item.earth_online.battery_carbon": "Battery Grade Carbon",
+  "item.earth_online.manganese_oxide_dust": "Manganese Oxide Dust MnO2",
+  "item.earth_online.nickel_precursor": "Nickel Precursor",
+  "item.earth_online.lithium_salt": "Lithium Salt",
+  "item.earth_online.electrolyte": "Electrolyte",
+  "item.earth_online.electrode_sheet": "Electrode Sheet",
+  "item.earth_online.simple_battery_cell": "Simple Battery Cell",
+  "item.earth_online.hard_water_sample": "Hard Water Sample",
+  "item.earth_online.softened_water": "Softened Water",
+  "item.earth_online.sludge_cake": "Sludge Cake",
+  "item.earth_online.neutral_salt": "Neutral Salt",
+  "item.earth_online.activated_carbon_filter": "Activated Carbon Filter",
+  "item.earth_online.lime_treatment_residue": "Lime Treatment Residue",
+  "item.earth_online.stabilized_tailings": "Stabilized Tailings"
 }

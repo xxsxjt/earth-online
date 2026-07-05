@@ -75,6 +75,22 @@
     "earth_online:pet_resin",
     "earth_online:synthetic_rubber",
     "earth_online:caprolactam",
-    "earth_online:nylon_fiber"
+    "earth_online:nylon_fiber",
+    "earth_online:graphite_dust",
+    "earth_online:activated_carbon",
+    "earth_online:battery_carbon",
+    "earth_online:manganese_oxide_dust",
+    "earth_online:nickel_precursor",
+    "earth_online:lithium_salt",
+    "earth_online:electrolyte",
+    "earth_online:electrode_sheet",
+    "earth_online:simple_battery_cell",
+    "earth_online:hard_water_sample",
+    "earth_online:softened_water",
+    "earth_online:sludge_cake",
+    "earth_online:neutral_salt",
+    "earth_online:activated_carbon_filter",
+    "earth_online:lime_treatment_residue",
+    "earth_online:stabilized_tailings"
   ]
 }

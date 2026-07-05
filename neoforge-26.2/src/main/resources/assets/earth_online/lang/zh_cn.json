@@ -141,5 +141,21 @@
   "item.earth_online.pet_resin": "PET 聚酯树脂",
   "item.earth_online.synthetic_rubber": "合成橡胶",
   "item.earth_online.caprolactam": "己内酰胺 C6H11NO",
-  "item.earth_online.nylon_fiber": "尼龙纤维"
+  "item.earth_online.nylon_fiber": "尼龙纤维",
+  "item.earth_online.graphite_dust": "石墨粉 C",
+  "item.earth_online.activated_carbon": "活性炭",
+  "item.earth_online.battery_carbon": "电池级碳粉",
+  "item.earth_online.manganese_oxide_dust": "锰氧化物粉 MnO2",
+  "item.earth_online.nickel_precursor": "镍前驱体",
+  "item.earth_online.lithium_salt": "锂盐",
+  "item.earth_online.electrolyte": "电解液",
+  "item.earth_online.electrode_sheet": "电极片",
+  "item.earth_online.simple_battery_cell": "简易电池单元",
+  "item.earth_online.hard_water_sample": "硬水样品",
+  "item.earth_online.softened_water": "软化水",
+  "item.earth_online.sludge_cake": "污泥饼",
+  "item.earth_online.neutral_salt": "中和盐",
+  "item.earth_online.activated_carbon_filter": "活性炭滤料",
+  "item.earth_online.lime_treatment_residue": "石灰处理渣",
+  "item.earth_online.stabilized_tailings": "稳定化尾矿"
 }

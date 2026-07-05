@@ -48,6 +48,22 @@ ITEMS = {
     "synthetic_rubber": ("合成橡胶", "Synthetic Rubber", "a black synthetic rubber sheet roll"),
     "caprolactam": ("己内酰胺 C6H11NO", "Caprolactam C6H11NO", "pale caprolactam crystals"),
     "nylon_fiber": ("尼龙纤维", "Nylon Fiber", "off-white nylon fibers bundled like thread"),
+    "graphite_dust": ("石墨粉 C", "Graphite Dust C", "dark gray flaky graphite powder"),
+    "activated_carbon": ("活性炭", "Activated Carbon", "porous black activated carbon granules"),
+    "battery_carbon": ("电池级碳粉", "Battery Grade Carbon", "fine conductive black battery carbon powder"),
+    "manganese_oxide_dust": ("锰氧化物粉 MnO2", "Manganese Oxide Dust MnO2", "dark brown manganese oxide powder"),
+    "nickel_precursor": ("镍前驱体", "Nickel Precursor", "green nickel battery precursor crystals"),
+    "lithium_salt": ("锂盐", "Lithium Salt", "pale white lithium salt crystals"),
+    "electrolyte": ("电解液", "Electrolyte", "clear blue electrolyte vial for batteries"),
+    "electrode_sheet": ("电极片", "Electrode Sheet", "thin layered black and copper battery electrode sheet"),
+    "simple_battery_cell": ("简易电池单元", "Simple Battery Cell", "small cylindrical battery cell with metal caps"),
+    "hard_water_sample": ("硬水样品", "Hard Water Sample", "cloudy mineral rich water sample vial"),
+    "softened_water": ("软化水", "Softened Water", "clear softened water vial with pale blue tint"),
+    "sludge_cake": ("污泥饼", "Sludge Cake", "dark brown pressed industrial sludge cake"),
+    "neutral_salt": ("中和盐", "Neutral Salt", "mixed white gray neutralization salt crystals"),
+    "activated_carbon_filter": ("活性炭滤料", "Activated Carbon Filter", "black activated carbon filter cartridge"),
+    "lime_treatment_residue": ("石灰处理渣", "Lime Treatment Residue", "off-white chalky lime treatment residue clump"),
+    "stabilized_tailings": ("稳定化尾矿", "Stabilized Tailings", "gray stabilized tailings aggregate blocky lump"),
 }
 
 
@@ -117,6 +133,16 @@ def update_resource_metadata() -> None:
         "PET polyester",
         "synthetic rubber",
         "nylon fiber",
+        "battery materials",
+        "graphite anode material",
+        "lithium salt electrolyte",
+        "nickel manganese battery precursors",
+        "simple battery cells",
+        "water softening",
+        "activated carbon filtration",
+        "wastewater neutralization",
+        "tailings stabilization",
+        "sludge cake sintering",
     ]:
         if entry not in industries:
             industries.append(entry)
