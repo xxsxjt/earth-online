@@ -2,6 +2,7 @@ package com.xxsx.earthonline.integration.jei;
 
 import com.xxsx.earthonline.EarthOnline;
 import com.xxsx.earthonline.ProcessingMachineBlock;
+import com.xxsx.earthonline.RouteGuide;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.recipe.RecipeType;
@@ -15,9 +16,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @JeiPlugin
@@ -112,28 +110,18 @@ public class EarthOnlineJeiPlugin implements IModPlugin {
     }
 
     private static void registerRouteInfo(IRecipeRegistration registration) {
-        Map<Item, RouteInfo> routes = new LinkedHashMap<>();
-        for (ProcessingMachineBlock.Recipe recipe : ProcessingMachineBlock.recipes()) {
-            Item input = recipe.input().get().asItem();
-            routes.computeIfAbsent(input, ignored -> new RouteInfo()).next.add(recipe);
-            for (ProcessingMachineBlock.Output output : recipe.outputs()) {
-                Item item = output.item().get().asItem();
-                routes.computeIfAbsent(item, ignored -> new RouteInfo()).sources.add(recipe);
-            }
-        }
-
-        for (Map.Entry<Item, RouteInfo> entry : routes.entrySet()) {
+        for (Map.Entry<Item, RouteGuide.RouteInfo> entry : RouteGuide.buildRoutesByItem().entrySet()) {
             Item item = entry.getKey();
-            RouteInfo info = entry.getValue();
-            List<Component> lines = new ArrayList<>();
+            RouteGuide.RouteInfo info = entry.getValue();
+            java.util.List<Component> lines = new java.util.ArrayList<>();
             lines.add(line("Earth Online 路线提示", ChatFormatting.GOLD));
-            if (!info.next.isEmpty()) {
-                ProcessingMachineBlock.Recipe example = info.next.get(0);
-                lines.add(line("下一步：放入 " + joinMachines(info.next), ChatFormatting.AQUA));
-                lines.add(line("示例产出：" + describeOutputs(example), ChatFormatting.GRAY));
+            if (!info.next().isEmpty()) {
+                ProcessingMachineBlock.Recipe example = info.next().get(0);
+                lines.add(line("下一步：放入 " + RouteGuide.joinMachines(info.next(), 4), ChatFormatting.AQUA));
+                lines.add(line("示例产出：" + RouteGuide.describeOutputs(example), ChatFormatting.GRAY));
             }
-            if (!info.sources.isEmpty()) {
-                lines.add(line("常见来源：" + joinSources(info.sources), ChatFormatting.DARK_GREEN));
+            if (!info.sources().isEmpty()) {
+                lines.add(line("常见来源：" + RouteGuide.joinSources(info.sources(), 3), ChatFormatting.DARK_GREEN));
             }
             lines.add(line("如果路线很多，查 JEI 的“Earth Online 工业处理”分类或右键野外地质手册。", ChatFormatting.DARK_GRAY));
             registration.addItemStackInfo(new ItemStack(item), lines.toArray(Component[]::new));
@@ -142,46 +130,5 @@ public class EarthOnlineJeiPlugin implements IModPlugin {
 
     private static Component line(String text, ChatFormatting color) {
         return Component.literal(text).withStyle(color);
-    }
-
-    private static String joinMachines(List<ProcessingMachineBlock.Recipe> recipes) {
-        List<String> names = new ArrayList<>();
-        for (ProcessingMachineBlock.Recipe recipe : recipes) {
-            String name = recipe.kind().displayName();
-            if (!names.contains(name)) {
-                names.add(name);
-            }
-            if (names.size() >= 4) {
-                break;
-            }
-        }
-        return String.join(" / ", names);
-    }
-
-    private static String joinSources(List<ProcessingMachineBlock.Recipe> recipes) {
-        List<String> names = new ArrayList<>();
-        for (ProcessingMachineBlock.Recipe recipe : recipes) {
-            String input = recipe.inputStack().getItemName().getString();
-            String name = recipe.kind().displayName() + "：" + input;
-            if (!names.contains(name)) {
-                names.add(name);
-            }
-            if (names.size() >= 3) {
-                break;
-            }
-        }
-        return String.join("；", names);
-    }
-
-    private static String describeOutputs(ProcessingMachineBlock.Recipe recipe) {
-        return recipe.outputStacks().stream()
-                .map(stack -> stack.getCount() + "x " + stack.getItemName().getString())
-                .reduce((a, b) -> a + " + " + b)
-                .orElse("无产物");
-    }
-
-    private static class RouteInfo {
-        private final List<ProcessingMachineBlock.Recipe> next = new ArrayList<>();
-        private final List<ProcessingMachineBlock.Recipe> sources = new ArrayList<>();
     }
 }

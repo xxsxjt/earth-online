@@ -21,7 +21,11 @@
     "polypropylene",
     "PVC",
     "aluminum smelting",
-    "steel refining"
+    "steel refining",
+    "slag cement",
+    "ceramic brick",
+    "polymer fiber",
+    "mercury amalgamation gold recovery"
   ],
   "note": "Java ProcessingMachineBlock owns executable recipes; this file documents the current content envelope and JEI/handbook coverage."
 }

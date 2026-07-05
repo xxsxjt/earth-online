@@ -21,6 +21,15 @@
 - [玩家入门流程](docs/player-guide.md)
 - [贴图 AI 提示词](docs/asset-prompts.md)
 
+## 本地验证
+
+```powershell
+cd neoforge-26.2
+.\gradlew.bat build
+cd ..
+python tools\validate_resources.py
+```
+
 ## 当前模块
 
 - GitHub: https://github.com/xxsxjt/earth-online
@@ -38,6 +47,7 @@
 - Earth Online 材料、矿床和机器都有玩家提示：悬停材料会显示下一台机器、示例产出和常见来源。
 - 已接入 JEI：显示 Earth Online 工业处理分类，并把所有处理机器作为配方催化剂。
 - 扩展常见化学工业入口：氯碱、硫酸、硝酸、氮磷钾肥、水泥、玻璃、煤化工、铝工业、钢坯、合成氨、尿素、甲醇/甲醛、聚乙烯、聚丙烯、PVC。
+- 补全下游闭环：长石/云母/铝硅酸盐进入玻璃与陶瓷，矿渣进入水泥，塑料树脂可压制为 MC 兼容材料。
 - 移除主世界原版矿物生成，改用 Earth Online 的稀疏大矿床 placed features。
 - 保留原版物品生态：矿物处理最终输出 `minecraft:iron_ingot`、`minecraft:copper_ingot`、`minecraft:gold_ingot`、`minecraft:diamond` 等。
 - 使用 26.2 新版 `assets/<modid>/items/*.json` 物品模型定义。
