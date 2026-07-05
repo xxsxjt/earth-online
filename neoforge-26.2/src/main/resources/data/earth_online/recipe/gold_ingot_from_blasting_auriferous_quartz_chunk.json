@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:blasting",
+  "group": "gold_ingot",
+  "ingredient": "earth_online:auriferous_quartz_chunk",
+  "result": {
+    "id": "minecraft:gold_ingot"
+  },
+  "experience": 1.0
+}

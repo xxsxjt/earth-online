@@ -1,0 +1,33 @@
+# Gradle
+build/
+.gradle/
+run/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+*.iml
+.idea/
+.ipr
+.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS
+*.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Local generated previews and raw AI outputs
+tmp/
+output/
+texture-backups/
+
+# Personal helper scripts or local secrets
+local/
+*.local.*
+providers.json

@@ -1,0 +1,29 @@
+{
+  "replace": false,
+  "values": [
+    "earth_online:rich_magnetite_ore",
+    "earth_online:auriferous_quartz_vein",
+    "earth_online:kimberlite",
+    "earth_online:diamondiferous_kimberlite",
+    "earth_online:emerald_beryl_vein",
+    "earth_online:jaw_crusher",
+    "earth_online:ball_mill",
+    "earth_online:magnetic_separator",
+    "earth_online:flotation_cell",
+    "earth_online:ore_roaster",
+    "earth_online:reduction_furnace",
+    "earth_online:electrolytic_cell",
+    "earth_online:powder_press",
+    "earth_online:chemical_reactor",
+    "earth_online:distillation_column",
+    "earth_online:mixer",
+    "earth_online:crystallizer",
+    "earth_online:industrial_kiln",
+    "earth_online:gas_separator",
+    "earth_online:fertilizer_granulator",
+    "earth_online:polymerizer",
+    "earth_online:steam_cracker",
+    "earth_online:synthesis_loop",
+    "earth_online:absorption_tower"
+  ]
+}

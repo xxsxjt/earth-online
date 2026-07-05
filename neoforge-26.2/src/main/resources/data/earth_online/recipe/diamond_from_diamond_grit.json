@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "earth_online:diamond_grit"
+  },
+  "result": {
+    "id": "minecraft:diamond"
+  }
+}

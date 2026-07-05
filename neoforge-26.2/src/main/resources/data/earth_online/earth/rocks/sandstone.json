@@ -1,0 +1,35 @@
+{
+  "id": "minecraft:sandstone",
+  "note": "Rock compositions are ranges, not exact block formulas.",
+  "components": [
+    {
+      "material": "quartz_sand",
+      "formula": "SiO2",
+      "min": 0.7,
+      "max": 0.95
+    },
+    {
+      "material": "feldspar",
+      "formula": "aluminosilicates",
+      "min": 0.0,
+      "max": 0.12
+    },
+    {
+      "material": "calcite_cement",
+      "formula": "CaCO3",
+      "min": 0.0,
+      "max": 0.15
+    },
+    {
+      "material": "iron_oxide_stain",
+      "formula": "Fe oxides",
+      "min": 0.0,
+      "max": 0.04
+    }
+  ],
+  "processing": [
+    "ball_milling",
+    "sieving",
+    "magnetic_separation_when_applicable"
+  ]
+}

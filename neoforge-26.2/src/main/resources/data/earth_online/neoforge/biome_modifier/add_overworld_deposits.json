@@ -1,0 +1,19 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "earth_online:poor_magnetite_lens",
+    "earth_online:magnetite_lens",
+    "earth_online:rich_magnetite_lens",
+    "earth_online:chalcopyrite_vein",
+    "earth_online:auriferous_quartz_vein",
+    "earth_online:bituminous_coal_seam",
+    "earth_online:anthracite_coal_seam",
+    "earth_online:kimberlite_pipe",
+    "earth_online:diamondiferous_kimberlite_pipe",
+    "earth_online:lapis_lazuli_body",
+    "earth_online:redstone_mineral_body",
+    "earth_online:cinnabar_vein"
+  ],
+  "step": "underground_ores"
+}

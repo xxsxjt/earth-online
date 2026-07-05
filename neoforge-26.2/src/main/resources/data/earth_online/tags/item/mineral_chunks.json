@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "earth_online:magnetite_chunk",
+    "earth_online:chalcopyrite_chunk",
+    "earth_online:auriferous_quartz_chunk",
+    "earth_online:kimberlite_chunk",
+    "earth_online:cinnabar_chunk"
+  ]
+}

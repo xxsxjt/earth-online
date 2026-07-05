@@ -1,0 +1,35 @@
+{
+  "id": "minecraft:blackstone",
+  "note": "Rock compositions are ranges, not exact block formulas.",
+  "components": [
+    {
+      "material": "pyroxene",
+      "formula": "(Mg,Fe,Ca)SiO3",
+      "min": 0.25,
+      "max": 0.45
+    },
+    {
+      "material": "plagioclase",
+      "formula": "CaAl2Si2O8-NaAlSi3O8",
+      "min": 0.2,
+      "max": 0.4
+    },
+    {
+      "material": "magnetite_ilmenite",
+      "formula": "Fe3O4 + FeTiO3",
+      "min": 0.03,
+      "max": 0.12
+    },
+    {
+      "material": "volcanic_glass",
+      "formula": "silicate glass",
+      "min": 0.05,
+      "max": 0.2
+    }
+  ],
+  "processing": [
+    "ball_milling",
+    "sieving",
+    "magnetic_separation_when_applicable"
+  ]
+}

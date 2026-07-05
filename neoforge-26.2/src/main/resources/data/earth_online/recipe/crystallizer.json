@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "CBC",
+    "III"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "C": "minecraft:copper_ingot",
+    "B": "minecraft:bucket",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "earth_online:crystallizer"
+  }
+}

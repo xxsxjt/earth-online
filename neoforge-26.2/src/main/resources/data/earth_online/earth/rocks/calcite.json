@@ -1,0 +1,29 @@
+{
+  "id": "minecraft:calcite",
+  "note": "Rock compositions are ranges, not exact block formulas.",
+  "components": [
+    {
+      "material": "calcite",
+      "formula": "CaCO3",
+      "min": 0.9,
+      "max": 0.99
+    },
+    {
+      "material": "dolomite",
+      "formula": "CaMg(CO3)2",
+      "min": 0.0,
+      "max": 0.08
+    },
+    {
+      "material": "clay_impurities",
+      "formula": "aluminosilicates",
+      "min": 0.0,
+      "max": 0.03
+    }
+  ],
+  "processing": [
+    "ball_milling",
+    "sieving",
+    "magnetic_separation_when_applicable"
+  ]
+}

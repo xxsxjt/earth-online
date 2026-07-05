@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "earth_online:poor_magnetite_ore",
+    "earth_online:magnetite_ore",
+    "earth_online:rich_magnetite_ore",
+    "earth_online:chalcopyrite_ore",
+    "earth_online:auriferous_quartz_vein",
+    "earth_online:bituminous_coal_seam",
+    "earth_online:anthracite_coal_seam",
+    "earth_online:kimberlite",
+    "earth_online:diamondiferous_kimberlite",
+    "earth_online:lapis_lazuli_ore",
+    "earth_online:emerald_beryl_vein",
+    "earth_online:redstone_mineral_ore",
+    "earth_online:cinnabar_vein"
+  ]
+}

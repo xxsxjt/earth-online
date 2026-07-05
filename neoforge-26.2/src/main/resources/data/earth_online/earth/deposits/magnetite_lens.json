@@ -1,0 +1,26 @@
+{
+  "deposit": "earth_online:magnetite_lens",
+  "shape": "lens",
+  "y": [
+    -56,
+    24
+  ],
+  "composition": [
+    {
+      "block": "earth_online:magnetite_ore",
+      "weight": 55
+    },
+    {
+      "block": "earth_online:poor_magnetite_ore",
+      "weight": 30
+    },
+    {
+      "block": "earth_online:rich_magnetite_ore",
+      "weight": 10
+    },
+    {
+      "block": "minecraft:deepslate",
+      "weight": 5
+    }
+  ]
+}

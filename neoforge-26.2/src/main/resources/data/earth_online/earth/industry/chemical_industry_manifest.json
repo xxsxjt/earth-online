@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "scope": "expanded first playable chemistry coverage",
+  "industries": [
+    "chlor-alkali",
+    "sulfuric acid",
+    "nitric acid",
+    "fertilizer",
+    "cement",
+    "glass",
+    "coal chemistry",
+    "bauxite/alumina",
+    "polymer precursor",
+    "air separation",
+    "Haber-Bosch ammonia",
+    "urea fertilizer",
+    "potash fertilizer",
+    "steam cracking",
+    "methanol/formaldehyde",
+    "polyethylene",
+    "polypropylene",
+    "PVC",
+    "aluminum smelting",
+    "steel refining"
+  ],
+  "note": "Java ProcessingMachineBlock owns executable recipes; this file documents the current content envelope and JEI/handbook coverage."
+}

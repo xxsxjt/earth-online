@@ -1,0 +1,35 @@
+{
+  "id": "minecraft:stone",
+  "note": "Rock compositions are ranges, not exact block formulas.",
+  "components": [
+    {
+      "material": "quartz",
+      "formula": "SiO2",
+      "min": 0.25,
+      "max": 0.45
+    },
+    {
+      "material": "feldspar",
+      "formula": "K/Na/Ca aluminosilicates",
+      "min": 0.25,
+      "max": 0.45
+    },
+    {
+      "material": "mica_clay",
+      "formula": "hydrated aluminosilicates",
+      "min": 0.05,
+      "max": 0.2
+    },
+    {
+      "material": "iron_oxides",
+      "formula": "Fe oxides",
+      "min": 0.0,
+      "max": 0.05
+    }
+  ],
+  "processing": [
+    "ball_milling",
+    "sieving",
+    "magnetic_separation_when_applicable"
+  ]
+}

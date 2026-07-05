@@ -1,0 +1,36 @@
+{
+  "id": "minecraft:granite",
+  "type": "igneous_intrusive",
+  "components": [
+    {
+      "material": "earth_online:quartz",
+      "formula": "SiO2",
+      "min": 0.2,
+      "max": 0.4
+    },
+    {
+      "material": "earth_online:orthoclase",
+      "formula": "KAlSi3O8",
+      "min": 0.2,
+      "max": 0.45
+    },
+    {
+      "material": "earth_online:albite",
+      "formula": "NaAlSi3O8",
+      "min": 0.1,
+      "max": 0.35
+    },
+    {
+      "material": "earth_online:biotite",
+      "formula": "K(Mg,Fe)3AlSi3O10(OH)2",
+      "min": 0.02,
+      "max": 0.15
+    },
+    {
+      "material": "earth_online:magnetite",
+      "formula": "Fe3O4",
+      "min": 0.0,
+      "max": 0.03
+    }
+  ]
+}

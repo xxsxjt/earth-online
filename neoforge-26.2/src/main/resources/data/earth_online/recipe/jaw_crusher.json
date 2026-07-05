@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "SFS",
+    "III"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "minecraft:stone",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "earth_online:jaw_crusher"
+  }
+}

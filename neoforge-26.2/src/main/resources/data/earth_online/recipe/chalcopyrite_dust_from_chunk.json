@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "earth_online:chalcopyrite_chunk"
+  ],
+  "result": {
+    "id": "earth_online:chalcopyrite_dust",
+    "count": 2
+  }
+}

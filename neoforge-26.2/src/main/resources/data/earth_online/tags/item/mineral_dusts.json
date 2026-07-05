@@ -1,0 +1,31 @@
+{
+  "replace": false,
+  "values": [
+    "earth_online:magnetite_dust",
+    "earth_online:chalcopyrite_dust",
+    "earth_online:quartz_dust",
+    "earth_online:feldspar_dust",
+    "earth_online:mica_dust",
+    "earth_online:tailings_dust",
+    "earth_online:coal_dust",
+    "earth_online:gold_dust",
+    "earth_online:diamond_grit",
+    "earth_online:cinnabar_dust",
+    "earth_online:silica_dust",
+    "earth_online:calcite_dust",
+    "earth_online:lime_dust",
+    "earth_online:hematite_dust",
+    "earth_online:pyrite_dust",
+    "earth_online:sulfur_dust",
+    "earth_online:mafic_silicate_dust",
+    "earth_online:aluminosilicate_dust",
+    "earth_online:slag",
+    "earth_online:salt_dust",
+    "earth_online:phosphate_rock_dust",
+    "earth_online:soda_ash",
+    "earth_online:gypsum_dust",
+    "earth_online:cement_powder",
+    "earth_online:clay_dust",
+    "earth_online:bauxite_dust"
+  ]
+}

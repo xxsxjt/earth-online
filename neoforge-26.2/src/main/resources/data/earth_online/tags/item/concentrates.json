@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "earth_online:iron_concentrate",
+    "earth_online:copper_concentrate",
+    "earth_online:gold_concentrate",
+    "earth_online:roasted_copper_concentrate",
+    "earth_online:redstone_concentrate",
+    "earth_online:lapis_concentrate",
+    "earth_online:beryl_concentrate"
+  ]
+}

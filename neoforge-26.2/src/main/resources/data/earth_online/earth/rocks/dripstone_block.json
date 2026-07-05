@@ -1,0 +1,29 @@
+{
+  "id": "minecraft:dripstone_block",
+  "note": "Rock compositions are ranges, not exact block formulas.",
+  "components": [
+    {
+      "material": "calcite",
+      "formula": "CaCO3",
+      "min": 0.75,
+      "max": 0.95
+    },
+    {
+      "material": "aragonite",
+      "formula": "CaCO3",
+      "min": 0.0,
+      "max": 0.1
+    },
+    {
+      "material": "clay_iron_staining",
+      "formula": "Fe oxides + clay",
+      "min": 0.01,
+      "max": 0.08
+    }
+  ],
+  "processing": [
+    "ball_milling",
+    "sieving",
+    "magnetic_separation_when_applicable"
+  ]
+}

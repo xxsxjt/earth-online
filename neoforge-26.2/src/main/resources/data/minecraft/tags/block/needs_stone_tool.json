@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "earth_online:poor_magnetite_ore",
+    "earth_online:magnetite_ore",
+    "earth_online:chalcopyrite_ore",
+    "earth_online:bituminous_coal_seam",
+    "earth_online:anthracite_coal_seam",
+    "earth_online:lapis_lazuli_ore",
+    "earth_online:redstone_mineral_ore",
+    "earth_online:cinnabar_vein",
+    "earth_online:sieve",
+    "earth_online:leaching_tank"
+  ]
+}

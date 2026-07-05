@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "CSC",
+    "III"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:copper_ingot",
+    "S": "earth_online:sulfur_dust"
+  },
+  "result": {
+    "id": "earth_online:fertilizer_granulator"
+  }
+}
