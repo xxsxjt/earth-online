@@ -152,6 +152,30 @@ public class EarthOnline {
     public static final DeferredItem<Item> STEEL_BLOOM = item("steel_bloom");
     public static final DeferredItem<Item> FERROSILICON = item("ferrosilicon");
     public static final DeferredItem<Item> ALUMINUM_INGOT = item("aluminum_ingot");
+    public static final DeferredItem<Item> CRUDE_OIL_SAMPLE = item("crude_oil_sample");
+    public static final DeferredItem<Item> NATURAL_GAS_CELL = item("natural_gas_cell");
+    public static final DeferredItem<Item> NAPHTHA = item("naphtha");
+    public static final DeferredItem<Item> KEROSENE_FRACTION = item("kerosene_fraction");
+    public static final DeferredItem<Item> DIESEL_FRACTION = item("diesel_fraction");
+    public static final DeferredItem<Item> LUBRICATING_OIL = item("lubricating_oil");
+    public static final DeferredItem<Item> ASPHALT = item("asphalt");
+    public static final DeferredItem<Item> PETROLEUM_COKE = item("petroleum_coke");
+    public static final DeferredItem<Item> WOOD_CHIPS = item("wood_chips");
+    public static final DeferredItem<Item> CELLULOSE_PULP = item("cellulose_pulp");
+    public static final DeferredItem<Item> BLEACHED_PULP = item("bleached_pulp");
+    public static final DeferredItem<Item> CELLULOSE_FIBER = item("cellulose_fiber");
+    public static final DeferredItem<Item> TITANIUM_DIOXIDE = item("titanium_dioxide");
+    public static final DeferredItem<Item> IRON_OXIDE_PIGMENT = item("iron_oxide_pigment");
+    public static final DeferredItem<Item> CARBON_BLACK = item("carbon_black");
+    public static final DeferredItem<Item> PAINT_BASE = item("paint_base");
+    public static final DeferredItem<Item> STYRENE = item("styrene");
+    public static final DeferredItem<Item> POLYSTYRENE_RESIN = item("polystyrene_resin");
+    public static final DeferredItem<Item> ETHYLENE_GLYCOL = item("ethylene_glycol");
+    public static final DeferredItem<Item> TEREPHTHALIC_ACID = item("terephthalic_acid");
+    public static final DeferredItem<Item> PET_RESIN = item("pet_resin");
+    public static final DeferredItem<Item> SYNTHETIC_RUBBER = item("synthetic_rubber");
+    public static final DeferredItem<Item> CAPROLACTAM = item("caprolactam");
+    public static final DeferredItem<Item> NYLON_FIBER = item("nylon_fiber");
     public static final DeferredItem<FieldGeologyNotebookItem> FIELD_GEOLOGY_NOTEBOOK = notebookItem("field_geology_notebook");
 
     public EarthOnline(IEventBus modBus) {

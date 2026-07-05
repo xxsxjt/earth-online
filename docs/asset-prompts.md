@@ -284,6 +284,56 @@ original 16x16 pixel art block texture front face of a packed absorption tower, 
 
 ## 常见化工物品
 
+### Agnes 批量物品贴图
+
+本项目已加入自动化脚本：
+
+```powershell
+python tools\generate_agnes_item_textures.py
+```
+
+脚本会从 `C:\Users\du_ji\WorkBuddy\agnes\providers.json` 读取 Agnes 配置，调用 `agnes-image-2.1-flash`，把原始生成图保存到 `tmp/imagegen/agnes-modern-chemistry/`，再裁切缩放为 `assets/earth_online/textures/item/*.png`。不要把 API Key 写进仓库或日志。
+
+通用 Agnes 提示词结构：
+
+```text
+Create one Minecraft-style pixel art item icon for a mod called Earth Online.
+Item id: <item_id>
+Subject: <real industrial material description>.
+Style: clean 16x16 Minecraft item texture, readable silhouette, hand-painted pixel art, small industrial chemistry material icon, centered, no text, no letters, no UI, no watermark.
+Background: transparent if supported; otherwise pure flat #00ff00 chroma key with no shadows or gradients.
+Constraints: isolated icon only, generous padding, crisp edges, suitable for downscaling to 16x16.
+```
+
+当前新增现代化工提示词覆盖：
+
+```text
+crude_oil_sample: a small dark crude oil vial with black-brown liquid
+natural_gas_cell: a pale blue compressed gas cell with a metal cap
+naphtha: a light amber petrochemical distillate vial
+kerosene_fraction: a golden kerosene distillate vial
+diesel_fraction: a darker amber diesel distillate vial
+lubricating_oil: a thick olive-black lubricating oil canister
+asphalt: a matte black asphalt chunk with subtle aggregate speckles
+petroleum_coke: a porous dark petroleum coke lump
+wood_chips: several tan brown wood chips
+cellulose_pulp: a beige wet cellulose pulp clump
+bleached_pulp: a clean off-white bleached paper pulp clump
+cellulose_fiber: cream colored cellulose fibers bundled like string
+titanium_dioxide: bright white titanium dioxide pigment powder
+iron_oxide_pigment: red iron oxide pigment powder
+carbon_black: deep black carbon black powder
+paint_base: a small neutral paint base bucket
+styrene: a clear pale aromatic monomer vial
+polystyrene_resin: white polystyrene resin pellets
+ethylene_glycol: a clear blue-tinted ethylene glycol vial
+terephthalic_acid: off-white terephthalic acid crystal powder
+pet_resin: translucent pale blue PET resin pellets
+synthetic_rubber: a black synthetic rubber sheet roll
+caprolactam: pale caprolactam crystals
+nylon_fiber: off-white nylon fibers bundled like thread
+```
+
 ### 气体单元
 
 ```text

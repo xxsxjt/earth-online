@@ -18,6 +18,7 @@
 ## 文档
 
 - [设计方案](docs/design-plan.md)
+- [近现代化工扩展计划](docs/modern-chemical-industry-plan.md)
 - [玩家入门流程](docs/player-guide.md)
 - [贴图 AI 提示词](docs/asset-prompts.md)
 
@@ -46,9 +47,10 @@ python tools\validate_resources.py
 - 空手右键机器打开 GUI，手持可处理材料右键机器会直接处理 1 个输入并给多种产物；机器界面可直接跳转手册。
 - Earth Online 材料、矿床和机器都有玩家提示：悬停材料会显示下一台机器、示例产出和常见来源。
 - 已接入 JEI：显示 Earth Online 工业处理分类，并把所有处理机器作为配方催化剂。
-- 扩展常见化学工业入口：氯碱、硫酸、硝酸、氮磷钾肥、水泥、玻璃、煤化工、铝工业、钢坯、合成氨、尿素、甲醇/甲醛、聚乙烯、聚丙烯、PVC。
+- 扩展常见化学工业入口：氯碱、硫酸、硝酸、氮磷钾肥、水泥、玻璃、煤化工、铝工业、钢坯、合成氨、尿素、甲醇/甲醛、聚乙烯、聚丙烯、PVC、石油炼化、造纸纤维、颜料涂料、PS、PET、合成橡胶、尼龙。
 - 补全下游闭环：长石/云母/铝硅酸盐进入玻璃与陶瓷，矿渣进入水泥，塑料树脂可压制为 MC 兼容材料。
+- 新增现代工业副产物流：原油分馏会同时产生天然气、石脑油、煤油、柴油、润滑油、沥青、石油焦；颜料和炭黑可接回染料/涂料；纸浆可接回纸和线。
 - 移除主世界原版矿物生成，改用 Earth Online 的稀疏大矿床 placed features。
 - 保留原版物品生态：矿物处理最终输出 `minecraft:iron_ingot`、`minecraft:copper_ingot`、`minecraft:gold_ingot`、`minecraft:diamond` 等。
 - 使用 26.2 新版 `assets/<modid>/items/*.json` 物品模型定义。
-- 已用 Agnes 生成并接入机器、新材料和精矿贴图；同时覆盖部分原版岩石视觉以强化真实岩石体系。
+- 已用 Agnes 生成并接入机器、新材料和精矿贴图；同时覆盖部分原版岩石视觉以强化真实岩石体系。新增贴图可用 `tools/generate_agnes_item_textures.py` 续跑。

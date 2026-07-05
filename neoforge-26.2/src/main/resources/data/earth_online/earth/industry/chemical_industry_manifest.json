@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "scope": "expanded first playable chemistry coverage",
+  "scope": "modern first playable chemistry coverage",
   "industries": [
     "chlor-alkali",
     "sulfuric acid",
@@ -25,7 +25,22 @@
     "slag cement",
     "ceramic brick",
     "polymer fiber",
-    "mercury amalgamation gold recovery"
+    "mercury amalgamation gold recovery",
+    "petroleum refining",
+    "natural gas reforming",
+    "naphtha steam cracking",
+    "kerosene/diesel fraction upgrading",
+    "lubricants/asphalt/petroleum coke",
+    "wood pulping and paper",
+    "cellulose fiber",
+    "titanium dioxide pigment",
+    "iron oxide pigment",
+    "carbon black",
+    "paint base",
+    "polystyrene",
+    "PET polyester",
+    "synthetic rubber",
+    "nylon fiber"
   ],
-  "note": "Java ProcessingMachineBlock owns executable recipes; this file documents the current content envelope and JEI/handbook coverage."
+  "note": "Java ProcessingMachineBlock owns executable recipes; this manifest documents implemented industry families for handbook, JEI and future data-driven migration."
 }
