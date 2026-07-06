@@ -69,7 +69,20 @@
     "monazite and bastnasite rare earth processing",
     "mixed rare earth oxide",
     "neodymium magnet material",
-    "industrial catalysts"
+    "industrial catalysts",
+    "chlor-alkali bleach and peroxide",
+    "soap, surfactants and detergents",
+    "ABS and acrylic polymer chemistry",
+    "polyurethane foam",
+    "copper wire and printed circuit boards",
+    "solder alloys and flux",
+    "LED phosphor and ceramic electronics substrates",
+    "zinc, lead and tin metallurgy",
+    "kaolin ceramics and firebrick",
+    "mineral wool insulation",
+    "ammonium sulfate and superphosphate fertilizer",
+    "urea formaldehyde resin",
+    "syngas and carbon monoxide processing"
   ],
   "note": "Java ProcessingMachineBlock owns executable recipes; this manifest documents implemented industry families for handbook, JEI and future data-driven migration."
 }

@@ -386,6 +386,48 @@ iron_catalyst: dark iron catalyst pellets
 vanadium_catalyst: orange vanadium catalyst pellets
 nickel_catalyst: green nickel catalyst pellets
 platinum_group_catalyst: silver platinum group catalyst grains
+sodium_hypochlorite: pale yellow sodium hypochlorite bleach vial
+bleaching_powder: off-white bleaching powder granules in a small pile
+hydrogen_peroxide: clear hydrogen peroxide vial with bright highlights
+soap_base: pale cream soap base flakes
+glycerol: clear viscous glycerol vial
+surfactant: blue white surfactant paste in a small sample jar
+detergent_powder: white detergent powder with blue speckles
+butadiene: pale compressed petrochemical gas cell
+acrylonitrile: clear acrylonitrile chemical vial
+abs_resin: ivory ABS plastic pellets
+acrylic_monomer: clear acrylic monomer vial
+acrylic_resin: transparent acrylic resin pellets
+polyol: pale syrup polyol sample vial
+isocyanate: amber isocyanate reagent vial
+polyurethane_foam: small pale yellow polyurethane foam block
+copper_wire: coiled shiny copper wire
+fiberglass_cloth: woven pale fiberglass cloth square
+copper_clad_laminate: green circuit laminate sheet with copper edge
+printed_circuit_board: small green printed circuit board with copper traces
+solder_alloy: silver solder alloy wire coil
+solder_flux: amber solder flux paste jar
+led_phosphor: bright yellow rare earth LED phosphor powder
+ceramic_substrate: white ceramic electronics substrate plate
+sphalerite_dust: brown yellow sphalerite zinc sulfide powder
+zinc_oxide: fine white zinc oxide powder
+zinc_ingot: blue silver zinc metal ingot
+galena_dust: dark lead gray galena powder with metallic grains
+lead_ingot: dull heavy blue gray lead ingot
+cassiterite_dust: dark brown cassiterite tin ore powder
+tin_ingot: bright pale tin metal ingot
+kaolin_dust: soft white kaolin clay powder
+refractory_clay: tan refractory clay lump
+firebrick: orange tan refractory firebrick
+ceramic_body: gray white ceramic body clay lump
+porcelain_blank: smooth white porcelain blank piece
+ceramic_insulator: white ribbed ceramic electrical insulator
+mineral_wool: pale fibrous mineral wool tuft
+ammonium_sulfate: white ammonium sulfate fertilizer crystals
+single_superphosphate: gray tan single superphosphate fertilizer granules
+urea_formaldehyde_resin: cream urea formaldehyde resin granules
+carbon_monoxide_cell: gray compressed carbon monoxide gas cell
+syngas_cell: steel gas cell with blue gray synthesis gas glow
 ```
 
 ### 气体单元

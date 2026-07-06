@@ -343,10 +343,10 @@ public class ProcessingMachineBlock extends Block {
         recipes.add(r(Kind.ELECTROLYTIC_CELL, EarthOnline.ELECTROLYTE::get, "电解液活化为电池单元", out(EarthOnline.SIMPLE_BATTERY_CELL::get, 1), out(EarthOnline.NEUTRAL_SALT::get, 1)));
         recipes.add(r(Kind.ELECTROLYTIC_CELL, EarthOnline.ELECTRODE_SHEET::get, "电极片装配电池单元", out(EarthOnline.SIMPLE_BATTERY_CELL::get, 1), out(EarthOnline.ELECTROLYTE::get, 1)));
 
-        recipes.add(r(Kind.BALL_MILL, () -> Blocks.CLAY, "黏土粉磨", out(EarthOnline.CLAY_DUST::get, 4), out(EarthOnline.ALUMINOSILICATE_DUST::get, 1)));
+        recipes.add(r(Kind.BALL_MILL, () -> Blocks.CLAY, "黏土粉磨", out(EarthOnline.CLAY_DUST::get, 4), out(EarthOnline.KAOLIN_DUST::get, 1), out(EarthOnline.ALUMINOSILICATE_DUST::get, 1)));
         recipes.add(r(Kind.BALL_MILL, () -> Blocks.DIRT, "土壤筛磨提盐和黏土", out(EarthOnline.CLAY_DUST::get, 1), out(EarthOnline.SALT_DUST::get, 1), out(EarthOnline.TAILINGS_DUST::get, 2)));
         recipes.add(r(Kind.BALL_MILL, () -> Items.BONE_MEAL, "骨粉磷酸盐富集", out(EarthOnline.PHOSPHATE_ROCK_DUST::get, 2), out(EarthOnline.CALCITE_DUST::get, 1)));
-        recipes.add(r(Kind.SIEVE, () -> Blocks.SAND, "砂中重矿物筛分", out(EarthOnline.SILICA_DUST::get, 3), out(EarthOnline.BAUXITE_DUST::get, 1), out(EarthOnline.TITANIUM_DIOXIDE::get, 1), out(EarthOnline.MONAZITE_SAND::get, 1), out(EarthOnline.TAILINGS_DUST::get, 1)));
+        recipes.add(r(Kind.SIEVE, () -> Blocks.SAND, "砂中重矿物筛分", out(EarthOnline.SILICA_DUST::get, 3), out(EarthOnline.BAUXITE_DUST::get, 1), out(EarthOnline.TITANIUM_DIOXIDE::get, 1), out(EarthOnline.MONAZITE_SAND::get, 1), out(EarthOnline.CASSITERITE_DUST::get, 1), out(EarthOnline.TAILINGS_DUST::get, 1)));
         recipes.add(r(Kind.CRYSTALLIZER, () -> Items.WATER_BUCKET, "盐水蒸发结晶", out(EarthOnline.BRINE_CRYSTAL::get, 1), out(() -> Items.BUCKET, 1)));
 
         recipes.add(r(Kind.LEACHING_TANK, EarthOnline.WOOD_CHIPS::get, "木质原料胶乳/纤维并行浸提", out(EarthOnline.NATURAL_LATEX::get, 1), out(EarthOnline.CELLULOSE_PULP::get, 1)));
@@ -401,6 +401,65 @@ public class ProcessingMachineBlock extends Block {
         recipes.add(r(Kind.ABSORPTION_TOWER, EarthOnline.VANADIUM_CATALYST::get, "钒催化二氧化硫吸收", out(EarthOnline.SULFURIC_ACID::get, 2)));
         recipes.add(r(Kind.SYNTHESIS_LOOP, EarthOnline.NICKEL_CATALYST::get, "镍催化加氢入口", out(EarthOnline.HYDROGEN_GAS_CELL::get, 1), out(EarthOnline.INDUSTRIAL_SOLVENT::get, 1)));
         recipes.add(r(Kind.CHEMICAL_REACTOR, EarthOnline.PLATINUM_GROUP_CATALYST::get, "铂族催化氧化入口", out(EarthOnline.NITRIC_ACID::get, 1), out(EarthOnline.OXYGEN_GAS_CELL::get, 1)));
+
+        recipes.add(r(Kind.ABSORPTION_TOWER, EarthOnline.CHLORINE_GAS_CELL::get, "氯气吸收制次氯酸盐和盐酸", out(EarthOnline.SODIUM_HYPOCHLORITE::get, 1), out(EarthOnline.HYDROCHLORIC_ACID::get, 1)));
+        recipes.add(r(Kind.CHEMICAL_REACTOR, EarthOnline.SODIUM_HYDROXIDE::get, "烧碱氯化制漂白液近似路线", out(EarthOnline.SODIUM_HYPOCHLORITE::get, 1), out(EarthOnline.NEUTRAL_SALT::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.SODIUM_HYPOCHLORITE::get, "次氯酸盐吸附成漂白粉", out(EarthOnline.BLEACHING_POWDER::get, 1), out(EarthOnline.SLAKED_LIME::get, 1)));
+        recipes.add(r(Kind.CHEMICAL_REACTOR, EarthOnline.HYDROGEN_GAS_CELL::get, "氢氧合成过氧化氢近似路线", out(EarthOnline.HYDROGEN_PEROXIDE::get, 1), out(EarthOnline.OXYGEN_GAS_CELL::get, 1)));
+        recipes.add(r(Kind.ABSORPTION_TOWER, EarthOnline.HYDROGEN_PEROXIDE::get, "过氧化氢漂白纸浆", out(EarthOnline.BLEACHED_PULP::get, 1), out(EarthOnline.SOFTENED_WATER::get, 1)));
+        recipes.add(r(Kind.CHEMICAL_REACTOR, () -> Items.WHEAT_SEEDS, "植物油皂化入口", out(EarthOnline.SOAP_BASE::get, 1), out(EarthOnline.GLYCEROL::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.SOAP_BASE::get, "皂基复配表面活性剂", out(EarthOnline.SURFACTANT::get, 1), out(EarthOnline.GLYCEROL::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.SURFACTANT::get, "洗涤剂粉体配混", out(EarthOnline.DETERGENT_POWDER::get, 2), out(EarthOnline.SODA_ASH::get, 1)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.DETERGENT_POWDER::get, "洗涤剂整理为白色兼容染料", out(() -> Items.DYE.white(), 2), out(EarthOnline.SODIUM_SULFATE::get, 1)));
+
+        recipes.add(r(Kind.STEAM_CRACKER, EarthOnline.ETHYLENE::get, "乙烯裂解副产丁二烯和丙烯腈入口", out(EarthOnline.BUTADIENE::get, 1), out(EarthOnline.ACRYLONITRILE::get, 1), out(EarthOnline.HYDROGEN_GAS_CELL::get, 1)));
+        recipes.add(r(Kind.CHEMICAL_REACTOR, EarthOnline.PROPYLENE::get, "丙烯氧化制亚克力单体", out(EarthOnline.ACRYLIC_MONOMER::get, 1), out(EarthOnline.ACETONE::get, 1)));
+        recipes.add(r(Kind.POLYMERIZER, EarthOnline.ACRYLONITRILE::get, "丙烯腈丁二烯苯乙烯共聚近似", out(EarthOnline.ABS_RESIN::get, 1), out(EarthOnline.BUTADIENE::get, 1)));
+        recipes.add(r(Kind.POLYMERIZER, EarthOnline.ACRYLIC_MONOMER::get, "亚克力树脂聚合", out(EarthOnline.ACRYLIC_RESIN::get, 2)));
+        recipes.add(r(Kind.SYNTHESIS_LOOP, EarthOnline.FORMALDEHYDE::get, "甲醛路线制多元醇和脲醛树脂", out(EarthOnline.POLYOL::get, 1), out(EarthOnline.UREA_FORMALDEHYDE_RESIN::get, 1)));
+        recipes.add(r(Kind.CHEMICAL_REACTOR, EarthOnline.AMMONIA::get, "氨基路线制异氰酸酯中间物", out(EarthOnline.ISOCYANATE::get, 1), out(EarthOnline.UREA::get, 1)));
+        recipes.add(r(Kind.POLYMERIZER, EarthOnline.POLYOL::get, "聚氨酯发泡", out(EarthOnline.POLYURETHANE_FOAM::get, 2), out(EarthOnline.ISOCYANATE::get, 1)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.ABS_RESIN::get, "ABS 树脂压制为耐冲击兼容材料", out(() -> Items.SLIME_BALL, 1), out(EarthOnline.CARBON_BLACK::get, 1)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.POLYURETHANE_FOAM::get, "聚氨酯泡沫整理为轻质纤维", out(() -> Items.STRING, 2), out(() -> Blocks.WOOL.white(), 1)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.ACRYLIC_RESIN::get, "亚克力树脂压制为透明兼容板材", out(() -> Items.GLASS, 1), out(EarthOnline.INDUSTRIAL_SOLVENT::get, 1)));
+
+        recipes.add(r(Kind.POWDER_PRESS, () -> Items.COPPER_INGOT, "铜锭拉丝", out(EarthOnline.COPPER_WIRE::get, 4)));
+        recipes.add(r(Kind.INDUSTRIAL_KILN, EarthOnline.SILICA_DUST::get, "二氧化硅拉制玻璃纤维", out(EarthOnline.FIBERGLASS_CLOTH::get, 1), out(() -> Items.GLASS, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.FIBERGLASS_CLOTH::get, "玻纤环氧覆铜板基材", out(EarthOnline.COPPER_CLAD_LAMINATE::get, 1), out(EarthOnline.EPOXY_RESIN::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.COPPER_WIRE::get, "铜线蚀刻制印刷电路板", out(EarthOnline.PRINTED_CIRCUIT_BOARD::get, 1), out(EarthOnline.COPPER_CLAD_LAMINATE::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.PHOTORESIST_PRECURSOR::get, "光刻胶显影回收 PCB", out(EarthOnline.PRINTED_CIRCUIT_BOARD::get, 1), out(EarthOnline.INDUSTRIAL_SOLVENT::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.SOLDER_ALLOY::get, "焊料连接电子板", out(EarthOnline.PRINTED_CIRCUIT_BOARD::get, 1), out(EarthOnline.SOLDER_FLUX::get, 1)));
+        recipes.add(r(Kind.CRYSTALLIZER, EarthOnline.MIXED_RARE_EARTH_OXIDE::get, "稀土荧光粉分级", out(EarthOnline.LED_PHOSPHOR::get, 1), out(EarthOnline.NEODYMIUM_SALT::get, 1)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.PRINTED_CIRCUIT_BOARD::get, "电路板拆解为红石兼容件", out(() -> Items.REDSTONE, 4), out(EarthOnline.COPPER_WIRE::get, 2)));
+        recipes.add(r(Kind.MIXER, EarthOnline.CERAMIC_INSULATOR::get, "陶瓷绝缘件装配电子基板", out(EarthOnline.CERAMIC_SUBSTRATE::get, 1), out(EarthOnline.LED_PHOSPHOR::get, 1)));
+
+        recipes.add(r(Kind.SIEVE, EarthOnline.TAILINGS_DUST::get, "尾粉伴生铅锌矿物回收", out(EarthOnline.SPHALERITE_DUST::get, 1), out(EarthOnline.GALENA_DUST::get, 1), out(EarthOnline.SILICA_DUST::get, 1)));
+        recipes.add(r(Kind.FLOTATION_CELL, EarthOnline.SPHALERITE_DUST::get, "闪锌矿浮选焙烧入口", out(EarthOnline.ZINC_OXIDE::get, 1), out(EarthOnline.SULFUR_DUST::get, 1)));
+        recipes.add(r(Kind.REDUCTION_FURNACE, EarthOnline.ZINC_OXIDE::get, "氧化锌还原制锌", out(EarthOnline.ZINC_INGOT::get, 1), out(EarthOnline.SLAG::get, 1)));
+        recipes.add(r(Kind.FLOTATION_CELL, EarthOnline.GALENA_DUST::get, "方铅矿浮选富集", out(EarthOnline.LEAD_INGOT::get, 1), out(EarthOnline.SULFUR_DUST::get, 1)));
+        recipes.add(r(Kind.REDUCTION_FURNACE, EarthOnline.CASSITERITE_DUST::get, "锡石还原制锡", out(EarthOnline.TIN_INGOT::get, 1), out(EarthOnline.SLAG::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.TIN_INGOT::get, "锡基低温焊料调配", out(EarthOnline.SOLDER_ALLOY::get, 1), out(EarthOnline.SOLDER_FLUX::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.ZINC_INGOT::get, "锌铝镀层兼容化", out(EarthOnline.ALUMINUM_ALLOY_BILLET::get, 1), out(EarthOnline.SLAG::get, 1)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.LEAD_INGOT::get, "铅锭安全封装为重金属兼容坯", out(EarthOnline.SOLDER_ALLOY::get, 1), out(EarthOnline.STABILIZED_TAILINGS::get, 1)));
+
+        recipes.add(r(Kind.SIEVE, EarthOnline.CLAY_DUST::get, "黏土分级提纯高岭土", out(EarthOnline.KAOLIN_DUST::get, 2), out(EarthOnline.ALUMINOSILICATE_DUST::get, 1)));
+        recipes.add(r(Kind.MIXER, EarthOnline.KAOLIN_DUST::get, "高岭土配制陶瓷坯料", out(EarthOnline.CERAMIC_BODY::get, 1), out(EarthOnline.FELDSPAR_DUST::get, 1)));
+        recipes.add(r(Kind.INDUSTRIAL_KILN, EarthOnline.KAOLIN_DUST::get, "高岭土煅烧制耐火黏土", out(EarthOnline.REFRACTORY_CLAY::get, 1), out(EarthOnline.ALUMINA::get, 1)));
+        recipes.add(r(Kind.INDUSTRIAL_KILN, EarthOnline.REFRACTORY_CLAY::get, "耐火黏土烧成耐火砖", out(EarthOnline.FIREBRICK::get, 2), out(EarthOnline.SLAG::get, 1)));
+        recipes.add(r(Kind.INDUSTRIAL_KILN, EarthOnline.CERAMIC_BODY::get, "陶瓷坯体烧成瓷坯", out(EarthOnline.PORCELAIN_BLANK::get, 1), out(EarthOnline.SLAG::get, 1)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.PORCELAIN_BLANK::get, "瓷坯压制绝缘件", out(EarthOnline.CERAMIC_INSULATOR::get, 2)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.FIREBRICK::get, "耐火砖整理为兼容砖块", out(() -> Items.BRICK, 4)));
+        recipes.add(r(Kind.INDUSTRIAL_KILN, EarthOnline.MAFIC_SILICATE_DUST::get, "镁铁质硅酸盐熔融纤维化", out(EarthOnline.MINERAL_WOOL::get, 1), out(EarthOnline.SLAG::get, 1)));
+        recipes.add(r(Kind.POWDER_PRESS, EarthOnline.MINERAL_WOOL::get, "矿物棉整理为隔热纤维", out(() -> Items.STRING, 3), out(() -> Blocks.WOOL.white(), 1)));
+
+        recipes.add(r(Kind.CHEMICAL_REACTOR, EarthOnline.SULFURIC_ACID::get, "硫酸铵肥料中和", out(EarthOnline.AMMONIUM_SULFATE::get, 1), out(EarthOnline.GYPSUM_DUST::get, 1)));
+        recipes.add(r(Kind.CHEMICAL_REACTOR, EarthOnline.PHOSPHATE_ROCK_DUST::get, "普通过磷酸钙酸解", out(EarthOnline.SINGLE_SUPERPHOSPHATE::get, 1), out(EarthOnline.GYPSUM_DUST::get, 1)));
+        recipes.add(r(Kind.FERTILIZER_GRANULATOR, EarthOnline.AMMONIUM_SULFATE::get, "硫酸铵造粒", out(EarthOnline.FERTILIZER_BLEND::get, 2)));
+        recipes.add(r(Kind.FERTILIZER_GRANULATOR, EarthOnline.SINGLE_SUPERPHOSPHATE::get, "过磷酸钙造粒", out(EarthOnline.FERTILIZER_BLEND::get, 2), out(EarthOnline.GYPSUM_DUST::get, 1)));
+        recipes.add(r(Kind.POLYMERIZER, EarthOnline.UREA_FORMALDEHYDE_RESIN::get, "脲醛树脂固化为木材胶黏剂", out(EarthOnline.POLYMER_RESIN::get, 2), out(EarthOnline.WOOD_CHIPS::get, 1)));
+        recipes.add(r(Kind.STEAM_CRACKER, EarthOnline.COAL_GAS_CELL::get, "煤气重整为合成气", out(EarthOnline.SYNGAS_CELL::get, 1), out(EarthOnline.CARBON_MONOXIDE_CELL::get, 1), out(EarthOnline.HYDROGEN_GAS_CELL::get, 1)));
+        recipes.add(r(Kind.SYNTHESIS_LOOP, EarthOnline.SYNGAS_CELL::get, "合成气路线制甲醇和氨", out(EarthOnline.METHANOL::get, 1), out(EarthOnline.AMMONIA::get, 1)));
+        recipes.add(r(Kind.ABSORPTION_TOWER, EarthOnline.CARBON_MONOXIDE_CELL::get, "一氧化碳变换吸收", out(EarthOnline.CARBON_DIOXIDE_CELL::get, 1), out(EarthOnline.HYDROGEN_GAS_CELL::get, 1)));
 
         return List.copyOf(recipes);
     }
