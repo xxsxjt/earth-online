@@ -44,6 +44,14 @@ public class ProcessingMachineBlock extends Block {
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (stack.isEmpty()) {
+            if (level.isClientSide()) {
+                openClientMachineScreen(this.kind, pos);
+                return InteractionResult.SUCCESS;
+            }
+            return InteractionResult.SUCCESS_SERVER;
+        }
+
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
