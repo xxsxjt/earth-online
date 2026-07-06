@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
@@ -12,6 +13,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @OnlyIn(Dist.CLIENT)
 public class FieldGeologyNotebookScreen extends Screen {
@@ -27,7 +29,8 @@ public class FieldGeologyNotebookScreen extends Screen {
     private static final int GOLD = 0xFF956215;
     private static final int LINE_HEIGHT = 12;
 
-    private final List<Page> pages = createPages();
+    private final boolean chinese = isChineseLanguage();
+    private final List<Page> pages = chinese ? createPages() : createEnglishPages();
     private final List<Button> tabButtons = new ArrayList<>();
 
     private int page;
@@ -36,7 +39,7 @@ public class FieldGeologyNotebookScreen extends Screen {
     private Button nextButton;
 
     public FieldGeologyNotebookScreen() {
-        super(Component.literal("地球 Online 野外地质手册"));
+        super(Component.translatable("screen.earth_online.notebook.title"));
     }
 
     @Override
@@ -63,13 +66,13 @@ public class FieldGeologyNotebookScreen extends Screen {
         }
 
         int bottom = top + bookHeight() - 28;
-        prevButton = addRenderableWidget(Button.builder(Component.literal("< 上一页"), b -> setPage(page - 1))
+        prevButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_online.notebook.prev"), b -> setPage(page - 1))
                 .bounds(left + bookWidth() - 182, bottom, 76, 20)
                 .build());
-        nextButton = addRenderableWidget(Button.builder(Component.literal("下一页 >"), b -> setPage(page + 1))
+        nextButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_online.notebook.next"), b -> setPage(page + 1))
                 .bounds(left + bookWidth() - 100, bottom, 76, 20)
                 .build());
-        addRenderableWidget(Button.builder(Component.literal("关闭"), b -> onClose())
+        addRenderableWidget(Button.builder(Component.translatable("screen.earth_online.notebook.close"), b -> onClose())
                 .bounds(left + 12, bottom, 54, 20)
                 .build());
         updateButtonState();
@@ -93,9 +96,9 @@ public class FieldGeologyNotebookScreen extends Screen {
         g.fill(contentLeft() - 18, top + 24, contentLeft() - 17, top + bh - 34, 0x553B2A1B);
         g.fill(left + 4, top + 4, left + bw - 4, top + 20, 0x1F2A2118);
 
-        drawCenteredTitle(g, "地球 Online 野外地质手册", left + bw / 2, top + 8, INK);
-        draw(g, "给不懂技术的玩家：照路线做，不用先背化学。", left + 14, top + 24, MUTED);
-        draw(g, "第 " + (page + 1) + " / " + pages.size() + " 页", left + bw - 70, top + 24, MUTED);
+        drawCenteredTitle(g, tr("screen.earth_online.notebook.title"), left + bw / 2, top + 8, INK);
+        draw(g, tr("screen.earth_online.notebook.subtitle"), left + 14, top + 24, MUTED);
+        draw(g, tr("screen.earth_online.notebook.page", page + 1, pages.size()), left + bw - 70, top + 24, MUTED);
 
         super.extractRenderState(g, mouseX, mouseY, delta);
 
@@ -140,7 +143,7 @@ public class FieldGeologyNotebookScreen extends Screen {
             g.fill(barX, knobY, barX + 3, knobY + knobH, 0xAA50351F);
         }
 
-        draw(g, "滚轮阅读；机器现在像熔炉一样放材料进槽位。", contentX, top + bh - 17, MUTED);
+        draw(g, tr("screen.earth_online.notebook.footer"), contentX, top + bh - 17, MUTED);
     }
 
     @Override
@@ -487,6 +490,63 @@ public class FieldGeologyNotebookScreen extends Screen {
         return List.copyOf(result);
     }
 
+    private static List<Page> createEnglishPages() {
+        List<Page> result = new ArrayList<>();
+        result.add(page("Start", "1. What is Earth Online?", GREEN,
+                "Earth Online keeps Minecraft's item ecosystem and crafting magic, but makes natural sources and industrial routes more realistic.",
+                "The main loop is simple: find a deposit, process it in machines, then get compatible Minecraft products.",
+                "",
+                "Notebook recipe: one dirt, any plank, or any stone creates the Field Geology Notebook.",
+                "Machines now work like furnaces: open the GUI, put input in the left slot, and wait for multiple outputs."));
+        result.add(page("Routes", "2. If you have this, where does it go?", GOLD,
+                "Ore and deposit blocks usually start in the Jaw Crusher.",
+                "Chunks and rocks usually go to the Ball Mill.",
+                "Magnetite, hematite, and mafic silicate powders go to the Magnetic Separator.",
+                "Sulfide ores and gem ores usually go to the Flotation Cell.",
+                "Concentrates go to roasting, reduction, leaching, or electrolysis depending on the material.",
+                "If unsure, hover the item or check JEI. Earth Online adds route hints to items."));
+        result.add(page("Machines", "3. Machine and multiblock basics", BLUE,
+                "Small machines can run as compact blocks.",
+                "Large real-world equipment needs support blocks around the controller.",
+                "Heavy frame: Control Panel in front, Machine Casing left/right/back.",
+                "Wet vessel: Control Panel in front, Steel Process Pipes left/right, Machine Casing behind.",
+                "Heated line: Control Panel in front, Machine Casing left/right, Steel Process Pipe above.",
+                "Tall column: Control Panel in front, casing left/right, pipes behind and two blocks upward.",
+                "The GUI shows the required pattern if the structure is missing."));
+        result.add(page("Iron", "4. Iron and copper", RED,
+                "Iron route:",
+                "Magnetite ore Fe3O4 -> crusher -> magnetite chunks + tailings.",
+                "Magnetite chunks -> ball mill -> magnetite dust.",
+                "Magnetite dust -> magnetic separator -> iron concentrate + tailings.",
+                "Iron concentrate -> reduction furnace -> minecraft:iron_ingot + slag.",
+                "",
+                "Copper route:",
+                "Chalcopyrite CuFeS2 -> crusher/ball mill/flotation -> copper concentrate.",
+                "Copper concentrate -> roaster/reduction furnace/electrolytic cell -> copper ingot + sulfur/slag."));
+        result.add(page("Rocks", "5. Rocks are mixtures", GREEN,
+                "Granite, diorite, andesite, basalt, tuff, blackstone, and deepslate are not single pure chemicals.",
+                "Granite can yield quartz dust, feldspar dust, mica dust, monazite sand, and tailings.",
+                "Calcite and dripstone mainly represent CaCO3 routes.",
+                "Minecraft machines are allowed to organize mixtures into clean stackable powders so the inventory stays playable."));
+        result.add(page("Chem", "6. Common chemical industry", BLUE,
+                "Chlor-alkali: salt -> electrolysis -> sodium hydroxide, chlorine, and hydrogen.",
+                "Fertilizer: ammonia, nitric acid, phosphate rock, potash, and urea routes.",
+                "Cement and glass: calcite/clay/silica -> mixing/kiln routes.",
+                "Petrochemistry: crude oil or coal tar -> distillation/cracking -> fuels, olefins, aromatics, and plastics.",
+                "Water treatment and waste routes turn tailings, sludge, acids, and bases back into usable products."));
+        result.add(page("Materials", "7. Modern materials", GOLD,
+                "Battery chain: graphite, lithium salt, nickel/manganese precursors, electrolyte, electrode sheets, battery cells.",
+                "Semiconductor chain: silica -> metallurgical silicon -> chlorosilane -> high-purity silicon -> polysilicon -> wafers.",
+                "Rare earth chain: monazite/bastnasite -> mixed rare earth oxides -> neodymium salts -> NdFeB magnets.",
+                "Electronics chain: copper wire, fiberglass cloth, copper clad laminate, printed circuit boards, solder, ceramic substrate."));
+        result.add(page("JEI", "8. JEI and compatibility", MUTED,
+                "Earth Online should not replace every other mod's ecosystem.",
+                "It changes natural sources, processing routes, mineral composition, and deposit shape.",
+                "Final products still connect back to familiar Minecraft items and tags so modpacks remain compatible.",
+                "Use JEI for exact recipes and the notebook for learning routes."));
+        return List.copyOf(result);
+    }
+
     private static Page page(String shortTitle, String title, int color, String... lines) {
         List<Entry> entries = new ArrayList<>();
         for (String line : lines) {
@@ -505,5 +565,14 @@ public class FieldGeologyNotebookScreen extends Screen {
     }
 
     private record Line(FormattedCharSequence text, int indent, int color, boolean heading, boolean blank) {
+    }
+
+    private static boolean isChineseLanguage() {
+        return Minecraft.getInstance().getLanguageManager().getSelected().toLowerCase(Locale.ROOT).startsWith("zh");
+    }
+
+    private static String tr(String key, Object... args) {
+        String raw = Language.getInstance().getOrDefault(key);
+        return args.length == 0 ? raw : String.format(Locale.ROOT, raw, args);
     }
 }

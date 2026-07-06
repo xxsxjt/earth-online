@@ -33,7 +33,7 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity {
                 case 1 -> PROCESS_TIME;
                 case 2 -> redstoneMode.id;
                 case 3 -> active ? 1 : 0;
-                case 4 -> kind().ordinal();
+                case 4 -> structureValid ? 1 : 0;
                 default -> 0;
             };
         }
@@ -59,6 +59,7 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity {
     private int progress;
     private RedstoneMode redstoneMode = RedstoneMode.ALWAYS;
     private boolean active;
+    private boolean structureValid = true;
 
     public ProcessingMachineBlockEntity(BlockPos pos, BlockState state) {
         super(EarthOnline.PROCESSING_MACHINE_BLOCK_ENTITY.get(), pos, state);
@@ -66,7 +67,24 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity {
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ProcessingMachineBlockEntity machine) {
         boolean changed = false;
+        if (machine.active) {
+            changed = true;
+        }
         machine.active = false;
+
+        boolean completeStructure = MachineMultiblock.isComplete(level, pos, machine.kind());
+        if (machine.structureValid != completeStructure) {
+            machine.structureValid = completeStructure;
+            changed = true;
+        }
+        if (!completeStructure) {
+            if (machine.progress != 0) {
+                machine.progress = 0;
+                changed = true;
+            }
+            machine.setChangedIfNeeded(changed);
+            return;
+        }
 
         if (!machine.redstoneMode.allows(level.hasNeighborSignal(pos))) {
             machine.setChangedIfNeeded(changed);
@@ -121,6 +139,10 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity {
         return redstoneMode;
     }
 
+    public boolean structureValid() {
+        return structureValid;
+    }
+
     public void cycleRedstoneMode() {
         this.redstoneMode = this.redstoneMode.next();
         setChanged();
@@ -145,7 +167,7 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     protected Component getDefaultName() {
-        return Component.literal(kind().displayName());
+        return Component.translatable(kind().displayNameKey());
     }
 
     @Override
@@ -232,18 +254,18 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity {
     }
 
     public enum RedstoneMode {
-        ALWAYS(0, "无信号持续激活", "不需要红石信号，有材料就持续工作。"),
-        REQUIRE_SIGNAL(1, "有红石信号才工作", "只有收到红石信号时工作。"),
-        REQUIRE_NO_SIGNAL(2, "无红石信号才工作", "收到红石信号时暂停。");
+        ALWAYS(0, "screen.earth_online.redstone.always", "screen.earth_online.redstone.always.desc"),
+        REQUIRE_SIGNAL(1, "screen.earth_online.redstone.require_signal", "screen.earth_online.redstone.require_signal.desc"),
+        REQUIRE_NO_SIGNAL(2, "screen.earth_online.redstone.require_no_signal", "screen.earth_online.redstone.require_no_signal.desc");
 
         private final int id;
-        private final String label;
-        private final String description;
+        private final String labelKey;
+        private final String descriptionKey;
 
-        RedstoneMode(int id, String label, String description) {
+        RedstoneMode(int id, String labelKey, String descriptionKey) {
             this.id = id;
-            this.label = label;
-            this.description = description;
+            this.labelKey = labelKey;
+            this.descriptionKey = descriptionKey;
         }
 
         public static RedstoneMode byId(int id) {
@@ -267,12 +289,12 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity {
             };
         }
 
-        public String label() {
-            return label;
+        public String labelKey() {
+            return labelKey;
         }
 
-        public String description() {
-            return description;
+        public String descriptionKey() {
+            return descriptionKey;
         }
     }
 }

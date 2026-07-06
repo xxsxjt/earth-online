@@ -1,6 +1,7 @@
 package com.xxsx.earthonline;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.locale.Language;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -514,6 +515,44 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
 
         public String description() {
             return description;
+        }
+
+        public String displayNameKey() {
+            return "block.earth_online." + blockId();
+        }
+
+        public String descriptionKey() {
+            return "tooltip.earth_online.machine." + blockId() + ".description";
+        }
+
+        public String localizedDisplayName() {
+            return Language.getInstance().getOrDefault(displayNameKey(), displayName);
+        }
+
+        public String blockId() {
+            return switch (this) {
+                case CRUSHER -> "jaw_crusher";
+                case BALL_MILL -> "ball_mill";
+                case SIEVE -> "sieve";
+                case MAGNETIC_SEPARATOR -> "magnetic_separator";
+                case FLOTATION_CELL -> "flotation_cell";
+                case ROASTER -> "ore_roaster";
+                case REDUCTION_FURNACE -> "reduction_furnace";
+                case LEACHING_TANK -> "leaching_tank";
+                case ELECTROLYTIC_CELL -> "electrolytic_cell";
+                case POWDER_PRESS -> "powder_press";
+                case CHEMICAL_REACTOR -> "chemical_reactor";
+                case DISTILLATION_COLUMN -> "distillation_column";
+                case MIXER -> "mixer";
+                case CRYSTALLIZER -> "crystallizer";
+                case INDUSTRIAL_KILN -> "industrial_kiln";
+                case GAS_SEPARATOR -> "gas_separator";
+                case FERTILIZER_GRANULATOR -> "fertilizer_granulator";
+                case POLYMERIZER -> "polymerizer";
+                case STEAM_CRACKER -> "steam_cracker";
+                case SYNTHESIS_LOOP -> "synthesis_loop";
+                case ABSORPTION_TOWER -> "absorption_tower";
+            };
         }
     }
 }

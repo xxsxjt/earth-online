@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    " C ",
+    " I "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "earth_online:steel_process_pipe",
+    "count": 6
+  }
+}

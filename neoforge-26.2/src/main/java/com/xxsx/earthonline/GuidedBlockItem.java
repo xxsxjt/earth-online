@@ -11,16 +11,16 @@ import net.minecraft.world.level.block.Block;
 import java.util.function.Consumer;
 
 public class GuidedBlockItem extends BlockItem {
-    private final String hint;
+    private final String hintKey;
 
-    public GuidedBlockItem(Block block, Properties properties, String hint) {
+    public GuidedBlockItem(Block block, Properties properties, String hintKey) {
         super(block, properties);
-        this.hint = hint;
+        this.hintKey = hintKey;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> lines, TooltipFlag flag) {
-        lines.accept(Component.literal(hint).withStyle(ChatFormatting.GOLD));
+        lines.accept(Component.translatable(hintKey).withStyle(ChatFormatting.GOLD));
         EarthOnlineTooltips.addRouteTips(stack, lines);
     }
 }

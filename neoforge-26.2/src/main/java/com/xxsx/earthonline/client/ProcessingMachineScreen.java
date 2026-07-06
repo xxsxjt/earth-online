@@ -3,10 +3,13 @@ package com.xxsx.earthonline.client;
 import com.xxsx.earthonline.ProcessingMachineBlock;
 import com.xxsx.earthonline.ProcessingMachineBlockEntity;
 import com.xxsx.earthonline.ProcessingMachineMenu;
+import com.xxsx.earthonline.MachineMultiblock;
+import com.xxsx.earthonline.RouteGuide;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -44,11 +47,11 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
     protected void init() {
         super.init();
         redstoneButtons.clear();
-        addRedstoneButton(8, "常开", ProcessingMachineMenu.BUTTON_REDSTONE_ALWAYS);
-        addRedstoneButton(70, "有信号", ProcessingMachineMenu.BUTTON_REDSTONE_REQUIRE_SIGNAL);
-        addRedstoneButton(132, "无信号", ProcessingMachineMenu.BUTTON_REDSTONE_REQUIRE_NO_SIGNAL);
+        addRedstoneButton(8, "screen.earth_online.redstone.always.short", ProcessingMachineMenu.BUTTON_REDSTONE_ALWAYS);
+        addRedstoneButton(70, "screen.earth_online.redstone.require_signal.short", ProcessingMachineMenu.BUTTON_REDSTONE_REQUIRE_SIGNAL);
+        addRedstoneButton(132, "screen.earth_online.redstone.require_no_signal.short", ProcessingMachineMenu.BUTTON_REDSTONE_REQUIRE_NO_SIGNAL);
 
-        addRenderableWidget(Button.builder(Component.literal("手册"), button -> {
+        addRenderableWidget(Button.builder(Component.translatable("screen.earth_online.button.notebook"), button -> {
                     this.onClose();
                     EarthOnlineClient.openNotebook();
                 })
@@ -80,10 +83,10 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
         drawOutputSlots(g);
         drawProgress(g);
 
-        g.text(this.font, "材料输入", this.leftPos + 18, this.topPos + 31, MUTED, false);
-        g.text(this.font, "多产物输出", this.leftPos + 119, this.topPos + 31, MUTED, false);
-        g.text(this.font, "红石控制", this.leftPos + 12, this.topPos + 66, ACCENT, false);
-        g.text(this.font, "玩家背包", this.leftPos + this.inventoryLabelX, this.topPos + this.inventoryLabelY, MUTED, false);
+        g.text(this.font, Component.translatable("screen.earth_online.machine.input"), this.leftPos + 18, this.topPos + 31, MUTED, false);
+        g.text(this.font, Component.translatable("screen.earth_online.machine.outputs"), this.leftPos + 119, this.topPos + 31, MUTED, false);
+        g.text(this.font, Component.translatable("screen.earth_online.machine.redstone"), this.leftPos + 12, this.topPos + 66, ACCENT, false);
+        g.text(this.font, Component.translatable("screen.earth_online.machine.inventory"), this.leftPos + this.inventoryLabelX, this.topPos + this.inventoryLabelY, MUTED, false);
 
         super.extractRenderState(g, mouseX, mouseY, delta);
 
@@ -126,41 +129,48 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
 
     private void drawStatus(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         ProcessingMachineBlockEntity.RedstoneMode redstone = this.menu.redstoneMode();
-        String status = this.menu.active() ? "运行中" : "待机";
+        String status = localized(this.menu.active() ? "screen.earth_online.machine.running" : "screen.earth_online.machine.idle");
         int color = this.menu.active() ? ACCENT : MUTED;
-        String bottom = status + " / " + redstone.description();
+        String bottom = status + " / " + localized(redstone.descriptionKey());
         if (this.font.width(bottom) > this.imageWidth - 16) {
             bottom = this.font.plainSubstrByWidth(bottom, this.imageWidth - 22) + "...";
         }
         g.text(this.font, bottom, this.leftPos + 8, this.topPos + this.imageHeight - 12, color, false);
 
+        if (!this.menu.structureValid()) {
+            MachineMultiblock.Pattern pattern = MachineMultiblock.patternFor(this.menu.kind());
+            g.text(this.font, Component.translatable("screen.earth_online.machine.structure_missing"), this.leftPos + 8, this.topPos + 24, WARNING, false);
+            g.text(this.font, Component.translatable(pattern.screenKey()), this.leftPos + 8, this.topPos + 35, WARNING, false);
+            return;
+        }
+
         if (isHovering(8, 76, 58, 18, mouseX, mouseY)
                 || isHovering(70, 76, 58, 18, mouseX, mouseY)
                 || isHovering(132, 76, 58, 18, mouseX, mouseY)) {
             g.setComponentTooltipForNextFrame(this.font, List.of(
-                    Component.literal(redstone.label()),
-                    Component.literal(redstone.description()),
-                    Component.literal("三个模式：常开 / 有红石信号才工作 / 无红石信号才工作")
+                    Component.translatable(redstone.labelKey()),
+                    Component.translatable(redstone.descriptionKey()),
+                    Component.translatable("screen.earth_online.redstone.tooltip")
             ), mouseX, mouseY);
         }
 
         ItemStack input = this.menu.getSlot(ProcessingMachineBlockEntity.SLOT_INPUT).getItem();
         if (input.isEmpty()) {
-            g.text(this.font, "把材料放入左侧输入格，机器会自动处理。", this.leftPos + 8, this.topPos + 24, MUTED, false);
+            g.text(this.font, Component.translatable("screen.earth_online.machine.empty_input"), this.leftPos + 8, this.topPos + 24, MUTED, false);
             return;
         }
 
         ProcessingMachineBlock.findRecipe(this.menu.kind(), input).ifPresentOrElse(recipe -> {
-            String note = recipe.note();
+            String note = recipeSummary(recipe);
             if (this.font.width(note) > 150) {
                 note = this.font.plainSubstrByWidth(note, 147) + "...";
             }
             g.text(this.font, note, this.leftPos + 8, this.topPos + 24, ACCENT, false);
-        }, () -> g.text(this.font, "这个材料不能由当前机器处理。", this.leftPos + 8, this.topPos + 24, WARNING, false));
+        }, () -> g.text(this.font, Component.translatable("screen.earth_online.machine.unsupported_input"), this.leftPos + 8, this.topPos + 24, WARNING, false));
     }
 
-    private void addRedstoneButton(int x, String label, int id) {
-        Button button = addRenderableWidget(Button.builder(Component.literal(label), b -> {
+    private void addRedstoneButton(int x, String labelKey, int id) {
+        Button button = addRenderableWidget(Button.builder(Component.translatable(labelKey), b -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.gameMode != null) {
                 mc.gameMode.handleInventoryButtonClick(this.menu.containerId, id);
@@ -171,17 +181,29 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
 
     private void syncRedstoneButtons() {
         ProcessingMachineBlockEntity.RedstoneMode mode = this.menu.redstoneMode();
-        setButtonState(0, "常开", mode == ProcessingMachineBlockEntity.RedstoneMode.ALWAYS);
-        setButtonState(1, "有信号", mode == ProcessingMachineBlockEntity.RedstoneMode.REQUIRE_SIGNAL);
-        setButtonState(2, "无信号", mode == ProcessingMachineBlockEntity.RedstoneMode.REQUIRE_NO_SIGNAL);
+        setButtonState(0, "screen.earth_online.redstone.always.short", mode == ProcessingMachineBlockEntity.RedstoneMode.ALWAYS);
+        setButtonState(1, "screen.earth_online.redstone.require_signal.short", mode == ProcessingMachineBlockEntity.RedstoneMode.REQUIRE_SIGNAL);
+        setButtonState(2, "screen.earth_online.redstone.require_no_signal.short", mode == ProcessingMachineBlockEntity.RedstoneMode.REQUIRE_NO_SIGNAL);
     }
 
-    private void setButtonState(int index, String label, boolean selected) {
+    private void setButtonState(int index, String labelKey, boolean selected) {
         if (index >= redstoneButtons.size()) {
             return;
         }
         Button button = redstoneButtons.get(index);
+        String label = localized(labelKey);
         button.setMessage(Component.literal(selected ? "[" + label + "]" : label));
         button.active = !selected;
+    }
+
+    private String recipeSummary(ProcessingMachineBlock.Recipe recipe) {
+        if (Minecraft.getInstance().getLanguageManager().getSelected().toLowerCase(java.util.Locale.ROOT).startsWith("zh")) {
+            return recipe.note();
+        }
+        return localized("screen.earth_online.machine.recipe_ready") + ": " + RouteGuide.describeOutputs(recipe);
+    }
+
+    private static String localized(String key) {
+        return Language.getInstance().getOrDefault(key);
     }
 }

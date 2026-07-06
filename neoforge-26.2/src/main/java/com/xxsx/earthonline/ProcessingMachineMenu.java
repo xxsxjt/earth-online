@@ -150,6 +150,10 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
         return data.get(3) != 0;
     }
 
+    public boolean structureValid() {
+        return data.get(4) != 0;
+    }
+
     private static ProcessingMachineBlock.Kind kindFromClientLevel(Inventory inventory, BlockPos pos) {
         if (inventory.player.level().getBlockState(pos).getBlock() instanceof ProcessingMachineBlock block) {
             return block.kind();

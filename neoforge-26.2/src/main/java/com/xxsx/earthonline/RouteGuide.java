@@ -40,26 +40,26 @@ public final class RouteGuide {
         RouteInfo route = routeFor(stack.getItem());
 
         if (!route.next().isEmpty()) {
-            lines.accept(Component.literal("下一步：放入 " + joinMachines(route.next(), 4)).withStyle(ChatFormatting.AQUA));
-            lines.accept(Component.literal("示例产出：" + describeOutputs(route.next().get(0))).withStyle(ChatFormatting.GRAY));
+            lines.accept(Component.translatable("tooltip.earth_online.route.next", joinMachines(route.next(), 4)).withStyle(ChatFormatting.AQUA));
+            lines.accept(Component.translatable("tooltip.earth_online.route.outputs", describeOutputs(route.next().get(0))).withStyle(ChatFormatting.GRAY));
             if (uniqueMachineCount(route.next()) > 1) {
-                lines.accept(Component.literal("有多条路线，右键对应机器或用 JEI 查看。").withStyle(ChatFormatting.DARK_GRAY));
+                lines.accept(Component.translatable("tooltip.earth_online.route.multiple").withStyle(ChatFormatting.DARK_GRAY));
             }
         }
 
         if (!route.sources().isEmpty()) {
-            lines.accept(Component.literal("常见来源：" + joinSources(route.sources(), 3)).withStyle(ChatFormatting.DARK_GREEN));
+            lines.accept(Component.translatable("tooltip.earth_online.route.sources", joinSources(route.sources(), 3)).withStyle(ChatFormatting.DARK_GREEN));
         }
 
         if (route.isEmpty()) {
-            lines.accept(Component.literal("用途：兼容 MC 生态或等待后续联动路线。").withStyle(ChatFormatting.GRAY));
+            lines.accept(Component.translatable("tooltip.earth_online.route.compat").withStyle(ChatFormatting.GRAY));
         }
     }
 
     public static String joinMachines(List<ProcessingMachineBlock.Recipe> recipes, int limit) {
         List<String> names = new ArrayList<>();
         for (ProcessingMachineBlock.Recipe recipe : recipes) {
-            String name = recipe.kind().displayName();
+            String name = recipe.kind().localizedDisplayName();
             if (!names.contains(name)) {
                 names.add(name);
             }
@@ -74,7 +74,7 @@ public final class RouteGuide {
         List<String> names = new ArrayList<>();
         for (ProcessingMachineBlock.Recipe recipe : recipes) {
             String input = recipe.inputStack().getItemName().getString();
-            String name = recipe.kind().displayName() + "：" + input;
+            String name = recipe.kind().localizedDisplayName() + ": " + input;
             if (!names.contains(name)) {
                 names.add(name);
             }

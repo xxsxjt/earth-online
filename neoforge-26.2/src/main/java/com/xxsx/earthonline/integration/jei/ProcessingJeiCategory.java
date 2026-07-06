@@ -2,6 +2,7 @@ package com.xxsx.earthonline.integration.jei;
 
 import com.xxsx.earthonline.EarthOnline;
 import com.xxsx.earthonline.ProcessingMachineBlock;
+import com.xxsx.earthonline.RouteGuide;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
@@ -13,6 +14,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 
 public class ProcessingJeiCategory implements IRecipeCategory<ProcessingMachineBlock.Recipe> {
@@ -31,7 +33,7 @@ public class ProcessingJeiCategory implements IRecipeCategory<ProcessingMachineB
 
     @Override
     public Component getTitle() {
-        return Component.literal("Earth Online 工业处理");
+        return Component.translatable("jei.earth_online.processing");
     }
 
     @Override
@@ -66,12 +68,19 @@ public class ProcessingJeiCategory implements IRecipeCategory<ProcessingMachineB
     @Override
     public void draw(ProcessingMachineBlock.Recipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
         var font = Minecraft.getInstance().font;
-        graphics.text(font, recipe.kind().displayName(), 4, 2, 0xFF84D3A5);
+        graphics.text(font, recipe.kind().localizedDisplayName(), 4, 2, 0xFF84D3A5);
         graphics.text(font, "->", 44, 27, 0xFF9AA7A7);
-        String note = recipe.note();
+        String note = recipeNote(recipe);
         if (font.width(note) > 156) {
             note = font.plainSubstrByWidth(note, 153) + "...";
         }
         graphics.text(font, note, 4, 58, 0xFF9AA7A7);
+    }
+
+    private static String recipeNote(ProcessingMachineBlock.Recipe recipe) {
+        if (Minecraft.getInstance().getLanguageManager().getSelected().toLowerCase(java.util.Locale.ROOT).startsWith("zh")) {
+            return recipe.note();
+        }
+        return Language.getInstance().getOrDefault("screen.earth_online.machine.recipe_ready") + ": " + RouteGuide.describeOutputs(recipe);
     }
 }

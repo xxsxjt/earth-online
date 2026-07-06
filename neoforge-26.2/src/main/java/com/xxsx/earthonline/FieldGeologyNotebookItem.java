@@ -31,20 +31,20 @@ public class FieldGeologyNotebookItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> lines, TooltipFlag flag) {
-        lines.accept(Component.literal("右键查看地球 Online 的入门手册").withStyle(ChatFormatting.GRAY));
-        lines.accept(Component.literal("核心：真实来源 + 多步骤处理 + 保留 MC 物品生态").withStyle(ChatFormatting.DARK_GREEN));
+        lines.accept(Component.translatable("tooltip.earth_online.notebook.use").withStyle(ChatFormatting.GRAY));
+        lines.accept(Component.translatable("tooltip.earth_online.notebook.core").withStyle(ChatFormatting.DARK_GREEN));
     }
 
     public static void sendGuide(Player player) {
-        player.sendSystemMessage(Component.literal("====== 地球 Online 野外地质手册 ======").withStyle(ChatFormatting.GOLD));
-        player.sendSystemMessage(Component.literal("目标：保留 MC 的锭、宝石和合成魔法，但把矿物来源、岩石组成、矿床和冶炼路线真实化。").withStyle(ChatFormatting.WHITE));
-        player.sendSystemMessage(Component.literal("1. 原版矿石不再作为自然来源；铁主要来自磁铁矿 Fe3O4，铜来自黄铜矿 CuFeS2，金常在石英脉里。").withStyle(ChatFormatting.GRAY));
-        player.sendSystemMessage(Component.literal("2. 不懂化学也没关系：右键机器打开界面，把材料放入输入格，机器会自动产出到输出格。").withStyle(ChatFormatting.GRAY));
-        player.sendSystemMessage(Component.literal("3. 基础路线：矿石 -> 破碎机 -> 碎块 -> 球磨机 -> 粉末 -> 分选/浮选/焙烧/还原。").withStyle(ChatFormatting.AQUA));
-        player.sendSystemMessage(Component.literal("4. 磁铁矿路线：磁铁矿粉 -> 磁选机 -> 铁精矿 + 尾粉；铁精矿 -> 还原炉 -> 铁锭 + 矿渣。").withStyle(ChatFormatting.RED));
-        player.sendSystemMessage(Component.literal("5. 黄铜矿路线：黄铜矿粉 -> 浮选槽 -> 铜精矿；铜精矿 -> 焙烧炉 -> 焙烧铜精矿 + 硫粉；再还原/电解出铜。").withStyle(ChatFormatting.YELLOW));
-        player.sendSystemMessage(Component.literal("6. 岩石不是单一化学式：花岗岩可磨出石英粉、长石粉、云母粉和尾粉；方解石/滴水石主要给碳酸盐粉。").withStyle(ChatFormatting.GREEN));
-        player.sendSystemMessage(Component.literal("提示：机器界面里可以切换红石模式；当前先做轻量自动处理，后续再升级能耗、催化剂和多输入。").withStyle(ChatFormatting.DARK_GRAY));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line0").withStyle(ChatFormatting.GOLD));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line1").withStyle(ChatFormatting.WHITE));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line2").withStyle(ChatFormatting.GRAY));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line3").withStyle(ChatFormatting.GRAY));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line4").withStyle(ChatFormatting.AQUA));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line5").withStyle(ChatFormatting.RED));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line6").withStyle(ChatFormatting.YELLOW));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line7").withStyle(ChatFormatting.GREEN));
+        player.sendSystemMessage(Component.translatable("guide.earth_online.line8").withStyle(ChatFormatting.DARK_GRAY));
     }
 
     private static boolean openClientNotebookScreen() {

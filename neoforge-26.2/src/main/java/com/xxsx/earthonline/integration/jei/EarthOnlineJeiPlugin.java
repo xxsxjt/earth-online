@@ -1,6 +1,7 @@
 package com.xxsx.earthonline.integration.jei;
 
 import com.xxsx.earthonline.EarthOnline;
+import com.xxsx.earthonline.MachineMultiblock;
 import com.xxsx.earthonline.ProcessingMachineBlock;
 import com.xxsx.earthonline.RouteGuide;
 import mezz.jei.api.IModPlugin;
@@ -69,11 +70,11 @@ public class EarthOnlineJeiPlugin implements IModPlugin {
 
     private static void registerHandbookInfo(IRecipeRegistration registration) {
         registration.addItemStackInfo(new ItemStack(EarthOnline.FIELD_GEOLOGY_NOTEBOOK.get()),
-                line("地球 Online 的主手册。", ChatFormatting.GOLD),
-                line("它不是化学考试，而是路线导航：挖到什么、下一步去哪台机器、最后得到什么兼容物品。", ChatFormatting.GRAY),
-                line("获取：一块泥土、任意木板或任意石头都能合成。", ChatFormatting.AQUA),
-                line("使用：右键打开分页界面；机器界面也有“打开手册”按钮。", ChatFormatting.GREEN),
-                line("JEI 联动：本页、机器页和材料页都会显示同一套路线提示。", ChatFormatting.DARK_GRAY));
+                lineKey("jei.earth_online.notebook.0", ChatFormatting.GOLD),
+                lineKey("jei.earth_online.notebook.1", ChatFormatting.GRAY),
+                lineKey("jei.earth_online.notebook.2", ChatFormatting.AQUA),
+                lineKey("jei.earth_online.notebook.3", ChatFormatting.GREEN),
+                lineKey("jei.earth_online.notebook.4", ChatFormatting.DARK_GRAY));
     }
 
     private static void registerMachineInfo(IRecipeRegistration registration) {
@@ -102,11 +103,12 @@ public class EarthOnlineJeiPlugin implements IModPlugin {
 
     private static void registerMachine(IRecipeRegistration registration, ItemLike item, ProcessingMachineBlock.Kind kind) {
         registration.addItemStackInfo(new ItemStack(item.asItem()),
-                line(kind.displayName(), ChatFormatting.GOLD),
-                line(kind.description(), ChatFormatting.GRAY),
-                line("右键：打开机器界面，把输入材料放入左侧槽位。", ChatFormatting.AQUA),
-                line("红石模式：持续工作 / 有信号才工作 / 无信号才工作。", ChatFormatting.GREEN),
-                line("JEI 工业处理分类中也能查看它的全部路线，共 " + ProcessingMachineBlock.recipesFor(kind).size() + " 条。", ChatFormatting.DARK_GRAY));
+                Component.translatable(kind.displayNameKey()).withStyle(ChatFormatting.GOLD),
+                Component.translatable(kind.descriptionKey()).withStyle(ChatFormatting.GRAY),
+                lineKey("tooltip.earth_online.machine.use", ChatFormatting.AQUA),
+                Component.translatable(MachineMultiblock.patternFor(kind).descriptionKey()).withStyle(ChatFormatting.GREEN),
+                lineKey("tooltip.earth_online.machine.redstone", ChatFormatting.GREEN),
+                lineKey("tooltip.earth_online.machine.routes", ChatFormatting.DARK_GRAY, ProcessingMachineBlock.recipesFor(kind).size()));
     }
 
     private static void registerRouteInfo(IRecipeRegistration registration) {
@@ -114,21 +116,25 @@ public class EarthOnlineJeiPlugin implements IModPlugin {
             Item item = entry.getKey();
             RouteGuide.RouteInfo info = entry.getValue();
             java.util.List<Component> lines = new java.util.ArrayList<>();
-            lines.add(line("Earth Online 路线提示", ChatFormatting.GOLD));
+            lines.add(lineKey("jei.earth_online.route.header", ChatFormatting.GOLD));
             if (!info.next().isEmpty()) {
                 ProcessingMachineBlock.Recipe example = info.next().get(0);
-                lines.add(line("下一步：放入 " + RouteGuide.joinMachines(info.next(), 4), ChatFormatting.AQUA));
-                lines.add(line("示例产出：" + RouteGuide.describeOutputs(example), ChatFormatting.GRAY));
+                lines.add(lineKey("tooltip.earth_online.route.next", ChatFormatting.AQUA, RouteGuide.joinMachines(info.next(), 4)));
+                lines.add(lineKey("tooltip.earth_online.route.outputs", ChatFormatting.GRAY, RouteGuide.describeOutputs(example)));
             }
             if (!info.sources().isEmpty()) {
-                lines.add(line("常见来源：" + RouteGuide.joinSources(info.sources(), 3), ChatFormatting.DARK_GREEN));
+                lines.add(lineKey("tooltip.earth_online.route.sources", ChatFormatting.DARK_GREEN, RouteGuide.joinSources(info.sources(), 3)));
             }
-            lines.add(line("如果路线很多，查 JEI 的“Earth Online 工业处理”分类或右键野外地质手册。", ChatFormatting.DARK_GRAY));
+            lines.add(lineKey("jei.earth_online.route.footer", ChatFormatting.DARK_GRAY));
             registration.addItemStackInfo(new ItemStack(item), lines.toArray(Component[]::new));
         }
     }
 
     private static Component line(String text, ChatFormatting color) {
         return Component.literal(text).withStyle(color);
+    }
+
+    private static Component lineKey(String key, ChatFormatting color, Object... args) {
+        return Component.translatable(key, args).withStyle(color);
     }
 }
