@@ -330,15 +330,17 @@ python 'C:\Users\du_ji\.codex\skills\.system\imagegen\scripts\image_gen.py' gene
 
 ## 常见化工物品
 
-### Agnes 批量首选，image-2 只做关键精修
+### image-2 首选，Agnes 仅作辅助批量
 
-Agnes 自动化脚本作为常规批量生成入口：
+正式资源仍以 `image-2` / `gpt-image-2` 为首选，特别是机器、能源设备、多方块成型态、矿床代表块和玩家高频查看的材料。Agnes 脚本只作为低成本草稿、风格探索、非关键补量或临时对照样张；如果 Agnes 结果要进入正式资源，仍应经过 contact sheet 审查，必要时用 `image-2` 重做。
+
+Agnes 辅助批量脚本：
 
 ```powershell
 python tools\generate_agnes_item_textures.py
 ```
 
-脚本会从 `C:\Users\du_ji\WorkBuddy\agnes\providers.json` 读取 Agnes 配置，调用 `agnes-image-2.1-flash`，把原始生成图保存到 `tmp/imagegen/agnes-modern-chemistry/`，再裁切缩放为 `assets/earth_on_minecraft/textures/item/*.png`。不要把 API Key 写进仓库或日志。
+脚本会从 `C:\Users\du_ji\WorkBuddy\agnes\providers.json` 读取 Agnes 配置，调用 `agnes-image-2.1-flash`，把原始生成图保存到 `tmp/imagegen/agnes-modern-chemistry/`，再裁切缩放为 `assets/earth_on_minecraft/textures/item/*.png`。不要把 API Key 写进仓库或日志。高可见资产不要因为脚本能批量生成就直接视为最终美术。
 
 通用 Agnes / image-2 提示词结构：
 
