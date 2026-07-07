@@ -18,6 +18,9 @@
     "earth_on_minecraft:industrial_kiln",
     "earth_on_minecraft:gas_separator",
     "earth_on_minecraft:fertilizer_granulator",
-    "earth_on_minecraft:polymerizer"
+    "earth_on_minecraft:polymerizer",
+    "earth_on_minecraft:steam_cracker",
+    "earth_on_minecraft:synthesis_loop",
+    "earth_on_minecraft:absorption_tower"
   ]
 }

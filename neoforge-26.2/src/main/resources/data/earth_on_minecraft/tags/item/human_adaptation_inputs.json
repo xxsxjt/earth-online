@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:salt_dust",
+    "earth_on_minecraft:brine_crystal",
+    "earth_on_minecraft:oxygen_gas_cell",
+    "earth_on_minecraft:activated_carbon_filter",
+    "earth_on_minecraft:softened_water",
+    "earth_on_minecraft:neutral_salt"
+  ]
+}

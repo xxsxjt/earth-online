@@ -20,6 +20,7 @@ public class EnergyGeneratorMenu extends AbstractContainerMenu {
     private final Container container;
     private final ContainerData data;
     private final BlockPos pos;
+    private final boolean steamTurbineGenerator;
 
     public EnergyGeneratorMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
         this(containerId, inventory, buf.readBlockPos());
@@ -27,26 +28,29 @@ public class EnergyGeneratorMenu extends AbstractContainerMenu {
 
     private EnergyGeneratorMenu(int containerId, Inventory inventory, BlockPos pos) {
         this(containerId, inventory, new SimpleContainer(EnergyGeneratorBlockEntity.SLOT_COUNT),
-                new SimpleContainerData(EnergyGeneratorBlockEntity.DATA_COUNT), pos);
+                new SimpleContainerData(EnergyGeneratorBlockEntity.DATA_COUNT), pos, isSteamTurbineGenerator(inventory, pos));
     }
 
     public EnergyGeneratorMenu(int containerId, Inventory inventory, EnergyGeneratorBlockEntity generator, ContainerData data) {
-        this(containerId, inventory, generator, data, generator.getBlockPos());
+        this(containerId, inventory, generator, data, generator.getBlockPos(),
+                generator.getBlockState().getBlock() == EarthOnMinecraft.STEAM_TURBINE_GENERATOR.get());
     }
 
-    private EnergyGeneratorMenu(int containerId, Inventory inventory, Container container, ContainerData data, BlockPos pos) {
+    private EnergyGeneratorMenu(int containerId, Inventory inventory, Container container, ContainerData data,
+                                BlockPos pos, boolean steamTurbineGenerator) {
         super(EarthOnMinecraft.ENERGY_GENERATOR_MENU.get(), containerId);
         checkContainerSize(container, EnergyGeneratorBlockEntity.SLOT_COUNT);
         checkContainerDataCount(data, EnergyGeneratorBlockEntity.DATA_COUNT);
         this.container = container;
         this.data = data;
         this.pos = pos;
+        this.steamTurbineGenerator = steamTurbineGenerator;
 
         this.container.startOpen(inventory.player);
         addSlot(new Slot(container, EnergyGeneratorBlockEntity.SLOT_FUEL, 38, 57) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return ProcessingMachineBlockEntity.getFuelTicks(stack) > 0;
+                return EnergyGeneratorBlockEntity.getGeneratorFuelTicks(stack, EnergyGeneratorMenu.this.steamTurbineGenerator) > 0;
             }
         });
 
@@ -68,7 +72,7 @@ public class EnergyGeneratorMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, PLAYER_INV_START, HOTBAR_END, true)) {
                 return ItemStack.EMPTY;
             }
-        } else if (ProcessingMachineBlockEntity.getFuelTicks(stack) > 0) {
+        } else if (EnergyGeneratorBlockEntity.getGeneratorFuelTicks(stack, this.steamTurbineGenerator) > 0) {
             if (!moveItemStackTo(stack, EnergyGeneratorBlockEntity.SLOT_FUEL, EnergyGeneratorBlockEntity.SLOT_FUEL + 1, false)) {
                 return ItemStack.EMPTY;
             }
@@ -125,10 +129,18 @@ public class EnergyGeneratorMenu extends AbstractContainerMenu {
     }
 
     public int generationPerTick() {
-        return EnergyGeneratorBlockEntity.GENERATION_PER_TICK;
+        return isTurbineData() ? EnergyGeneratorBlockEntity.TURBINE_GENERATION_PER_TICK : EnergyGeneratorBlockEntity.GENERATION_PER_TICK;
     }
 
     public int transferPerTick() {
-        return EnergyGeneratorBlockEntity.TRANSFER_PER_TICK;
+        return isTurbineData() ? EnergyGeneratorBlockEntity.TURBINE_TRANSFER_PER_TICK : EnergyGeneratorBlockEntity.TRANSFER_PER_TICK;
+    }
+
+    private boolean isTurbineData() {
+        return this.steamTurbineGenerator || capacity() >= EnergyGeneratorBlockEntity.TURBINE_CAPACITY;
+    }
+
+    private static boolean isSteamTurbineGenerator(Inventory inventory, BlockPos pos) {
+        return inventory.player.level().getBlockState(pos).getBlock() == EarthOnMinecraft.STEAM_TURBINE_GENERATOR.get();
     }
 }

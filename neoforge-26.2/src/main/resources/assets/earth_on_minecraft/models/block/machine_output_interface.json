@@ -1,10 +1,10 @@
 {
   "parent": "minecraft:block/cube",
   "textures": {
-    "particle": "earth_on_minecraft:block/power_machine_side",
+    "particle": "earth_on_minecraft:block/machine_output_interface",
     "down": "earth_on_minecraft:block/power_machine_side",
     "up": "earth_on_minecraft:block/power_machine_top",
-    "north": "earth_on_minecraft:block/hot_machine_side",
+    "north": "earth_on_minecraft:block/machine_output_interface",
     "south": "earth_on_minecraft:block/power_machine_side",
     "west": "earth_on_minecraft:block/power_machine_side",
     "east": "earth_on_minecraft:block/power_machine_side"

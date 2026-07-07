@@ -146,7 +146,7 @@ public class EnergyGeneratorBlockEntity extends BaseContainerBlockEntity impleme
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == SLOT_FUEL && getGeneratorFuelTicks(stack) > 0;
+        return slot == SLOT_FUEL && getGeneratorFuelTicks(stack, isSteamTurbineGenerator()) > 0;
     }
 
     @Override
@@ -193,7 +193,7 @@ public class EnergyGeneratorBlockEntity extends BaseContainerBlockEntity impleme
 
     private boolean tryConsumeFuel() {
         ItemStack fuel = this.items.get(SLOT_FUEL);
-        int ticks = getGeneratorFuelTicks(fuel);
+        int ticks = getGeneratorFuelTicks(fuel, isSteamTurbineGenerator());
         if (ticks <= 0) {
             return false;
         }
@@ -207,12 +207,12 @@ public class EnergyGeneratorBlockEntity extends BaseContainerBlockEntity impleme
         return true;
     }
 
-    private int getGeneratorFuelTicks(ItemStack stack) {
+    public static int getGeneratorFuelTicks(ItemStack stack, boolean steamTurbineGenerator) {
         if (stack.isEmpty()) {
             return 0;
         }
         Item item = stack.getItem();
-        if (isSteamTurbineGenerator()) {
+        if (steamTurbineGenerator) {
             if (item == EarthOnMinecraft.NUCLEAR_HEAT_MODULE.get().asItem()) {
                 return 120_000;
             }

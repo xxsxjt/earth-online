@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:copper_wire",
+    "earth_on_minecraft:copper_busbar",
+    "earth_on_minecraft:copper_clad_laminate",
+    "earth_on_minecraft:printed_circuit_board",
+    "earth_on_minecraft:ndfeb_magnet",
+    "earth_on_minecraft:neodymium_salt",
+    "earth_on_minecraft:mixed_rare_earth_oxide"
+  ]
+}

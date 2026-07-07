@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:auriferous_quartz_chunk",
+    "earth_on_minecraft:quartz_dust",
+    "earth_on_minecraft:cinnabar_dust",
+    "earth_on_minecraft:gold_dust",
+    "earth_on_minecraft:bastnasite_dust",
+    "earth_on_minecraft:monazite_sand",
+    "earth_on_minecraft:mixed_rare_earth_oxide",
+    "earth_on_minecraft:neodymium_salt",
+    "earth_on_minecraft:lithium_salt",
+    "earth_on_minecraft:ndfeb_magnet"
+  ]
+}

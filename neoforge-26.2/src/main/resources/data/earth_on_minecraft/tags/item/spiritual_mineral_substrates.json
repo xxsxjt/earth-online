@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:auriferous_quartz_chunk",
+    "earth_on_minecraft:quartz_dust",
+    "earth_on_minecraft:silica_dust",
+    "earth_on_minecraft:cinnabar_dust",
+    "earth_on_minecraft:gold_dust",
+    "earth_on_minecraft:rare_earth_tailings"
+  ]
+}

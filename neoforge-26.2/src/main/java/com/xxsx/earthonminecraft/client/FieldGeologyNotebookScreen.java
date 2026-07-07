@@ -83,9 +83,12 @@ public class FieldGeologyNotebookScreen extends Screen {
         int tabY = top + 42;
         int navW = Math.max(68, contentLeft() - left - 20);
         int tabCols = pages.size() > 14 ? 3 : pages.size() > 7 ? 2 : 1;
+        int tabRows = (pages.size() + tabCols - 1) / tabCols;
         int tabW = Math.max(22, (navW - (tabCols - 1) * 3) / tabCols);
-        int tabH = tabCols == 1 ? 18 : 14;
-        int tabGap = tabCols == 1 ? 3 : 2;
+        int bottom = top + bookHeight() - 28;
+        int tabGap = tabCols == 1 ? 3 : bookHeight() <= 240 ? 1 : 2;
+        int availableTabH = Math.max(10, bottom - 6 - tabY);
+        int tabH = tabCols == 1 ? 18 : Math.max(10, Math.min(14, (availableTabH - (tabRows - 1) * tabGap) / tabRows));
 
         for (int i = 0; i < pages.size(); i++) {
             final int index = i;
@@ -97,7 +100,6 @@ public class FieldGeologyNotebookScreen extends Screen {
             tabButtons.add(button);
         }
 
-        int bottom = top + bookHeight() - 28;
         prevButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.prev"), b -> setPage(page - 1))
                 .bounds(left + bookWidth() - 182, bottom, 76, 20)
                 .build());

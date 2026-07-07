@@ -4,12 +4,12 @@ license="All Rights Reserved"
 
 [[mods]]
 modId="earth_on_minecraft"
-version="0.1.0"
+version="0.1.1"
 displayName="Earth on Minecraft / 我的地球"
 description='''
 In-development beta for Minecraft 26.2 + NeoForge 26.2.0.7-beta.
 Earth on Minecraft keeps Minecraft's item ecosystem while replacing natural ore sources,
-rock composition, processing chains, electricity and ore deposits with a more realistic geology and industry model.
+rock composition, processing chains, electricity, ore deposits and addon-facing material tags with a more realistic geology and industry model.
 Expect recipes, worldgen, machine values and APIs to change during testing.
 '''
 authors="xxsx"

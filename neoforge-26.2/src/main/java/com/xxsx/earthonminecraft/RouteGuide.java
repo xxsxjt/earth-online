@@ -37,6 +37,9 @@ public final class RouteGuide {
     }
 
     public static void addRouteTips(ItemStack stack, Consumer<Component> lines) {
+        if (stack.isEmpty()) {
+            return;
+        }
         RouteInfo route = routeFor(stack.getItem());
 
         addBeginnerShortcutTips(stack.getItem(), lines);

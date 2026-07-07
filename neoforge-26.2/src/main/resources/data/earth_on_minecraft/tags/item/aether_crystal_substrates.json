@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:lithium_salt",
+    "earth_on_minecraft:bastnasite_dust",
+    "earth_on_minecraft:monazite_sand",
+    "earth_on_minecraft:mixed_rare_earth_oxide",
+    "earth_on_minecraft:neodymium_salt",
+    "earth_on_minecraft:led_phosphor",
+    "earth_on_minecraft:ceramic_substrate"
+  ]
+}

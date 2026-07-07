@@ -165,7 +165,7 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
         int color = statusColor();
         g.fill(x - 1, y - 1, x + STATUS_SIZE + 1, y + STATUS_SIZE + 1, 0xFF3B3B3B);
         g.fill(x, y, x + STATUS_SIZE, y + STATUS_SIZE, color);
-        g.text(this.font, stateLabel(), x + 8, y - 2, color, false);
+        g.text(this.font, Component.literal(visibleStatusLine()), x + 8, y - 2, color, false);
     }
 
     private void drawRedstoneIcon(GuiGraphicsExtractor g) {
@@ -343,6 +343,10 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
         return Component.translatable(this.menu.active()
                 ? "screen.earth_on_minecraft.machine.state.running.tooltip"
                 : "screen.earth_on_minecraft.machine.state.idle.tooltip");
+    }
+
+    private String visibleStatusLine() {
+        return fit(statusLine(), 68);
     }
 
     private Component trimmedTitle() {

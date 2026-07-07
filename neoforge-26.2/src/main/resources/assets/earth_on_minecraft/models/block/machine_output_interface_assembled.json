@@ -4,7 +4,7 @@
     "particle": "earth_on_minecraft:block/industrial_machine_casing_assembled",
     "down": "earth_on_minecraft:block/industrial_machine_casing_assembled",
     "up": "earth_on_minecraft:block/power_machine_top_active",
-    "north": "earth_on_minecraft:block/hot_machine_side_active",
+    "north": "earth_on_minecraft:block/machine_output_interface_assembled",
     "south": "earth_on_minecraft:block/industrial_machine_casing_assembled",
     "west": "earth_on_minecraft:block/industrial_machine_casing_assembled",
     "east": "earth_on_minecraft:block/industrial_machine_casing_assembled"
