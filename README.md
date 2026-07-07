@@ -29,7 +29,7 @@
 - [贴图 AI 提示词](docs/asset-prompts.md)
 - [扩展路线图：核能、电网、自动化和科幻附属边界](docs/earth-on-minecraft-expanded-roadmap.md)
 - [科幻附属路线图](docs/scifi-addon-roadmap.md)
-- [0.1.2 Beta 发布说明](docs/release-notes-0.1.2-beta.md)
+- [0.1.3 Beta 发布说明](docs/release-notes-0.1.3-beta.md)
 - [地质生成与世界高度计划](docs/geology-worldgen-notes.md)
 
 ## 本体与附属边界
@@ -51,9 +51,9 @@ python tools\validate_resources.py
 
 - GitHub: https://github.com/xxsxjt/xxsx-mc-earth-on-minecraft
 - `neoforge-26.2/` — NeoForge `26.2.0.7-beta` / Minecraft `26.2`，Java 25。
-- 构建产物：`neoforge-26.2/build/libs/earth-on-minecraft-neoforge-26.2-0.1.2.jar`
+- 构建产物：`neoforge-26.2/build/libs/earth-on-minecraft-neoforge-26.2-0.1.3.jar`
 - 测试部署：`D:\_dx\_Games\MC\xxxxxx\.minecraft\versions\26.2-NeoForge_26.2.0.7-beta\mods`
-- 发布状态：`0.1.2` 是开发中测试版，用于验证现实矿床、围岩/伴生特征、工业机器、电力、手册和 JEI 联动的可玩闭环。
+- 发布状态：`0.1.3` 是开发中测试版，用于验证现实矿床、围岩/伴生特征、工业机器、电力、手册、JEI 联动和可复现打包流程。
 
 第一版已实现：
 

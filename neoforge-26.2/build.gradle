@@ -3,7 +3,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.140'
 }
 
-version = '0.1.2'
+version = '0.1.3'
 group = 'com.xxsx.earthonminecraft'
 base.archivesName = 'earth-on-minecraft-neoforge-26.2'
 
@@ -35,6 +35,8 @@ dependencies {
 }
 
 jar {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
     manifest {
         attributes([
             'Specification-Title'     : 'earth_on_minecraft',
@@ -42,8 +44,7 @@ jar {
             'Specification-Version'   : '1',
             'Implementation-Title'    : project.name,
             'Implementation-Version'  : project.jar.archiveVersion,
-            'Implementation-Vendor'   : 'xxsx',
-            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            'Implementation-Vendor'   : 'xxsx'
         ])
     }
 }
