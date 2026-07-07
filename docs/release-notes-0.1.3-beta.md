@@ -15,6 +15,7 @@ This build is only intended for `Minecraft 26.2` with `NeoForge 26.2.0.7-beta`.
 
 - Keeps the 0.1.2 geology behavior: vanilla overworld ore placed features and vanilla large ore-vein noise are disabled, while Earth on Minecraft deposits and companion geology remain active.
 - Makes jar packaging reproducible by removing the per-build manifest timestamp and enabling stable archive file order/timestamps.
+- Cleans the NeoForge 26.2 Gradle toolchain paths so the real local JDK 25 path is used and missing-path warnings no longer hide useful build output.
 - Expands `tools/validate_resources.py` so local validation now checks JSON, PNG headers, model texture references, item-definition model targets, blockstate model targets, bilingual lang coverage, 26.2 `assets/items/*.json`, recipe/tag ids, and worldgen feature references.
 - Aligns asset documentation with the current rule: polished machine/block/multiblock assets should prefer `image-2`, while Agnes is draft/fill-in/fallback.
 
