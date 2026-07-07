@@ -20,6 +20,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -371,6 +372,7 @@ public class EarthOnMinecraft {
         BLOCK_ENTITY_TYPES.register(modBus);
         MENUS.register(modBus);
         modBus.addListener(this::registerCreativeTab);
+        NeoForge.EVENT_BUS.addListener(EarthOnMinecraftTooltips::addVanillaTooltips);
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             EarthOnMinecraftClient.register(modBus);
         }

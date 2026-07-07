@@ -275,16 +275,51 @@ final class MaterialChemistry {
             entry("conveyor_drive", info("motor + rubber belt + gearbox", "tooltip.earth_on_minecraft.chem.detail.device")),
             entry("redstone_io_gateway", info("redstone interface + PLC I/O board", "tooltip.earth_on_minecraft.chem.detail.electronics"))
     );
+    private static final Map<String, Info> VANILLA_INFO = Map.ofEntries(
+            entry("minecraft:stone", info("SiO2 + feldspar + mica + mafic silicates", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:cobblestone", info("mixed silicate rock fragments", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:deepslate", info("Al-silicates + quartz + mica/chlorite traces", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:cobbled_deepslate", info("deepslate fragments + mica/chlorite traces", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:granite", info("SiO2 + KAlSi3O8 + NaAlSi3O8 + mica", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:diorite", info("plagioclase + hornblende/pyroxene", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:andesite", info("plagioclase + pyroxene/amphibole + Fe oxides", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:basalt", info("Ca-plagioclase + pyroxene + olivine + magnetite", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:tuff", info("volcanic glass + feldspar + mafic lithic fragments", "tooltip.earth_on_minecraft.chem.detail.mixed_rock")),
+            entry("minecraft:calcite", info("CaCO3", "tooltip.earth_on_minecraft.chem.detail.carbonate")),
+            entry("minecraft:dripstone_block", info("CaCO3 + clay/iron traces", "tooltip.earth_on_minecraft.chem.detail.carbonate")),
+            entry("minecraft:sandstone", info("SiO2 grains + feldspar + calcite cement", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:blackstone", info("mafic silicates + Fe oxides", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:clay", info("Al2Si2O5(OH)4 + quartz + Fe oxides", "tooltip.earth_on_minecraft.chem.detail.clay")),
+            entry("minecraft:clay_ball", info("Al2Si2O5(OH)4 + quartz + Fe oxides", "tooltip.earth_on_minecraft.chem.detail.clay")),
+            entry("minecraft:sand", info("SiO2 + feldspar + heavy mineral traces", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:red_sand", info("SiO2 + Fe2O3 coatings + heavy mineral traces", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:gravel", info("quartz + carbonate + mafic rock fragments", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:dirt", info("silicates + clay + humus + carbonate/salt traces", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:grass_block", info("topsoil: silicates + clay + humus + roots", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:coarse_dirt", info("sand + silt + clay + humus-poor fragments", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:rooted_dirt", info("soil minerals + humus + root biomass", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:podzol", info("humus + leached aluminosilicates + Fe/Al oxides", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:mud", info("H2O + clay + silt + organics", "tooltip.earth_on_minecraft.chem.detail.soil")),
+            entry("minecraft:copper_ore", info("legacy MC copper ore; natural generation should be replaced by chalcopyrite CuFeS2", "tooltip.earth_on_minecraft.chem.detail.fantasy_mix")),
+            entry("minecraft:deepslate_copper_ore", info("legacy MC deepslate copper ore; natural generation should be replaced by chalcopyrite CuFeS2", "tooltip.earth_on_minecraft.chem.detail.fantasy_mix")),
+            entry("minecraft:raw_copper", info("legacy MC raw copper; Earth on Minecraft routes copper through chalcopyrite concentrate", "tooltip.earth_on_minecraft.chem.detail.fantasy_mix")),
+            entry("minecraft:raw_copper_block", info("legacy MC raw copper block; if found naturally, it came from vanilla ore-vein generation", "tooltip.earth_on_minecraft.chem.detail.fantasy_mix"))
+    );
 
     private MaterialChemistry() {
     }
 
+    static boolean hasDetails(ItemStack stack) {
+        Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        if (EarthOnMinecraft.MODID.equals(id.getNamespace())) {
+            return INFO.containsKey(id.getPath());
+        }
+        return VANILLA_INFO.containsKey(id.toString());
+    }
+
     static void addDetails(ItemStack stack, java.util.function.Consumer<Component> lines, TooltipFlag flag) {
         Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
-        if (!EarthOnMinecraft.MODID.equals(id.getNamespace())) {
-            return;
-        }
-        Info info = INFO.get(id.getPath());
+        Info info = EarthOnMinecraft.MODID.equals(id.getNamespace()) ? INFO.get(id.getPath()) : VANILLA_INFO.get(id.toString());
         if (info == null) {
             return;
         }

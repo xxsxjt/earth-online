@@ -1,9 +1,9 @@
 {
-  "feature": "earth_on_minecraft:redstone_mineral_body",
+  "feature": "earth_on_minecraft:chalcopyrite_granite_halo",
   "placement": [
     {
       "type": "minecraft:rarity_filter",
-      "chance": 7
+      "chance": 6
     },
     {
       "type": "minecraft:in_square"
@@ -13,10 +13,10 @@
       "height": {
         "type": "minecraft:trapezoid",
         "min_inclusive": {
-          "absolute": -64
+          "absolute": -16
         },
         "max_inclusive": {
-          "absolute": -16
+          "absolute": 96
         }
       }
     },
@@ -25,4 +25,3 @@
     }
   ]
 }
-

@@ -1,9 +1,9 @@
 {
-  "feature": "earth_on_minecraft:redstone_mineral_body",
+  "feature": "earth_on_minecraft:kimberlite_tuff_halo",
   "placement": [
     {
       "type": "minecraft:rarity_filter",
-      "chance": 7
+      "chance": 40
     },
     {
       "type": "minecraft:in_square"
@@ -16,7 +16,7 @@
           "absolute": -64
         },
         "max_inclusive": {
-          "absolute": -16
+          "absolute": 32
         }
       }
     },
@@ -25,4 +25,3 @@
     }
   ]
 }
-
