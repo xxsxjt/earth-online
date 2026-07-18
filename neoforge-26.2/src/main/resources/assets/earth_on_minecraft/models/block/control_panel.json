@@ -1,22 +1,8 @@
 {
-  "ambientocclusion": false,
+  "parent": "minecraft:block/orientable",
   "textures": {
-    "particle": "earth_on_minecraft:block/control_panel",
-    "panel": "earth_on_minecraft:block/control_panel",
-    "casing": "earth_on_minecraft:block/industrial_machine_casing"
-  },
-  "elements": [
-    {
-      "from": [1, 1, 14],
-      "to": [15, 15, 16],
-      "faces": {
-        "north": {"texture": "#panel", "uv": [1, 1, 15, 15]},
-        "south": {"texture": "#casing", "uv": [1, 1, 15, 15]},
-        "east": {"texture": "#casing", "uv": [14, 1, 16, 15]},
-        "west": {"texture": "#casing", "uv": [0, 1, 2, 15]},
-        "up": {"texture": "#casing", "uv": [1, 14, 15, 16]},
-        "down": {"texture": "#casing", "uv": [1, 0, 15, 2]}
-      }
-    }
-  ]
+    "front": "earth_on_minecraft:block/control_panel",
+    "side": "earth_on_minecraft:block/industrial_machine_casing",
+    "top": "earth_on_minecraft:block/industrial_machine_casing"
+  }
 }

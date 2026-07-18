@@ -1,34 +1,20 @@
 {
   "variants": {
-    "assembled=false,facing=north": {
-      "model": "earth_on_minecraft:block/control_panel"
-    },
-    "assembled=false,facing=east": {
-      "model": "earth_on_minecraft:block/control_panel",
-      "y": 90
-    },
-    "assembled=false,facing=south": {
-      "model": "earth_on_minecraft:block/control_panel",
-      "y": 180
-    },
-    "assembled=false,facing=west": {
-      "model": "earth_on_minecraft:block/control_panel",
-      "y": 270
-    },
-    "assembled=true,facing=north": {
-      "model": "earth_on_minecraft:block/control_panel_connected"
-    },
-    "assembled=true,facing=east": {
-      "model": "earth_on_minecraft:block/control_panel_connected",
-      "y": 90
-    },
-    "assembled=true,facing=south": {
-      "model": "earth_on_minecraft:block/control_panel_connected",
-      "y": 180
-    },
-    "assembled=true,facing=west": {
-      "model": "earth_on_minecraft:block/control_panel_connected",
-      "y": 270
-    }
+    "active=false,assembled=false,facing=north": { "model": "earth_on_minecraft:block/control_panel" },
+    "active=false,assembled=false,facing=east": { "model": "earth_on_minecraft:block/control_panel", "y": 90 },
+    "active=false,assembled=false,facing=south": { "model": "earth_on_minecraft:block/control_panel", "y": 180 },
+    "active=false,assembled=false,facing=west": { "model": "earth_on_minecraft:block/control_panel", "y": 270 },
+    "active=true,assembled=false,facing=north": { "model": "earth_on_minecraft:block/control_panel" },
+    "active=true,assembled=false,facing=east": { "model": "earth_on_minecraft:block/control_panel", "y": 90 },
+    "active=true,assembled=false,facing=south": { "model": "earth_on_minecraft:block/control_panel", "y": 180 },
+    "active=true,assembled=false,facing=west": { "model": "earth_on_minecraft:block/control_panel", "y": 270 },
+    "active=false,assembled=true,facing=north": { "model": "earth_on_minecraft:block/control_panel_connected" },
+    "active=false,assembled=true,facing=east": { "model": "earth_on_minecraft:block/control_panel_connected", "y": 90 },
+    "active=false,assembled=true,facing=south": { "model": "earth_on_minecraft:block/control_panel_connected", "y": 180 },
+    "active=false,assembled=true,facing=west": { "model": "earth_on_minecraft:block/control_panel_connected", "y": 270 },
+    "active=true,assembled=true,facing=north": { "model": "earth_on_minecraft:block/control_panel_active" },
+    "active=true,assembled=true,facing=east": { "model": "earth_on_minecraft:block/control_panel_active", "y": 90 },
+    "active=true,assembled=true,facing=south": { "model": "earth_on_minecraft:block/control_panel_active", "y": 180 },
+    "active=true,assembled=true,facing=west": { "model": "earth_on_minecraft:block/control_panel_active", "y": 270 }
   }
 }

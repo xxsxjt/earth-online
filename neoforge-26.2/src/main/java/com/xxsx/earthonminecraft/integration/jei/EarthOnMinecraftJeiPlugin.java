@@ -47,6 +47,7 @@ public class EarthOnMinecraftJeiPlugin implements IModPlugin {
             registration.addRecipes(recipeTypeFor(kind), ProcessingMachineBlock.recipesFor(kind));
         }
         registerHandbookInfo(registration);
+        registerLivingWorldInfo(registration);
         registerMachineInfo(registration);
         registerEnergyInfo(registration);
         registerRouteInfo(registration);
@@ -107,6 +108,15 @@ public class EarthOnMinecraftJeiPlugin implements IModPlugin {
                 lineKey("jei.earth_on_minecraft.notebook.4", ChatFormatting.GOLD),
                 lineKey("jei.earth_on_minecraft.notebook.5", ChatFormatting.AQUA),
                 lineKey("jei.earth_on_minecraft.notebook.6", JEI_HINT));
+    }
+
+    private static void registerLivingWorldInfo(IRecipeRegistration registration) {
+        registration.addItemStackInfo(new ItemStack(EarthOnMinecraft.SETTLEMENT_BOARD.get()),
+                lineKey("jei.earth_on_minecraft.settlement_board.0", ChatFormatting.GOLD),
+                lineKey("jei.earth_on_minecraft.settlement_board.1", JEI_BODY),
+                lineKey("jei.earth_on_minecraft.settlement_board.2", ChatFormatting.AQUA),
+                lineKey("jei.earth_on_minecraft.settlement_board.3", ChatFormatting.GREEN),
+                lineKey("jei.earth_on_minecraft.settlement_board.4", JEI_HINT));
     }
 
     private static void registerMachineInfo(IRecipeRegistration registration) {

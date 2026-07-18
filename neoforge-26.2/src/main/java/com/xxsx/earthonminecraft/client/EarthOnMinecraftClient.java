@@ -3,12 +3,9 @@ package com.xxsx.earthonminecraft.client;
 import com.xxsx.earthonminecraft.EarthOnMinecraft;
 import net.minecraft.client.Minecraft;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
-@OnlyIn(Dist.CLIENT)
 public final class EarthOnMinecraftClient {
     private EarthOnMinecraftClient() {
     }
@@ -22,6 +19,7 @@ public final class EarthOnMinecraftClient {
         event.register(EarthOnMinecraft.PROCESSING_MACHINE_MENU.get(), ProcessingMachineScreen::new);
         event.register(EarthOnMinecraft.ENERGY_GENERATOR_MENU.get(), EnergyGeneratorScreen::new);
         event.register(EarthOnMinecraft.BATTERY_BOX_MENU.get(), BatteryBoxScreen::new);
+        event.register(EarthOnMinecraft.SETTLEMENT_BOARD_MENU.get(), SettlementBoardScreen::new);
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

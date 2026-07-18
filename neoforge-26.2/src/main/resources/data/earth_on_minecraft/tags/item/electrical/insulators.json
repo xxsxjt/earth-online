@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:ceramic_insulator",
+    "earth_on_minecraft:rubber_gasket",
+    "earth_on_minecraft:fiberglass_cloth",
+    "earth_on_minecraft:mineral_wool",
+    "earth_on_minecraft:polyurethane_foam"
+  ]
+}

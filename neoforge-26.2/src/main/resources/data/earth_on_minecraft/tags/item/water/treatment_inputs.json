@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:hard_water_sample",
+    "earth_on_minecraft:brine_crystal",
+    "earth_on_minecraft:activated_carbon",
+    "earth_on_minecraft:activated_carbon_filter",
+    "earth_on_minecraft:slaked_lime",
+    "earth_on_minecraft:calcium_chloride"
+  ]
+}

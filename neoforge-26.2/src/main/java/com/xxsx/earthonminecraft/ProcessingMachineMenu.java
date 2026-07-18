@@ -17,6 +17,7 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
     public static final int BUTTON_REDSTONE_ALWAYS = 0;
     public static final int BUTTON_REDSTONE_REQUIRE_SIGNAL = 1;
     public static final int BUTTON_REDSTONE_REQUIRE_NO_SIGNAL = 2;
+    public static final int BUTTON_ROUTE_NEXT = 10;
     public static final int BUTTON_SIDE_BASE = 20;
     private static final int PLAYER_INV_START = ProcessingMachineBlockEntity.SLOT_COUNT;
     private static final int PLAYER_INV_END = PLAYER_INV_START + 27;
@@ -61,7 +62,8 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
         addSlot(new Slot(container, ProcessingMachineBlockEntity.SLOT_FUEL, 38, 57) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return ProcessingMachineBlockEntity.getFuelTicks(stack) > 0;
+                return ProcessingMachineMenu.this.kind.acceptsLocalFuel()
+                        && ProcessingMachineBlockEntity.getFuelTicks(stack) > 0;
             }
         });
 
@@ -82,6 +84,10 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
     public boolean clickMenuButton(Player player, int id) {
         if (container instanceof ProcessingMachineBlockEntity machine && id >= BUTTON_REDSTONE_ALWAYS && id <= BUTTON_REDSTONE_REQUIRE_NO_SIGNAL) {
             machine.setRedstoneMode(ProcessingMachineBlockEntity.RedstoneMode.byId(id));
+            return true;
+        }
+        if (container instanceof ProcessingMachineBlockEntity machine && id == BUTTON_ROUTE_NEXT) {
+            machine.cycleSelectedRoute();
             return true;
         }
         if (container instanceof ProcessingMachineBlockEntity machine
@@ -112,7 +118,7 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, ProcessingMachineBlockEntity.SLOT_INPUT, ProcessingMachineBlockEntity.SLOT_INPUT + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (ProcessingMachineBlockEntity.getFuelTicks(stack) > 0) {
+        } else if (this.kind.acceptsLocalFuel() && ProcessingMachineBlockEntity.getFuelTicks(stack) > 0) {
             if (!moveItemStackTo(stack, ProcessingMachineBlockEntity.SLOT_FUEL, ProcessingMachineBlockEntity.SLOT_FUEL + 1, false)) {
                 return ItemStack.EMPTY;
             }
@@ -188,8 +194,32 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
         return data.get(7) != 0;
     }
 
+    public int selectedRouteIndex() {
+        return Math.max(0, data.get(14));
+    }
+
+    public int routeCount() {
+        return Math.max(0, data.get(15));
+    }
+
+    public java.util.Optional<ProcessingMachineBlock.Recipe> selectedRecipe() {
+        return ProcessingMachineBlock.findRecipe(kind, getSlot(ProcessingMachineBlockEntity.SLOT_INPUT).getItem(), selectedRouteIndex());
+    }
+
     public int energyPerTick() {
-        return ProcessingMachineBlockEntity.energyPerTick();
+        return kind.energyPerTick();
+    }
+
+    public boolean acceptsLocalFuel() {
+        return kind.acceptsLocalFuel();
+    }
+
+    public ProcessingMachineBlock.PowerMode powerMode() {
+        return kind.powerMode();
+    }
+
+    public ProcessingMachineBlock.ProcessFamily processFamily() {
+        return kind.processFamily();
     }
 
     public ProcessingMachineBlockEntity.SideMode sideMode(Direction side) {

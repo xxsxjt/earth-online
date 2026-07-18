@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:copper_wire",
+    "earth_on_minecraft:copper_busbar",
+    "earth_on_minecraft:automation_bus",
+    "earth_on_minecraft:redstone_io_gateway"
+  ]
+}

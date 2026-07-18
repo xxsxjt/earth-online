@@ -1,0 +1,8 @@
+{
+  "title_key": "resident.earth_on_minecraft.role.resident",
+  "identity_key": "resident.earth_on_minecraft.identity.resident",
+  "vanilla_professions": ["minecraft:none", "minecraft:nitwit"],
+  "settlement_profiles": [],
+  "weight": 4,
+  "trades": []
+}

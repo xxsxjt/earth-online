@@ -1,0 +1,18 @@
+{
+  "wants": {
+    "id": "minecraft:emerald"
+  },
+  "gives": {
+    "id": "earth_on_minecraft:field_geology_notebook"
+  },
+  "max_uses": 8,
+  "reputation_discount": 0.05,
+  "xp": 2,
+  "merchant_predicate": {
+    "condition": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:nbt": "{NeoForgeData:{EarthOnMinecraftResidentRoleId:\"earth_on_minecraft:geologist\"}}"
+    }
+  }
+}

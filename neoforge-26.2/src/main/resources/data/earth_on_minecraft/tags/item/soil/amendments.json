@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:humus_sample",
+    "earth_on_minecraft:soil_mineral_mix",
+    "earth_on_minecraft:fertilizer_blend",
+    "earth_on_minecraft:ammonium_nitrate",
+    "earth_on_minecraft:ammonium_sulfate",
+    "earth_on_minecraft:single_superphosphate",
+    "earth_on_minecraft:potash",
+    "earth_on_minecraft:urea"
+  ]
+}

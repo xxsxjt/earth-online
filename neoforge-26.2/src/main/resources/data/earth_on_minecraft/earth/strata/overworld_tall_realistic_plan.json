@@ -1,0 +1,69 @@
+{
+  "id": "earth_on_minecraft:overworld_tall_realistic_plan",
+  "active_worldgen": false,
+  "status": "planned_world_preset_or_explicit_config_only",
+  "safe_default": "Keep vanilla 26.2 height unless the player creates a new world with this preset or explicitly enables a height integration.",
+  "recommended_height_options": [
+    {
+      "name": "conservative",
+      "min_y": -128,
+      "height": 512,
+      "use_case": "More room for sedimentary cover, deep ore belts and deepslate without heavily stressing compatibility."
+    },
+    {
+      "name": "realistic_beta",
+      "min_y": -256,
+      "height": 768,
+      "use_case": "Clearer crustal layering for new test worlds; requires runtime validation of 26.2 dimension type and worldgen height codecs."
+    },
+    {
+      "name": "smart_core_linked",
+      "height_multiplier_source": "config/xxsx_mc_smart_core-common.toml or a future shared config value",
+      "base_height": 384,
+      "use_case": "Optional integration with Smart Core's world-height UI. Earth on Minecraft should read a shared value or world preset selection, not hard-link to Smart Core Java classes."
+    }
+  ],
+  "planned_layers": [
+    {
+      "name": "soil_and_regolith",
+      "thickness_blocks": [2, 12],
+      "contents": ["topsoil", "dirt", "clay pockets", "sand/gravel alluvium", "laterite where climate fits"]
+    },
+    {
+      "name": "sedimentary_basin",
+      "thickness_ratio": 0.28,
+      "contents": ["sandstone", "shale", "limestone/calcite", "coal seams", "phosphorite", "evaporite salt", "oil/gas-bearing basins (future route)"]
+    },
+    {
+      "name": "weathered_and_lateritic_zone",
+      "thickness_ratio": 0.08,
+      "contents": ["bauxite laterite", "iron oxides", "kaolin", "clay", "near-surface copper/gold traces when above hydrothermal belts"]
+    },
+    {
+      "name": "felsic_intrusive_and_hydrothermal_zone",
+      "thickness_ratio": 0.20,
+      "contents": ["granite", "diorite", "quartz-calcite veins", "chalcopyrite", "gold", "cinnabar", "beryl", "rare earth accessory minerals"]
+    },
+    {
+      "name": "mafic_volcanic_zone",
+      "thickness_ratio": 0.16,
+      "contents": ["basalt", "andesite", "tuff", "magnetite", "chromite traces", "mafic silicates"]
+    },
+    {
+      "name": "metamorphic_basement",
+      "thickness_ratio": 0.24,
+      "contents": ["deepslate/slate proxy", "gneiss future proxy", "anthracite", "redstone mineral bodies", "lapis bodies", "rare earth carbonatite"]
+    },
+    {
+      "name": "mantle_derived_pipes",
+      "vertical_feature": true,
+      "contents": ["kimberlite", "diamondiferous kimberlite", "tuff breccia halo"]
+    }
+  ],
+  "implementation_rules": [
+    "Implement as a new-world preset or explicit config route, not as a default dimension override.",
+    "Before enabling, inspect vanilla 26.2 dimension_type/world preset JSON formats and runtime logs for RegistryDataLoader errors.",
+    "When height changes, retune every placed_feature height band together; otherwise deposits can vanish or crowd into the wrong layer.",
+    "If Smart Core is installed, integration should be optional and file/config based so Earth on Minecraft remains standalone."
+  ]
+}

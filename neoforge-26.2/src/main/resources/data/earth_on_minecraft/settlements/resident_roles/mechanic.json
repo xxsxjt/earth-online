@@ -1,0 +1,12 @@
+{
+  "title_key": "resident.earth_on_minecraft.role.mechanic",
+  "identity_key": "resident.earth_on_minecraft.identity.technician",
+  "vanilla_professions": ["minecraft:armorer", "minecraft:toolsmith", "minecraft:weaponsmith"],
+  "settlement_profiles": ["earth_on_minecraft:mechanized_town"],
+  "weight": 3,
+  "trades": [
+    { "level": 1, "input": "minecraft:iron_ingot", "input_count": 6, "output": "minecraft:emerald", "output_count": 1, "max_uses": 12, "xp": 2 },
+    { "level": 2, "input": "minecraft:emerald", "input_count": 3, "output": "earth_on_minecraft:rubber_gasket", "output_count": 4, "max_uses": 12, "xp": 10 },
+    { "level": 3, "input": "minecraft:emerald", "input_count": 6, "output": "earth_on_minecraft:lubricating_oil", "output_count": 2, "max_uses": 8, "xp": 20 }
+  ]
+}

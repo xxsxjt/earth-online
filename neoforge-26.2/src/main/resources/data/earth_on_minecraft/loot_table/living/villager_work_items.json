@@ -1,0 +1,132 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        { "condition": "minecraft:killed_by_player" },
+        { "condition": "minecraft:random_chance", "chance": 0.35 },
+        {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": { "minecraft:nbt": "{NeoForgeData:{EarthOnMinecraftResidentRoleId:\"earth_on_minecraft:miner\"}}" }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:torch",
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1.0, "max": 2.0 } }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        { "condition": "minecraft:killed_by_player" },
+        { "condition": "minecraft:random_chance", "chance": 0.35 },
+        {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": { "minecraft:nbt": "{NeoForgeData:{EarthOnMinecraftResidentRoleId:\"earth_on_minecraft:geologist\"}}" }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1.0, "max": 3.0 } }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        { "condition": "minecraft:killed_by_player" },
+        { "condition": "minecraft:random_chance", "chance": 0.35 },
+        {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": { "minecraft:nbt": "{NeoForgeData:{EarthOnMinecraftResidentRoleId:\"earth_on_minecraft:mechanic\"}}" }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_nugget",
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1.0, "max": 3.0 } }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        { "condition": "minecraft:killed_by_player" },
+        { "condition": "minecraft:random_chance", "chance": 0.35 },
+        {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": { "minecraft:nbt": "{NeoForgeData:{EarthOnMinecraftResidentRoleId:\"earth_on_minecraft:electrician\"}}" }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "earth_on_minecraft:copper_wire",
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1.0, "max": 2.0 } }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        { "condition": "minecraft:killed_by_player" },
+        { "condition": "minecraft:random_chance", "chance": 0.35 },
+        {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": { "minecraft:nbt": "{NeoForgeData:{EarthOnMinecraftResidentRoleId:\"earth_on_minecraft:water_operator\"}}" }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "earth_on_minecraft:activated_carbon",
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1.0, "max": 2.0 } }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        { "condition": "minecraft:killed_by_player" },
+        { "condition": "minecraft:random_chance", "chance": 0.35 },
+        {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": { "minecraft:nbt": "{NeoForgeData:{EarthOnMinecraftResidentRoleId:\"earth_on_minecraft:warehouse_manager\"}}" }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2.0, "max": 4.0 } }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "earth_on_minecraft:living/villager_work_items"
+}

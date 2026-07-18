@@ -1,0 +1,22 @@
+{
+  "display_name_key": "settlement.earth_on_minecraft.profile.agricultural_village",
+  "scale_key": "settlement.earth_on_minecraft.scale.village",
+  "technology_key": "settlement.earth_on_minecraft.technology.agricultural",
+  "name_keys": [
+    "settlement.earth_on_minecraft.name.riverbend",
+    "settlement.earth_on_minecraft.name.greenfield"
+  ],
+  "industry_keys": [
+    "settlement.earth_on_minecraft.industry.agriculture",
+    "settlement.earth_on_minecraft.industry.irrigation"
+  ],
+  "demand_keys": [
+    "settlement.earth_on_minecraft.material.tools",
+    "settlement.earth_on_minecraft.material.fertilizer"
+  ],
+  "supply_keys": [
+    "settlement.earth_on_minecraft.material.food",
+    "settlement.earth_on_minecraft.material.fiber"
+  ],
+  "weight": 4
+}

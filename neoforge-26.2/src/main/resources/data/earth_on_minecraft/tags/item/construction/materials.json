@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:cement_powder",
+    "earth_on_minecraft:asphalt",
+    "earth_on_minecraft:firebrick",
+    "earth_on_minecraft:mineral_wool",
+    "earth_on_minecraft:stabilized_tailings",
+    "earth_on_minecraft:steel_bloom",
+    "earth_on_minecraft:aluminum_ingot"
+  ]
+}

@@ -8,27 +8,26 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ControlPanelBlock extends SupportPartBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
-    private static final VoxelShape NORTH_SHAPE = Block.box(1.0, 1.0, 14.0, 15.0, 15.0, 16.0);
-    private static final VoxelShape SOUTH_SHAPE = Block.box(1.0, 1.0, 0.0, 15.0, 15.0, 2.0);
-    private static final VoxelShape WEST_SHAPE = Block.box(14.0, 1.0, 1.0, 16.0, 15.0, 15.0);
-    private static final VoxelShape EAST_SHAPE = Block.box(0.0, 1.0, 1.0, 2.0, 15.0, 15.0);
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
     public ControlPanelBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
+        registerDefaultState(defaultBlockState()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(ACTIVE, false));
     }
 
     @Override
@@ -55,19 +54,19 @@ public class ControlPanelBlock extends SupportPartBlock {
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return shapeFor(state.getValue(FACING));
-    }
-
-    @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return shapeFor(state.getValue(FACING));
-    }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(FACING);
+        builder.add(FACING, ACTIVE);
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
@@ -93,12 +92,4 @@ public class ControlPanelBlock extends SupportPartBlock {
                 });
     }
 
-    private static VoxelShape shapeFor(Direction facing) {
-        return switch (facing) {
-            case SOUTH -> SOUTH_SHAPE;
-            case WEST -> WEST_SHAPE;
-            case EAST -> EAST_SHAPE;
-            default -> NORTH_SHAPE;
-        };
-    }
 }

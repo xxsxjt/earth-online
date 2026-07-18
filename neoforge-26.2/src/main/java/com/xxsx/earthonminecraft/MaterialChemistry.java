@@ -281,11 +281,11 @@ final class MaterialChemistry {
             entry("redstone_io_gateway", info("redstone interface + PLC I/O board", "tooltip.earth_on_minecraft.chem.detail.electronics"))
     );
     private static final Map<String, Info> VANILLA_INFO = Map.ofEntries(
-            entry("minecraft:stone", info("SiO2 + feldspar + mica + mafic silicates", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
-            entry("minecraft:cobblestone", info("mixed silicate rock fragments", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:stone", info("SiO2 + feldspar group + Mg/Fe clay silicates + CaCO3 traces", "tooltip.earth_on_minecraft.chem.detail.generic_stone")),
+            entry("minecraft:cobblestone", info("variable parent-rock aggregate: SiO2/feldspar/mafic silicates + clay/carbonate quarry fines", "tooltip.earth_on_minecraft.chem.detail.aggregate")),
             entry("minecraft:deepslate", info("Al-silicates + quartz + mica/chlorite traces", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
             entry("minecraft:cobbled_deepslate", info("deepslate fragments + mica/chlorite traces", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
-            entry("minecraft:granite", info("SiO2 + KAlSi3O8 + NaAlSi3O8 + mica", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
+            entry("minecraft:granite", info("SiO2 + KAlSi3O8 + Na/Ca plagioclase + mica + Fe oxide traces", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
             entry("minecraft:diorite", info("plagioclase + hornblende/pyroxene", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
             entry("minecraft:andesite", info("plagioclase + pyroxene/amphibole + Fe oxides", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
             entry("minecraft:basalt", info("Ca-plagioclase + pyroxene + olivine + magnetite", "tooltip.earth_on_minecraft.chem.detail.silicate_mix")),
@@ -347,6 +347,17 @@ final class MaterialChemistry {
     }
 
     private static String formKey(String id) {
+        if (id.equals("stone")) {
+            return "tooltip.earth_on_minecraft.chem.form.local_rock";
+        }
+        if (id.equals("cobblestone") || id.equals("cobbled_deepslate")) {
+            return "tooltip.earth_on_minecraft.chem.form.aggregate";
+        }
+        if (id.equals("deepslate") || id.equals("granite") || id.equals("diorite") || id.equals("andesite")
+                || id.equals("basalt") || id.equals("tuff") || id.equals("calcite") || id.equals("dripstone_block")
+                || id.equals("sandstone") || id.equals("blackstone")) {
+            return "tooltip.earth_on_minecraft.chem.form.natural_block";
+        }
         if (id.endsWith("_ore") || id.endsWith("_vein") || id.endsWith("_seam") || id.equals("kimberlite")
                 || id.equals("diamondiferous_kimberlite")) {
             return "tooltip.earth_on_minecraft.chem.form.natural_block";
@@ -425,6 +436,8 @@ final class MaterialChemistry {
                     "tooltip.earth_on_minecraft.chem.detail.sulfide_ore",
                     "tooltip.earth_on_minecraft.chem.detail.vein",
                     "tooltip.earth_on_minecraft.chem.detail.mixed_rock",
+                    "tooltip.earth_on_minecraft.chem.detail.generic_stone",
+                    "tooltip.earth_on_minecraft.chem.detail.aggregate",
                     "tooltip.earth_on_minecraft.chem.detail.silicate",
                     "tooltip.earth_on_minecraft.chem.detail.silicate_mix",
                     "tooltip.earth_on_minecraft.chem.detail.carbonate",
@@ -463,6 +476,8 @@ final class MaterialChemistry {
                     "tooltip.earth_on_minecraft.chem.detail.sulfide_ore",
                     "tooltip.earth_on_minecraft.chem.detail.vein",
                     "tooltip.earth_on_minecraft.chem.detail.mixed_rock",
+                    "tooltip.earth_on_minecraft.chem.detail.generic_stone",
+                    "tooltip.earth_on_minecraft.chem.detail.aggregate",
                     "tooltip.earth_on_minecraft.chem.detail.silicate",
                     "tooltip.earth_on_minecraft.chem.detail.silicate_mix",
                     "tooltip.earth_on_minecraft.chem.detail.carbonate",
@@ -541,6 +556,8 @@ final class MaterialChemistry {
                     "tooltip.earth_on_minecraft.chem.detail.glass",
                     "tooltip.earth_on_minecraft.chem.detail.ceramic",
                     "tooltip.earth_on_minecraft.chem.detail.clay",
+                    "tooltip.earth_on_minecraft.chem.detail.generic_stone",
+                    "tooltip.earth_on_minecraft.chem.detail.aggregate",
                     "tooltip.earth_on_minecraft.chem.detail.silicate",
                     "tooltip.earth_on_minecraft.chem.detail.silicate_mix",
                     "tooltip.earth_on_minecraft.chem.detail.carbonate" -> "tooltip.earth_on_minecraft.chem.use.construction";

@@ -4,7 +4,7 @@
     "particle": "earth_on_minecraft:block/power_machine_side_active",
     "down": "earth_on_minecraft:block/power_machine_top_active",
     "up": "earth_on_minecraft:block/power_machine_top_active",
-    "north": "earth_on_minecraft:block/power_machine_side_active",
+    "north": "earth_on_minecraft:block/steam_turbine_generator_front_active",
     "south": "earth_on_minecraft:block/power_machine_side_active",
     "west": "earth_on_minecraft:block/power_machine_side_active",
     "east": "earth_on_minecraft:block/power_machine_side_active"

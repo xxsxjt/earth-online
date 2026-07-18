@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+from collections import deque
 import json
 import pathlib
 import re
@@ -424,22 +425,67 @@ def remove_flat_background(image: Image.Image) -> Image.Image:
     ]
     # Prefer green chroma key if present; otherwise use the average corner color.
     has_green_key = any(g > 150 and g > r * 1.45 and g > b * 1.45 for r, g, b, _a in corner_samples)
+    has_magenta_key = any(r > 150 and b > 150 and g < min(r, b) * 0.55 for r, g, b, _a in corner_samples)
     if has_green_key:
         key = (0, 255, 0)
         threshold = 82
+    elif has_magenta_key:
+        key = (255, 0, 255)
+        threshold = 120
     else:
         key = tuple(sum(sample[i] for sample in corner_samples) // 4 for i in range(3))
         threshold = 42
+    def color_distance(r: int, g: int, b: int) -> int:
+        return abs(r - key[0]) + abs(g - key[1]) + abs(b - key[2])
+
+    def is_background(x: int, y: int) -> bool:
+        r, g, b, _a = pixels[x, y]
+        if has_green_key:
+            return g > 130 and g > r * 1.35 and g > b * 1.35
+        if has_magenta_key:
+            return r > 135 and b > 135 and g < min(r, b) * 0.72
+        return color_distance(r, g, b) < threshold
+
+    # Only remove key-colored pixels connected to the image border. This keeps
+    # legitimate green liquids, catalysts, circuit boards, and mineral grains.
+    queue: deque[tuple[int, int]] = deque()
+    visited: set[tuple[int, int]] = set()
+    for x in range(width):
+        queue.append((x, 0))
+        queue.append((x, height - 1))
+    for y in range(height):
+        queue.append((0, y))
+        queue.append((width - 1, y))
+
+    while queue:
+        x, y = queue.popleft()
+        if (x, y) in visited or not is_background(x, y):
+            continue
+        visited.add((x, y))
+        if x > 0:
+            queue.append((x - 1, y))
+        if x + 1 < width:
+            queue.append((x + 1, y))
+        if y > 0:
+            queue.append((x, y - 1))
+        if y + 1 < height:
+            queue.append((x, y + 1))
+
+    for x, y in visited:
+        r, g, b, _a = pixels[x, y]
+        pixels[x, y] = (r, g, b, 0)
+
     for y in range(height):
         for x in range(width):
-            r, g, b, a = pixels[x, y]
-            if g > 130 and g > r * 1.35 and g > b * 1.35:
-                pixels[x, y] = (r, g, b, 0)
+            if (x, y) in visited:
                 continue
-            dist = abs(r - key[0]) + abs(g - key[1]) + abs(b - key[2])
-            if dist < threshold:
-                pixels[x, y] = (r, g, b, 0)
-            elif a == 255 and dist < threshold * 2:
+            if not any((nx, ny) in visited for nx, ny in (
+                (x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)
+            ) if 0 <= nx < width and 0 <= ny < height):
+                continue
+            r, g, b, a = pixels[x, y]
+            dist = color_distance(r, g, b)
+            if a == 255 and dist < threshold * 2:
                 pixels[x, y] = (r, g, b, max(40, int(255 * (dist - threshold) / threshold)))
     return img
 

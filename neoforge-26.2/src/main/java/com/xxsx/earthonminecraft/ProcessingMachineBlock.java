@@ -1,9 +1,15 @@
 package com.xxsx.earthonminecraft;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.locale.Language;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -12,17 +18,22 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +44,7 @@ import java.util.function.Supplier;
 
 public class ProcessingMachineBlock extends Block implements EntityBlock {
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     private static final List<Recipe> RECIPES = createRecipes();
 
     private final Kind kind;
@@ -40,7 +52,12 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
     public ProcessingMachineBlock(Properties properties, Kind kind) {
         super(properties);
         this.kind = kind;
-        registerDefaultState(stateDefinition.any().setValue(ACTIVE, false));
+        registerDefaultState(stateDefinition.any().setValue(ACTIVE, false).setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
@@ -62,6 +79,52 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ProcessingMachineBlockEntity(pos, state);
+    }
+
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(ACTIVE) || random.nextInt(5) != 0) {
+            return;
+        }
+        Direction facing = state.getValue(FACING);
+        double x = pos.getX() + 0.5D + facing.getStepX() * 0.52D;
+        double y = pos.getY() + 0.58D + random.nextDouble() * 0.18D;
+        double z = pos.getZ() + 0.5D + facing.getStepZ() * 0.52D;
+        double driftX = (random.nextDouble() - 0.5D) * 0.025D;
+        double driftZ = (random.nextDouble() - 0.5D) * 0.025D;
+        var particle = switch (kind) {
+            case CRUSHER -> ParticleTypes.POOF;
+            case BALL_MILL -> ParticleTypes.CLOUD;
+            case FLOTATION_CELL -> ParticleTypes.SPLASH;
+            case REDUCTION_FURNACE -> ParticleTypes.FLAME;
+            default -> switch (kind.processFamily()) {
+                case THERMAL, COLUMN -> ParticleTypes.SMOKE;
+                case WET_PROCESS, MIXING, REACTION -> ParticleTypes.SPLASH;
+                case ELECTROCHEMICAL -> ParticleTypes.ELECTRIC_SPARK;
+                case COMMINUTION, FORMING -> ParticleTypes.CLOUD;
+                case CLASSIFICATION, CRYSTALLIZATION -> ParticleTypes.CRIT;
+            };
+        };
+        level.addParticle(particle, x, y, z, driftX, 0.01D, driftZ);
+        if (kind == Kind.FLOTATION_CELL && random.nextBoolean()) {
+            level.addParticle(ParticleTypes.BUBBLE, x, y - 0.08D, z, driftX, 0.025D, driftZ);
+        } else if (kind == Kind.REDUCTION_FURNACE && random.nextBoolean()) {
+            level.addParticle(ParticleTypes.SMOKE, x, y + 0.12D, z, 0.0D, 0.02D, 0.0D);
+        }
+
+        if (random.nextInt(35) == 0) {
+            SoundEvent sound = switch (kind) {
+                case CRUSHER -> SoundEvents.STONE_HIT;
+                case BALL_MILL -> SoundEvents.GRINDSTONE_USE;
+                case FLOTATION_CELL -> SoundEvents.BUBBLE_COLUMN_BUBBLE_POP;
+                case REDUCTION_FURNACE -> SoundEvents.BLASTFURNACE_FIRE_CRACKLE;
+                default -> null;
+            };
+            if (sound != null) {
+                level.playLocalSound(pos, sound, SoundSource.BLOCKS, 0.16F,
+                        0.88F + random.nextFloat() * 0.18F, false);
+            }
+        }
     }
 
     @Override
@@ -87,7 +150,17 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(ACTIVE);
+        builder.add(ACTIVE, FACING);
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     public static List<Recipe> recipes() {
@@ -98,13 +171,26 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
         return RECIPES.stream().filter(recipe -> recipe.kind == kind).toList();
     }
 
-    public static Optional<Recipe> findRecipe(Kind kind, ItemStack stack) {
+    public static List<Recipe> matchingRecipes(Kind kind, ItemStack stack) {
         if (stack.isEmpty()) {
-            return Optional.empty();
+            return List.of();
         }
         return RECIPES.stream()
                 .filter(recipe -> recipe.kind == kind && stack.getItem() == recipe.input.get().asItem())
-                .findFirst();
+                .toList();
+    }
+
+    public static Optional<Recipe> findRecipe(Kind kind, ItemStack stack) {
+        return findRecipe(kind, stack, 0);
+    }
+
+    public static Optional<Recipe> findRecipe(Kind kind, ItemStack stack, int routeIndex) {
+        List<Recipe> matches = matchingRecipes(kind, stack);
+        if (matches.isEmpty()) {
+            return Optional.empty();
+        }
+        int safeIndex = Math.floorMod(routeIndex, matches.size());
+        return Optional.of(matches.get(safeIndex));
     }
 
     public Kind kind() {
@@ -161,8 +247,8 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
         recipes.add(r(Kind.BALL_MILL, () -> Blocks.DIORITE, "闪长岩矿物分离", out(EarthOnMinecraft.FELDSPAR_DUST::get, 3), out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 2), out(EarthOnMinecraft.TAILINGS_DUST::get, 1)));
         recipes.add(r(Kind.BALL_MILL, () -> Blocks.ANDESITE, "安山岩矿物分离", out(EarthOnMinecraft.FELDSPAR_DUST::get, 2), out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 3), out(EarthOnMinecraft.MAGNETITE_DUST::get, 1)));
         recipes.add(r(Kind.BALL_MILL, () -> Blocks.BASALT, "玄武岩矿物分离", out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 4), out(EarthOnMinecraft.MAGNETITE_DUST::get, 1), out(EarthOnMinecraft.TAILINGS_DUST::get, 1)));
-        recipes.add(r(Kind.BALL_MILL, () -> Blocks.STONE, "普通石头硅酸盐混合物粉磨", out(EarthOnMinecraft.SILICA_DUST::get, 2), out(EarthOnMinecraft.FELDSPAR_DUST::get, 1), out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 1), out(EarthOnMinecraft.CALCITE_DUST::get, 1), out(EarthOnMinecraft.TAILINGS_DUST::get, 1)));
-        recipes.add(r(Kind.BALL_MILL, () -> Blocks.COBBLESTONE, "圆石碎屑再粉磨", out(EarthOnMinecraft.SILICA_DUST::get, 2), out(EarthOnMinecraft.FELDSPAR_DUST::get, 1), out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 1), out(EarthOnMinecraft.TAILINGS_DUST::get, 1)));
+        recipes.add(r(Kind.BALL_MILL, () -> Blocks.STONE, "普通石料粉磨（未分类硅酸盐-碳酸盐岩）", out(EarthOnMinecraft.SILICA_DUST::get, 2), out(EarthOnMinecraft.FELDSPAR_DUST::get, 1), out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 1), out(EarthOnMinecraft.CALCITE_DUST::get, 1), out(EarthOnMinecraft.TAILINGS_DUST::get, 1)));
+        recipes.add(r(Kind.BALL_MILL, () -> Blocks.COBBLESTONE, "圆石碎屑粉磨（混合采石骨料）", out(EarthOnMinecraft.SILICA_DUST::get, 2), out(EarthOnMinecraft.FELDSPAR_DUST::get, 1), out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 1), out(EarthOnMinecraft.TAILINGS_DUST::get, 1)));
         recipes.add(r(Kind.BALL_MILL, () -> Blocks.DEEPSLATE, "深板岩矿物分离", out(EarthOnMinecraft.ALUMINOSILICATE_DUST::get, 4), out(EarthOnMinecraft.MICA_DUST::get, 1), out(EarthOnMinecraft.TAILINGS_DUST::get, 1)));
         recipes.add(r(Kind.BALL_MILL, () -> Blocks.COBBLED_DEEPSLATE, "深层圆石矿物分离", out(EarthOnMinecraft.ALUMINOSILICATE_DUST::get, 3), out(EarthOnMinecraft.MICA_DUST::get, 1), out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 1), out(EarthOnMinecraft.TAILINGS_DUST::get, 1)));
         recipes.add(r(Kind.BALL_MILL, () -> Blocks.TUFF, "凝灰岩矿物分离", out(EarthOnMinecraft.SILICA_DUST::get, 2), out(EarthOnMinecraft.MAFIC_SILICATE_DUST::get, 2), out(EarthOnMinecraft.TAILINGS_DUST::get, 2)));
@@ -574,34 +660,43 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
     }
 
     public enum Kind {
-        CRUSHER("颚式破碎机", "把矿石和矿床方块粗碎成碎块，通常会产生尾粉或伴生矿物。"),
-        BALL_MILL("球磨机", "把碎块和岩石磨成粉末，是分离矿物组分的基础步骤。"),
-        SIEVE("筛分机", "按颗粒大小和密度做简化筛分，适合尾粉、金伯利岩和含金石英碎块。"),
-        MAGNETIC_SEPARATOR("磁选机", "利用磁性分离磁铁矿、赤铁矿和镁铁质硅酸盐里的含铁组分。"),
-        FLOTATION_CELL("浮选槽", "富集硫化矿和宝石矿物，让铜、金、青金石、红石等进入精矿。"),
-        ROASTER("焙烧炉", "把硫化矿、辰砂和碳酸盐做热处理，产出焙烧矿、硫粉或石灰粉。"),
-        REDUCTION_FURNACE("还原炉", "用简化碳热还原把精矿变成兼容 MC 的锭，同时产生矿渣。"),
-        LEACHING_TANK("浸出槽", "模拟湿法冶金，从石英脉、绿柱石和红石精矿里选择性提取目标物。"),
-        ELECTROLYTIC_CELL("电解槽", "用现代电化学路线精炼铜、金、青金石和绿柱石精矿。"),
-        POWDER_PRESS("压粉机", "把粉末或精矿压回 MC 兼容物品，保留合成魔法的便利性。"),
-        CHEMICAL_REACTOR("化学反应釜", "承载酸碱中和、酸解、氧化和常见无机化工反应的简化路线。"),
-        DISTILLATION_COLUMN("精馏塔", "分离盐卤、盐酸和煤焦油等混合物，得到更集中的化工原料。"),
-        MIXER("工业混合机", "把粉体和母料混合成玻璃配合料、水泥生料、肥料母料等中间物。"),
-        CRYSTALLIZER("结晶器", "把盐、烧碱、硝酸铵、石膏等溶液或粉体整理成可堆叠产品。"),
-        INDUSTRIAL_KILN("工业窑炉", "处理玻璃、水泥、铝土矿和其他需要高温煅烧的化工路线。"),
-        GAS_SEPARATOR("气体分离器", "从煤气、氯气等气体混合物中回收氢、氨、盐酸等产品。"),
-        FERTILIZER_GRANULATOR("肥料造粒机", "把氮肥、磷肥和复合肥母料整理成可运输的颗粒产品。"),
-        POLYMERIZER("聚合釜", "把乙烯、丙烯和氯乙烯聚合为常见塑料树脂。"),
-        STEAM_CRACKER("蒸汽裂解炉", "把煤焦油、煤气和混合树脂裂解成芳烃、烯烃与合成气入口。"),
-        SYNTHESIS_LOOP("合成塔", "承载合成氨、甲醇、尿素和树脂前驱体这类高压循环反应。"),
-        ABSORPTION_TOWER("吸收塔", "把酸性或含氯尾气吸收为硫酸、盐酸、纯碱等可用产品。");
+        CRUSHER("颚式破碎机", "把矿石和矿床方块粗碎成碎块，通常会产生尾粉或伴生矿物。", 80, 20, PowerMode.LOCAL_OR_GRID, ProcessFamily.COMMINUTION),
+        BALL_MILL("球磨机", "把碎块和岩石磨成粉末，是分离矿物组分的基础步骤。", 140, 32, PowerMode.LOCAL_OR_GRID, ProcessFamily.COMMINUTION),
+        SIEVE("筛分机", "按颗粒大小和密度做简化筛分，适合尾粉、金伯利岩和含金石英碎块。", 80, 16, PowerMode.LOCAL_OR_GRID, ProcessFamily.CLASSIFICATION),
+        MAGNETIC_SEPARATOR("磁选机", "利用磁性分离磁铁矿、赤铁矿和镁铁质硅酸盐里的含铁组分。", 100, 48, PowerMode.GRID_ONLY, ProcessFamily.CLASSIFICATION),
+        FLOTATION_CELL("浮选槽", "富集硫化矿和宝石矿物，让铜、金、青金石、红石等进入精矿。", 180, 56, PowerMode.GRID_ONLY, ProcessFamily.WET_PROCESS),
+        ROASTER("焙烧炉", "把硫化矿、辰砂和碳酸盐做热处理，产出焙烧矿、硫粉或石灰粉。", 220, 56, PowerMode.HEAT_OR_GRID, ProcessFamily.THERMAL),
+        REDUCTION_FURNACE("还原炉", "用简化碳热还原把精矿变成兼容 MC 的锭，同时产生矿渣。", 260, 72, PowerMode.HEAT_OR_GRID, ProcessFamily.THERMAL),
+        LEACHING_TANK("浸出槽", "模拟湿法冶金，从石英脉、绿柱石和红石精矿里选择性提取目标物。", 200, 40, PowerMode.GRID_ONLY, ProcessFamily.WET_PROCESS),
+        ELECTROLYTIC_CELL("电解槽", "用现代电化学路线精炼铜、金、青金石和绿柱石精矿。", 280, 96, PowerMode.GRID_ONLY, ProcessFamily.ELECTROCHEMICAL),
+        POWDER_PRESS("压粉机", "把粉末或精矿压回 MC 兼容物品，保留合成魔法的便利性。", 100, 48, PowerMode.GRID_ONLY, ProcessFamily.FORMING),
+        CHEMICAL_REACTOR("化学反应釜", "承载酸碱中和、酸解、氧化和常见无机化工反应的简化路线。", 200, 64, PowerMode.GRID_ONLY, ProcessFamily.REACTION),
+        DISTILLATION_COLUMN("精馏塔", "分离盐卤、盐酸和煤焦油等混合物，得到更集中的化工原料。", 260, 64, PowerMode.HEAT_OR_GRID, ProcessFamily.COLUMN),
+        MIXER("工业混合机", "把粉体和母料混合成玻璃配合料、水泥生料、肥料母料等中间物。", 100, 32, PowerMode.GRID_ONLY, ProcessFamily.MIXING),
+        CRYSTALLIZER("结晶器", "把盐、烧碱、硝酸铵、石膏等溶液或粉体整理成可堆叠产品。", 200, 40, PowerMode.GRID_ONLY, ProcessFamily.CRYSTALLIZATION),
+        INDUSTRIAL_KILN("工业窑炉", "处理玻璃、水泥、铝土矿和其他需要高温煅烧的化工路线。", 300, 80, PowerMode.HEAT_OR_GRID, ProcessFamily.THERMAL),
+        GAS_SEPARATOR("气体分离器", "从煤气、氯气等气体混合物中回收氢、氨、盐酸等产品。", 220, 96, PowerMode.GRID_ONLY, ProcessFamily.CLASSIFICATION),
+        FERTILIZER_GRANULATOR("肥料造粒机", "把氮肥、磷肥和复合肥母料整理成可运输的颗粒产品。", 140, 40, PowerMode.GRID_ONLY, ProcessFamily.FORMING),
+        POLYMERIZER("聚合釜", "把乙烯、丙烯和氯乙烯聚合为常见塑料树脂。", 260, 72, PowerMode.GRID_ONLY, ProcessFamily.REACTION),
+        STEAM_CRACKER("蒸汽裂解炉", "把煤焦油、煤气和混合树脂裂解成芳烃、烯烃与合成气入口。", 320, 120, PowerMode.HEAT_OR_GRID, ProcessFamily.THERMAL),
+        SYNTHESIS_LOOP("合成塔", "承载合成氨、甲醇、尿素和树脂前驱体这类高压循环反应。", 360, 128, PowerMode.GRID_ONLY, ProcessFamily.REACTION),
+        ABSORPTION_TOWER("吸收塔", "把酸性或含氯尾气吸收为硫酸、盐酸、纯碱等可用产品。", 240, 56, PowerMode.GRID_ONLY, ProcessFamily.COLUMN);
 
         private final String displayName;
         private final String description;
+        private final int processTicks;
+        private final int energyPerTick;
+        private final PowerMode powerMode;
+        private final ProcessFamily processFamily;
 
-        Kind(String displayName, String description) {
+        Kind(String displayName, String description, int processTicks, int energyPerTick,
+             PowerMode powerMode, ProcessFamily processFamily) {
             this.displayName = displayName;
             this.description = description;
+            this.processTicks = processTicks;
+            this.energyPerTick = energyPerTick;
+            this.powerMode = powerMode;
+            this.processFamily = processFamily;
         }
 
         public String displayName() {
@@ -618,6 +713,30 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
 
         public String descriptionKey() {
             return "tooltip.earth_on_minecraft.machine." + blockId() + ".description";
+        }
+
+        public String setpointKey() {
+            return "screen.earth_on_minecraft.machine.setpoint." + blockId();
+        }
+
+        public int processTicks() {
+            return processTicks;
+        }
+
+        public int energyPerTick() {
+            return energyPerTick;
+        }
+
+        public PowerMode powerMode() {
+            return powerMode;
+        }
+
+        public ProcessFamily processFamily() {
+            return processFamily;
+        }
+
+        public boolean acceptsLocalFuel() {
+            return powerMode.allowsLocalFuel();
         }
 
         public String localizedDisplayName() {
@@ -648,6 +767,57 @@ public class ProcessingMachineBlock extends Block implements EntityBlock {
                 case SYNTHESIS_LOOP -> "synthesis_loop";
                 case ABSORPTION_TOWER -> "absorption_tower";
             };
+        }
+    }
+
+    public enum PowerMode {
+        LOCAL_OR_GRID(true, "screen.earth_on_minecraft.machine.power.local_or_grid"),
+        HEAT_OR_GRID(true, "screen.earth_on_minecraft.machine.power.heat_or_grid"),
+        GRID_ONLY(false, "screen.earth_on_minecraft.machine.power.grid_only");
+
+        private final boolean allowsLocalFuel;
+        private final String labelKey;
+
+        PowerMode(boolean allowsLocalFuel, String labelKey) {
+            this.allowsLocalFuel = allowsLocalFuel;
+            this.labelKey = labelKey;
+        }
+
+        public boolean allowsLocalFuel() {
+            return allowsLocalFuel;
+        }
+
+        public String labelKey() {
+            return labelKey;
+        }
+    }
+
+    public enum ProcessFamily {
+        COMMINUTION("screen.earth_on_minecraft.machine.family.comminution", 0xFF7A6247),
+        CLASSIFICATION("screen.earth_on_minecraft.machine.family.classification", 0xFF4F7081),
+        WET_PROCESS("screen.earth_on_minecraft.machine.family.wet_process", 0xFF347B75),
+        THERMAL("screen.earth_on_minecraft.machine.family.thermal", 0xFFA44C2B),
+        ELECTROCHEMICAL("screen.earth_on_minecraft.machine.family.electrochemical", 0xFF356AA0),
+        FORMING("screen.earth_on_minecraft.machine.family.forming", 0xFF76678D),
+        REACTION("screen.earth_on_minecraft.machine.family.reaction", 0xFF8A5A32),
+        COLUMN("screen.earth_on_minecraft.machine.family.column", 0xFF4B6F76),
+        MIXING("screen.earth_on_minecraft.machine.family.mixing", 0xFF65733D),
+        CRYSTALLIZATION("screen.earth_on_minecraft.machine.family.crystallization", 0xFF6B7692);
+
+        private final String labelKey;
+        private final int accentColor;
+
+        ProcessFamily(String labelKey, int accentColor) {
+            this.labelKey = labelKey;
+            this.accentColor = accentColor;
+        }
+
+        public String labelKey() {
+            return labelKey;
+        }
+
+        public int accentColor() {
+            return accentColor;
         }
     }
 }

@@ -1,0 +1,12 @@
+{
+  "title_key": "resident.earth_on_minecraft.role.geologist",
+  "identity_key": "resident.earth_on_minecraft.identity.specialist",
+  "vanilla_professions": ["minecraft:cartographer", "minecraft:librarian"],
+  "settlement_profiles": ["earth_on_minecraft:resource_village"],
+  "weight": 2,
+  "trades": [
+    { "level": 1, "input": "minecraft:emerald", "input_count": 1, "output": "earth_on_minecraft:field_geology_notebook", "output_count": 1, "max_uses": 8, "xp": 2 },
+    { "level": 2, "input": "earth_on_minecraft:calcite_dust", "input_count": 8, "output": "minecraft:emerald", "output_count": 1, "max_uses": 12, "xp": 10 },
+    { "level": 3, "input": "minecraft:emerald", "input_count": 3, "output": "earth_on_minecraft:auriferous_quartz_chunk", "output_count": 2, "max_uses": 8, "xp": 20 }
+  ]
+}

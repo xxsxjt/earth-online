@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:resident/electrician/level_2_2",
+    "earth_on_minecraft:resident/geologist/level_2_2"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "earth_on_minecraft:smart_core_height_contract",
+  "status": "integration_contract_only",
+  "purpose": "Document how Earth on Minecraft should cooperate with Xxsx Smart Core's world-height UI without hard-linking Java classes.",
+  "smart_core_config_candidates": [
+    {
+      "file": "config/xxsx_mc_smart_core-common.toml",
+      "section": "world",
+      "key": "height_multiplier",
+      "type": "integer",
+      "range": [1, 16],
+      "base_height": 384
+    },
+    {
+      "file": "config/earth_on_minecraft-common.toml",
+      "section": "world",
+      "key": "strata_profile",
+      "type": "string",
+      "values": ["vanilla_height", "tall_512", "tall_768"]
+    }
+  ],
+  "rules": [
+    "Default generated worlds stay at vanilla 26.2 height unless the player explicitly selects a new-world preset or config route.",
+    "Earth on Minecraft may read Smart Core's height multiplier as a hint, but must still validate the active world's dimension type and not assume the value was applied.",
+    "When height changes, every placed_feature height band must be retuned as a set."
+  ]
+}

@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "earth_on_minecraft:block/battery_box"
+    },
+    "facing=east": {
+      "model": "earth_on_minecraft:block/battery_box",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "earth_on_minecraft:block/battery_box",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "earth_on_minecraft:block/battery_box",
+      "y": 270
     }
   }
 }

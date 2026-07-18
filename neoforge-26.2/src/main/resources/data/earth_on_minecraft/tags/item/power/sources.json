@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "earth_on_minecraft:coal_dust",
+    "earth_on_minecraft:coke",
+    "earth_on_minecraft:petroleum_coke",
+    "earth_on_minecraft:coal_gas_cell",
+    "earth_on_minecraft:natural_gas_cell",
+    "earth_on_minecraft:syngas_cell",
+    "earth_on_minecraft:simple_battery_cell",
+    "earth_on_minecraft:nuclear_heat_module",
+    "earth_on_minecraft:steam_turbine_assembly"
+  ]
+}

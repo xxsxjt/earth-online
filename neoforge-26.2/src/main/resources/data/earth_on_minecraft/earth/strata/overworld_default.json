@@ -1,0 +1,49 @@
+{
+  "id": "earth_on_minecraft:overworld_default",
+  "dimension": "minecraft:overworld",
+  "active_worldgen": false,
+  "minecraft_height": {
+    "min_y": -64,
+    "height": 384,
+    "logical_top_y": 320
+  },
+  "purpose": "Documentation metadata for the current safe default. It does not override the vanilla dimension type.",
+  "layers": [
+    {
+      "name": "surface_regolith",
+      "relative_to_surface": true,
+      "thickness_blocks": [1, 8],
+      "materials": ["grass_block", "dirt", "coarse_dirt", "podzol", "mud", "sand", "gravel", "clay"],
+      "role": "soil, weathered rock, alluvium and near-surface material routes"
+    },
+    {
+      "name": "sedimentary_cover",
+      "y_range": [24, 128],
+      "materials": ["sandstone", "limestone/calcite", "shale/deepslate proxy", "bituminous_coal_seam", "phosphorite_bed", "evaporite_salt_bed"],
+      "deposits": ["bituminous coal", "phosphorite", "evaporite salt", "bauxite laterite near surface"]
+    },
+    {
+      "name": "igneous_and_hydrothermal_belts",
+      "y_range": [-16, 96],
+      "materials": ["granite", "diorite", "andesite", "tuff", "calcite veins"],
+      "deposits": ["chalcopyrite veins", "auriferous quartz", "cinnabar", "emerald beryl veins"]
+    },
+    {
+      "name": "mafic_metamorphic_basement",
+      "y_range": [-64, 32],
+      "materials": ["deepslate", "basalt", "blackstone proxy", "tuff halo"],
+      "deposits": ["magnetite lenses", "anthracite seams", "lapis bodies", "redstone mineral bodies", "rare earth carbonatite"]
+    },
+    {
+      "name": "rare_vertical_pipes",
+      "y_range": [-64, 80],
+      "materials": ["kimberlite", "tuff breccia halo"],
+      "deposits": ["kimberlite pipe", "diamondiferous kimberlite pipe"]
+    }
+  ],
+  "compatibility_notes": [
+    "Do not force taller height into existing worlds.",
+    "Validate ore removal in new chunks because old chunks can retain historical vanilla ores.",
+    "The next custom deposit generator should bind host rock, main ore, companion minerals and halo rock into one spatial body."
+  ]
+}

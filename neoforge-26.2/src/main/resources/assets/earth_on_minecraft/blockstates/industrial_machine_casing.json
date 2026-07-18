@@ -1,10 +1,28 @@
 {
-  "variants": {
-    "assembled=false": {
-      "model": "earth_on_minecraft:block/industrial_machine_casing"
+  "multipart": [
+    {
+      "when": { "assembled": "false" },
+      "apply": { "model": "earth_on_minecraft:block/industrial_machine_casing" }
     },
-    "assembled=true": {
-      "model": "earth_on_minecraft:block/industrial_machine_casing_assembled"
+    {
+      "when": { "assembled": "true", "assembly_style": "none" },
+      "apply": { "model": "earth_on_minecraft:block/industrial_machine_casing_assembled" }
+    },
+    {
+      "when": { "assembled": "true", "assembly_style": "heavy" },
+      "apply": { "model": "earth_on_minecraft:block/industrial_machine_casing_assembled" }
+    },
+    {
+      "when": { "assembled": "true", "assembly_style": "wet" },
+      "apply": { "model": "earth_on_minecraft:block/industrial_machine_casing_assembled_wet" }
+    },
+    {
+      "when": { "assembled": "true", "assembly_style": "heated" },
+      "apply": { "model": "earth_on_minecraft:block/industrial_machine_casing_assembled_heated" }
+    },
+    {
+      "when": { "assembled": "true", "assembly_style": "tower" },
+      "apply": { "model": "earth_on_minecraft:block/industrial_machine_casing_assembled_tower" }
     }
-  }
+  ]
 }

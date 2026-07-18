@@ -23,10 +23,14 @@ public final class MachineMultiblock {
 
     public static Pattern patternFor(ProcessingMachineBlock.Kind kind) {
         return switch (kind) {
-            case GAS_SEPARATOR -> Pattern.HEAVY_FRAME;
-            case FLOTATION_CELL, LEACHING_TANK, ELECTROLYTIC_CELL, CHEMICAL_REACTOR, POLYMERIZER -> Pattern.WET_VESSEL;
-            case ROASTER, REDUCTION_FURNACE, INDUSTRIAL_KILN, STEAM_CRACKER -> Pattern.HEATED_LINE;
-            case DISTILLATION_COLUMN, SYNTHESIS_LOOP, ABSORPTION_TOWER -> Pattern.TALL_COLUMN;
+            case GAS_SEPARATOR -> Pattern.PRESSURE_SKID;
+            case FLOTATION_CELL, LEACHING_TANK -> Pattern.WET_VESSEL;
+            case ELECTROLYTIC_CELL -> Pattern.ELECTROLYSIS_BANK;
+            case CHEMICAL_REACTOR, POLYMERIZER -> Pattern.REACTION_VESSEL;
+            case ROASTER, REDUCTION_FURNACE, INDUSTRIAL_KILN -> Pattern.HEATED_LINE;
+            case STEAM_CRACKER -> Pattern.CRACKING_FURNACE;
+            case DISTILLATION_COLUMN, ABSORPTION_TOWER -> Pattern.TALL_COLUMN;
+            case SYNTHESIS_LOOP -> Pattern.PRESSURE_LOOP;
             default -> Pattern.NONE;
         };
     }
@@ -107,34 +111,77 @@ public final class MachineMultiblock {
     }
 
     public static void syncAssembly(Level level, BlockPos controller, ProcessingMachineBlock.Kind kind, boolean assembled) {
-        clearAssemblyNear(level, controller);
+        Pattern pattern = patternFor(kind);
+        clearAssemblyForPattern(level, controller, pattern);
         if (!assembled) {
             return;
         }
+        StyledSupportPartBlock.AssemblyStyle style = assemblyStyleFor(pattern);
         findMatch(level, controller, kind).ifPresent(match -> {
             for (BlockPos part : match.parts()) {
-                setAssembled(level, part, true);
+                setAssembled(level, part, true, style);
             }
         });
     }
 
-    private static void clearAssemblyNear(Level level, BlockPos controller) {
-        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
-        for (int dx = -5; dx <= 5; dx++) {
-            for (int dy = -1; dy <= 5; dy++) {
-                for (int dz = -5; dz <= 5; dz++) {
-                    cursor.set(controller.getX() + dx, controller.getY() + dy, controller.getZ() + dz);
-                    setAssembled(level, cursor, false);
+    public static void syncPanelActive(Level level, BlockPos controller, ProcessingMachineBlock.Kind kind, boolean active) {
+        if (level.isClientSide()) {
+            return;
+        }
+        findMatch(level, controller, kind).ifPresent(match -> {
+            for (BlockPos part : match.parts()) {
+                BlockState state = level.getBlockState(part);
+                if (state.getBlock() != EarthOnMinecraft.CONTROL_PANEL.get()
+                        || !state.hasProperty(ControlPanelBlock.ACTIVE)) {
+                    continue;
                 }
+                boolean nextActive = active && state.getValue(SupportPartBlock.ASSEMBLED);
+                if (state.getValue(ControlPanelBlock.ACTIVE) != nextActive) {
+                    level.setBlock(part, state.setValue(ControlPanelBlock.ACTIVE, nextActive), Block.UPDATE_CLIENTS);
+                }
+            }
+        });
+    }
+
+    private static void clearAssemblyForPattern(Level level, BlockPos controller, Pattern pattern) {
+        if (pattern == Pattern.NONE) {
+            return;
+        }
+        for (Direction front : HORIZONTALS) {
+            for (Requirement requirement : requirementsFor(pattern, front)) {
+                setAssembled(level, requirement.resolve(controller), false,
+                        StyledSupportPartBlock.AssemblyStyle.NONE);
             }
         }
     }
 
-    private static void setAssembled(Level level, BlockPos pos, boolean assembled) {
+    private static void setAssembled(Level level, BlockPos pos, boolean assembled,
+                                     StyledSupportPartBlock.AssemblyStyle style) {
         var state = level.getBlockState(pos);
-        if (state.hasProperty(SupportPartBlock.ASSEMBLED) && state.getValue(SupportPartBlock.ASSEMBLED) != assembled) {
-            level.setBlock(pos, state.setValue(SupportPartBlock.ASSEMBLED, assembled), Block.UPDATE_CLIENTS);
+        if (!state.hasProperty(SupportPartBlock.ASSEMBLED)) {
+            return;
         }
+        BlockState next = state.setValue(SupportPartBlock.ASSEMBLED, assembled);
+        if (next.hasProperty(ControlPanelBlock.ACTIVE) && !assembled) {
+            next = next.setValue(ControlPanelBlock.ACTIVE, false);
+        }
+        if (next.hasProperty(StyledSupportPartBlock.ASSEMBLY_STYLE)) {
+            next = next.setValue(StyledSupportPartBlock.ASSEMBLY_STYLE,
+                    assembled ? style : StyledSupportPartBlock.AssemblyStyle.NONE);
+        }
+        if (next != state) {
+            level.setBlock(pos, next, Block.UPDATE_CLIENTS);
+        }
+    }
+
+    private static StyledSupportPartBlock.AssemblyStyle assemblyStyleFor(Pattern pattern) {
+        return switch (pattern) {
+            case NONE -> StyledSupportPartBlock.AssemblyStyle.NONE;
+            case PRESSURE_SKID -> StyledSupportPartBlock.AssemblyStyle.HEAVY;
+            case WET_VESSEL, ELECTROLYSIS_BANK, REACTION_VESSEL -> StyledSupportPartBlock.AssemblyStyle.WET;
+            case HEATED_LINE, CRACKING_FURNACE -> StyledSupportPartBlock.AssemblyStyle.HEATED;
+            case TALL_COLUMN, PRESSURE_LOOP -> StyledSupportPartBlock.AssemblyStyle.TOWER;
+        };
     }
 
     private static Optional<Direction> findPanelFront(Level level, BlockPos controller) {
@@ -213,7 +260,7 @@ public final class MachineMultiblock {
                 return Optional.of(new Match(Direction.NORTH, List.of()));
             }
         },
-        HEAVY_FRAME("tooltip.earth_on_minecraft.multiblock.heavy_frame", "screen.earth_on_minecraft.machine.structure.heavy_frame") {
+        PRESSURE_SKID("tooltip.earth_on_minecraft.multiblock.pressure_skid", "screen.earth_on_minecraft.machine.structure.pressure_skid") {
             @Override
             Optional<Match> findMatch(Level level, BlockPos controller) {
                 return findBox(level, controller, 1, 2, 2, PartRole.CASING, PartRole.CASING);
@@ -225,13 +272,37 @@ public final class MachineMultiblock {
                 return findBox(level, controller, 1, 2, 2, PartRole.CASING, PartRole.PIPE);
             }
         },
+        ELECTROLYSIS_BANK("tooltip.earth_on_minecraft.multiblock.electrolysis_bank", "screen.earth_on_minecraft.machine.structure.electrolysis_bank") {
+            @Override
+            Optional<Match> findMatch(Level level, BlockPos controller) {
+                return findBox(level, controller, 1, 3, 2, PartRole.CASING, PartRole.PIPE);
+            }
+        },
+        REACTION_VESSEL("tooltip.earth_on_minecraft.multiblock.reaction_vessel", "screen.earth_on_minecraft.machine.structure.reaction_vessel") {
+            @Override
+            Optional<Match> findMatch(Level level, BlockPos controller) {
+                return findBox(level, controller, 1, 3, 3, PartRole.CASING, PartRole.PIPE);
+            }
+        },
         HEATED_LINE("tooltip.earth_on_minecraft.multiblock.heated_line", "screen.earth_on_minecraft.machine.structure.heated_line") {
             @Override
             Optional<Match> findMatch(Level level, BlockPos controller) {
                 return findBox(level, controller, 1, 3, 2, PartRole.CASING, PartRole.PIPE);
             }
         },
+        CRACKING_FURNACE("tooltip.earth_on_minecraft.multiblock.cracking_furnace", "screen.earth_on_minecraft.machine.structure.cracking_furnace") {
+            @Override
+            Optional<Match> findMatch(Level level, BlockPos controller) {
+                return findBox(level, controller, 1, 3, 3, PartRole.CASING, PartRole.PIPE);
+            }
+        },
         TALL_COLUMN("tooltip.earth_on_minecraft.multiblock.tall_column", "screen.earth_on_minecraft.machine.structure.tall_column") {
+            @Override
+            Optional<Match> findMatch(Level level, BlockPos controller) {
+                return findBox(level, controller, 1, 3, 4, PartRole.CASING, PartRole.PIPE);
+            }
+        },
+        PRESSURE_LOOP("tooltip.earth_on_minecraft.multiblock.pressure_loop", "screen.earth_on_minecraft.machine.structure.pressure_loop") {
             @Override
             Optional<Match> findMatch(Level level, BlockPos controller) {
                 return findBox(level, controller, 1, 3, 3, PartRole.CASING, PartRole.PIPE);
@@ -260,10 +331,14 @@ public final class MachineMultiblock {
     private static List<Requirement> requirementsFor(Pattern pattern, Direction front) {
         return switch (pattern) {
             case NONE -> List.of();
-            case HEAVY_FRAME -> buildBoxRequirements(front, 1, 2, 2, PartRole.CASING, PartRole.CASING);
+            case PRESSURE_SKID -> buildBoxRequirements(front, 1, 2, 2, PartRole.CASING, PartRole.CASING);
             case WET_VESSEL -> buildBoxRequirements(front, 1, 2, 2, PartRole.CASING, PartRole.PIPE);
+            case ELECTROLYSIS_BANK -> buildBoxRequirements(front, 1, 3, 2, PartRole.CASING, PartRole.PIPE);
+            case REACTION_VESSEL -> buildBoxRequirements(front, 1, 3, 3, PartRole.CASING, PartRole.PIPE);
             case HEATED_LINE -> buildBoxRequirements(front, 1, 3, 2, PartRole.CASING, PartRole.PIPE);
-            case TALL_COLUMN -> buildBoxRequirements(front, 1, 3, 3, PartRole.CASING, PartRole.PIPE);
+            case CRACKING_FURNACE -> buildBoxRequirements(front, 1, 3, 3, PartRole.CASING, PartRole.PIPE);
+            case TALL_COLUMN -> buildBoxRequirements(front, 1, 3, 4, PartRole.CASING, PartRole.PIPE);
+            case PRESSURE_LOOP -> buildBoxRequirements(front, 1, 3, 3, PartRole.CASING, PartRole.PIPE);
         };
     }
 
@@ -284,9 +359,9 @@ public final class MachineMultiblock {
         List<Requirement> requirements = new ArrayList<>();
         requirements.add(Requirement.relative(front, 0, -1, 0, PartRole.CONTROL_PANEL));
         for (int right = -halfWidth; right <= halfWidth; right++) {
-            for (int back = 0; back < depth; back++) {
+            for (int back = -1; back < depth - 1; back++) {
                 for (int up = 0; up < height; up++) {
-                    if (right == 0 && back == 0 && up == 0) {
+                    if (right == 0 && up == 0 && (back == -1 || back == 0)) {
                         continue;
                     }
                     PartRole role = up == 0 ? lowerRole : upperRole;

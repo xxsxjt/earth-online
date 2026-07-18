@@ -1,24 +1,31 @@
 {
   "id": "minecraft:stone",
-  "note": "Rock compositions are ranges, not exact block formulas.",
+  "type": "unclassified_overworld_rock",
+  "note": "Minecraft stone is a gameplay abstraction for common overworld bedrock. It is not granite; use it as a mixed silicate-carbonate source until a later strata preset can replace it with local lithology.",
   "components": [
     {
       "material": "quartz",
       "formula": "SiO2",
-      "min": 0.25,
-      "max": 0.45
+      "min": 0.2,
+      "max": 0.4
     },
     {
       "material": "feldspar",
       "formula": "K/Na/Ca aluminosilicates",
-      "min": 0.25,
-      "max": 0.45
+      "min": 0.15,
+      "max": 0.35
     },
     {
-      "material": "mica_clay",
-      "formula": "hydrated aluminosilicates",
-      "min": 0.05,
-      "max": 0.2
+      "material": "mafic_clay_chlorite",
+      "formula": "Mg/Fe silicates + hydrated aluminosilicates",
+      "min": 0.1,
+      "max": 0.3
+    },
+    {
+      "material": "carbonate_cement",
+      "formula": "CaCO3",
+      "min": 0.0,
+      "max": 0.15
     },
     {
       "material": "iron_oxides",

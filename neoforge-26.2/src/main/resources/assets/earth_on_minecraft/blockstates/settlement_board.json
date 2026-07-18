@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "earth_on_minecraft:block/settlement_board" },
+    "facing=east": { "model": "earth_on_minecraft:block/settlement_board", "y": 90 },
+    "facing=south": { "model": "earth_on_minecraft:block/settlement_board", "y": 180 },
+    "facing=west": { "model": "earth_on_minecraft:block/settlement_board", "y": 270 }
+  }
+}

@@ -2,6 +2,8 @@ package com.xxsx.earthonminecraft;
 
 import com.mojang.logging.LogUtils;
 import com.xxsx.earthonminecraft.client.EarthOnMinecraftClient;
+import com.xxsx.earthonminecraft.living.ResidentProfileManager;
+import com.xxsx.earthonminecraft.living.SettlementDataManager;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -87,8 +89,8 @@ public class EarthOnMinecraft {
     public static final DeferredBlock<ProcessingMachineBlock> SYNTHESIS_LOOP = machineBlock("synthesis_loop", ProcessingMachineBlock.Kind.SYNTHESIS_LOOP);
     public static final DeferredBlock<ProcessingMachineBlock> ABSORPTION_TOWER = machineBlock("absorption_tower", ProcessingMachineBlock.Kind.ABSORPTION_TOWER);
 
-    public static final DeferredBlock<SupportPartBlock> INDUSTRIAL_MACHINE_CASING = supportBlock("industrial_machine_casing", MapColor.METAL, 4.5F, "tooltip.earth_on_minecraft.support.casing");
-    public static final DeferredBlock<SupportPartBlock> STEEL_PROCESS_PIPE = supportBlock("steel_process_pipe", MapColor.METAL, 3.0F, "tooltip.earth_on_minecraft.support.pipe");
+    public static final DeferredBlock<StyledSupportPartBlock> INDUSTRIAL_MACHINE_CASING = supportBlock("industrial_machine_casing", MapColor.METAL, 4.5F, "tooltip.earth_on_minecraft.support.casing");
+    public static final DeferredBlock<StyledSupportPartBlock> STEEL_PROCESS_PIPE = supportBlock("steel_process_pipe", MapColor.METAL, 3.0F, "tooltip.earth_on_minecraft.support.pipe");
     public static final DeferredBlock<ControlPanelBlock> CONTROL_PANEL = controlPanelBlock("control_panel", MapColor.COLOR_GRAY, 3.5F, "tooltip.earth_on_minecraft.support.control_panel");
     public static final DeferredBlock<StructureProjectionBlock> STRUCTURE_PROJECTION = structureProjectionBlock("structure_projection");
     public static final DeferredBlock<MachineInterfaceBlock> MACHINE_INPUT_INTERFACE = machineInterfaceBlock("machine_input_interface", MachineInterfaceBlock.InterfaceType.INPUT, "tooltip.earth_on_minecraft.support.input_interface");
@@ -100,6 +102,7 @@ public class EarthOnMinecraft {
     public static final DeferredBlock<PowerCableBlock> HEAVY_COPPER_POWER_CABLE = powerCableBlock("heavy_copper_power_cable", 3);
     public static final DeferredBlock<BatteryBoxBlock> BATTERY_BOX = batteryBoxBlock("battery_box");
     public static final DeferredBlock<ConveyorBeltBlock> CONVEYOR_BELT = conveyorBeltBlock("conveyor_belt");
+    public static final DeferredBlock<SettlementBoardBlock> SETTLEMENT_BOARD = settlementBoardBlock("settlement_board");
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ProcessingMachineBlockEntity>> PROCESSING_MACHINE_BLOCK_ENTITY =
             BLOCK_ENTITY_TYPES.register("processing_machine", () -> new BlockEntityType<>(
@@ -125,10 +128,16 @@ public class EarthOnMinecraft {
             BLOCK_ENTITY_TYPES.register("conveyor_belt", () -> new BlockEntityType<>(
                     ConveyorBeltBlockEntity::new,
                     CONVEYOR_BELT.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SettlementBoardBlockEntity>> SETTLEMENT_BOARD_BLOCK_ENTITY =
+            BLOCK_ENTITY_TYPES.register("settlement_board", () -> new BlockEntityType<>(
+                    SettlementBoardBlockEntity::new,
+                    SETTLEMENT_BOARD.get()));
     public static final DeferredHolder<MenuType<?>, MenuType<EnergyGeneratorMenu>> ENERGY_GENERATOR_MENU =
             MENUS.register("combustion_generator", () -> IMenuTypeExtension.create(EnergyGeneratorMenu::new));
     public static final DeferredHolder<MenuType<?>, MenuType<BatteryBoxMenu>> BATTERY_BOX_MENU =
             MENUS.register("battery_box", () -> IMenuTypeExtension.create(BatteryBoxMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<SettlementBoardMenu>> SETTLEMENT_BOARD_MENU =
+            MENUS.register("settlement_board", () -> IMenuTypeExtension.create(SettlementBoardMenu::new));
 
     public static final DeferredItem<Item> MAGNETITE_CHUNK = item("magnetite_chunk");
     public static final DeferredItem<Item> CHALCOPYRITE_CHUNK = item("chalcopyrite_chunk");
@@ -380,6 +389,13 @@ public class EarthOnMinecraft {
         MENUS.register(modBus);
         modBus.addListener(this::registerCreativeTab);
         NeoForge.EVENT_BUS.addListener(EarthOnMinecraftTooltips::addVanillaTooltips);
+        NeoForge.EVENT_BUS.addListener(SettlementDataManager::registerReloadListeners);
+        NeoForge.EVENT_BUS.addListener(ResidentProfileManager::onEntityJoin);
+        NeoForge.EVENT_BUS.addListener(ResidentProfileManager::onEntityTick);
+        NeoForge.EVENT_BUS.addListener(ResidentProfileManager::onEntityInteract);
+        NeoForge.EVENT_BUS.addListener(ResidentProfileManager::onLivingDeath);
+        NeoForge.EVENT_BUS.addListener(SettlementFacilities::onBlockPlaced);
+        NeoForge.EVENT_BUS.addListener(SettlementFacilities::onBlockBreak);
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             EarthOnMinecraftClient.register(modBus);
         }
@@ -413,8 +429,8 @@ public class EarthOnMinecraft {
         return block;
     }
 
-    private static DeferredBlock<SupportPartBlock> supportBlock(String id, MapColor color, float strength, String hintKey) {
-        DeferredBlock<SupportPartBlock> block = BLOCKS.registerBlock(id, SupportPartBlock::new,
+    private static DeferredBlock<StyledSupportPartBlock> supportBlock(String id, MapColor color, float strength, String hintKey) {
+        DeferredBlock<StyledSupportPartBlock> block = BLOCKS.registerBlock(id, StyledSupportPartBlock::new,
                 () -> BlockBehaviour.Properties.of()
                         .mapColor(color)
                         .strength(strength, strength * 2.0F)
@@ -432,6 +448,7 @@ public class EarthOnMinecraft {
                 () -> BlockBehaviour.Properties.of()
                         .mapColor(color)
                         .strength(strength, strength * 2.0F)
+                        .lightLevel(state -> state.getValue(ControlPanelBlock.ACTIVE) ? 5 : 0)
                         .requiresCorrectToolForDrops()
                         .sound(SoundType.METAL));
         DeferredItem<?> item = ITEMS.registerItem(id,
@@ -542,6 +559,20 @@ public class EarthOnMinecraft {
                         .sound(SoundType.METAL));
         DeferredItem<?> item = ITEMS.registerItem(id,
                 props -> new GuidedBlockItem(block.get(), props, "tooltip.earth_on_minecraft.automation.conveyor"),
+                props -> props);
+        TAB_ITEMS.add(item);
+        return block;
+    }
+
+    private static DeferredBlock<SettlementBoardBlock> settlementBoardBlock(String id) {
+        DeferredBlock<SettlementBoardBlock> block = BLOCKS.registerBlock(id, SettlementBoardBlock::new,
+                () -> BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.WOOD)
+                        .strength(2.0F, 3.0F)
+                        .noOcclusion()
+                        .sound(SoundType.WOOD));
+        DeferredItem<?> item = ITEMS.registerItem(id,
+                props -> new GuidedBlockItem(block.get(), props, "tooltip.earth_on_minecraft.settlement_board"),
                 props -> props);
         TAB_ITEMS.add(item);
         return block;

@@ -1,0 +1,34 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "earth_on_minecraft:block/control_panel_connected",
+    "panel": "earth_on_minecraft:block/control_panel_connected",
+    "casing": "earth_on_minecraft:block/industrial_machine_casing_assembled",
+    "status": "minecraft:block/sea_lantern"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": { "texture": "#casing", "cullface": "down" },
+        "up": { "texture": "#casing", "cullface": "up" },
+        "north": { "texture": "#panel", "cullface": "north" },
+        "south": { "texture": "#casing", "cullface": "south" },
+        "west": { "texture": "#casing", "cullface": "west" },
+        "east": { "texture": "#casing", "cullface": "east" }
+      }
+    },
+    {
+      "from": [11, 10, 0],
+      "to": [14, 13, 0.5],
+      "faces": {
+        "north": { "texture": "#status" },
+        "up": { "texture": "#status" },
+        "down": { "texture": "#status" },
+        "west": { "texture": "#status" },
+        "east": { "texture": "#status" }
+      }
+    }
+  ]
+}

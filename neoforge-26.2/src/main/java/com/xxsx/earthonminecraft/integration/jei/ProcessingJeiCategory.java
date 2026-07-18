@@ -25,7 +25,7 @@ public class ProcessingJeiCategory implements IRecipeCategory<ProcessingMachineB
 
     public ProcessingJeiCategory(IGuiHelper guiHelper, ProcessingMachineBlock.Kind kind,
                                  IRecipeType<ProcessingMachineBlock.Recipe> recipeType, ItemLike iconItem) {
-        this.background = guiHelper.createBlankDrawable(168, 72);
+        this.background = guiHelper.createBlankDrawable(168, 88);
         this.icon = guiHelper.createDrawableItemLike(iconItem);
         this.kind = kind;
         this.recipeType = recipeType;
@@ -73,14 +73,19 @@ public class ProcessingJeiCategory implements IRecipeCategory<ProcessingMachineB
     @Override
     public void draw(ProcessingMachineBlock.Recipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
         var font = Minecraft.getInstance().font;
-        graphics.text(font, Component.translatable(kind.displayNameKey()), 4, 2, 0xFF84D3A5);
-        graphics.text(font, "->", 44, 27, 0xFFE8DFAF);
-        graphics.text(font, Component.translatable("jei.earth_on_minecraft.processing.fuel"), 4, 46, 0xFFE0B75A);
+        int accent = kind.processFamily().accentColor();
+        graphics.fill(0, 0, getWidth(), 14, 0xFF25292C);
+        graphics.fill(0, 14, getWidth(), getHeight(), 0xFF34383B);
+        graphics.fill(0, 14, 3, getHeight(), accent);
+        graphics.text(font, Component.translatable(kind.displayNameKey()), 5, 3, 0xFFF4F4F4);
+        String processLine = localized(kind.processFamily().labelKey()) + " | " + localized(kind.setpointKey());
+        graphics.text(font, fit(processLine, 158), 5, 16, accent);
+        graphics.text(font, "->", 44, 31, 0xFFF2E4B6);
+        graphics.text(font, fit(localized(kind.powerMode().labelKey()), 158), 5, 51, 0xFFFFD782);
+        graphics.text(font, Component.translatable("jei.earth_on_minecraft.processing.spec",
+                Math.max(1, (kind.processTicks() + 19) / 20), kind.energyPerTick()), 5, 62, 0xFFD9EEF4);
         String note = recipeNote(recipe);
-        if (font.width(note) > 126) {
-            note = font.plainSubstrByWidth(note, 123) + "...";
-        }
-        graphics.text(font, note, 40, 58, 0xFFFFF2CC);
+        graphics.text(font, fit(note, 158), 5, 74, 0xFFFFF2CC);
     }
 
     private static String recipeNote(ProcessingMachineBlock.Recipe recipe) {
@@ -88,5 +93,17 @@ public class ProcessingJeiCategory implements IRecipeCategory<ProcessingMachineB
             return recipe.note();
         }
         return Language.getInstance().getOrDefault("screen.earth_on_minecraft.machine.recipe_ready") + ": " + RouteGuide.describeOutputs(recipe);
+    }
+
+    private static String localized(String key) {
+        return Language.getInstance().getOrDefault(key);
+    }
+
+    private static String fit(String text, int width) {
+        var font = Minecraft.getInstance().font;
+        if (font.width(text) <= width) {
+            return text;
+        }
+        return font.plainSubstrByWidth(text, Math.max(0, width - font.width("..."))) + "...";
     }
 }

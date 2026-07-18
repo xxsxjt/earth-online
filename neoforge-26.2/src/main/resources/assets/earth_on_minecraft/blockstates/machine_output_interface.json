@@ -1,10 +1,50 @@
 {
   "variants": {
-    "assembled=false": {
+    "assembled=false,facing=down": {
+      "model": "earth_on_minecraft:block/machine_output_interface",
+      "x": 90
+    },
+    "assembled=false,facing=east": {
+      "model": "earth_on_minecraft:block/machine_output_interface",
+      "y": 90
+    },
+    "assembled=false,facing=north": {
       "model": "earth_on_minecraft:block/machine_output_interface"
     },
-    "assembled=true": {
+    "assembled=false,facing=south": {
+      "model": "earth_on_minecraft:block/machine_output_interface",
+      "y": 180
+    },
+    "assembled=false,facing=up": {
+      "model": "earth_on_minecraft:block/machine_output_interface",
+      "x": 270
+    },
+    "assembled=false,facing=west": {
+      "model": "earth_on_minecraft:block/machine_output_interface",
+      "y": 270
+    },
+    "assembled=true,facing=down": {
+      "model": "earth_on_minecraft:block/machine_output_interface_assembled",
+      "x": 90
+    },
+    "assembled=true,facing=east": {
+      "model": "earth_on_minecraft:block/machine_output_interface_assembled",
+      "y": 90
+    },
+    "assembled=true,facing=north": {
       "model": "earth_on_minecraft:block/machine_output_interface_assembled"
+    },
+    "assembled=true,facing=south": {
+      "model": "earth_on_minecraft:block/machine_output_interface_assembled",
+      "y": 180
+    },
+    "assembled=true,facing=up": {
+      "model": "earth_on_minecraft:block/machine_output_interface_assembled",
+      "x": 270
+    },
+    "assembled=true,facing=west": {
+      "model": "earth_on_minecraft:block/machine_output_interface_assembled",
+      "y": 270
     }
   }
 }

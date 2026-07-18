@@ -136,6 +136,10 @@ public class EnergyGeneratorMenu extends AbstractContainerMenu {
         return isTurbineData() ? EnergyGeneratorBlockEntity.TURBINE_TRANSFER_PER_TICK : EnergyGeneratorBlockEntity.TRANSFER_PER_TICK;
     }
 
+    public boolean steamTurbineGenerator() {
+        return isTurbineData();
+    }
+
     private boolean isTurbineData() {
         return this.steamTurbineGenerator || capacity() >= EnergyGeneratorBlockEntity.TURBINE_CAPACITY;
     }

@@ -3,7 +3,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.140'
 }
 
-version = '0.1.6'
+version = '0.1.9'
 group = 'com.xxsx.earthonminecraft'
 base.archivesName = 'earth-on-minecraft-neoforge-26.2'
 
@@ -13,9 +13,14 @@ neoForge {
     version = '26.2.0.7-beta'
 
     runs {
-        configureEach {
+        client {
             client()
+            gameDirectory = project.file('runs/client')
+        }
+        server {
             server()
+            gameDirectory = project.file('runs/server')
+            programArgument('--nogui')
         }
     }
 
@@ -26,11 +31,21 @@ neoForge {
     }
 }
 
-def localJeiJar = file('D:/_dx/_Games/MC/xxxxxx/.minecraft/versions/26.2-NeoForge_26.2.0.7-beta/mods/[JEI物品管理器] jei-26.2-neoforge-30.6.0.36.jar')
+def jeiSearchDirs = [
+        file('libs'),
+        file('D:/_dx/_Games/MC/xxxxxx/.minecraft/versions/26.2-NeoForge_26.2.0.7-beta/mods')
+]
+def localJeiJar = jeiSearchDirs
+        .findAll { it.exists() }
+        .collectMany { dir -> fileTree(dir: dir, include: ['*jei-26.2-neoforge-*.jar', '*JEI*jei-26.2-neoforge-*.jar']).files }
+        .sort { a, b -> b.lastModified() <=> a.lastModified() }
+        .find()
 
 dependencies {
-    if (localJeiJar.exists()) {
+    if (localJeiJar != null && localJeiJar.exists()) {
         compileOnly files(localJeiJar)
+    } else {
+        logger.warn('JEI compileOnly jar not found. Put jei-26.2-neoforge-*.jar in neoforge-26.2/libs or install it in the 26.2 test instance mods folder.')
     }
 }
 

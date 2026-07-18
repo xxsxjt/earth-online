@@ -31,7 +31,7 @@ single item sprite on transparent background, centered, readable silhouette, no 
 机器贴图补充：
 
 ```text
-industrial voxel machine block texture, exterior face of a physical cube machine, functional front face, coherent side/top/back surface roles, bolts, vents, service hatches, ports, subdued realistic material colors, readable at 64x64/128x128, no cutaway diagram
+industrial voxel machine block texture, exterior face of a physical cube machine, functional front face, coherent side/top/back surface roles, bolts, vents, service hatches, ports, subdued realistic material colors, readable at 256x256/128x128/64x64, no cutaway diagram
 ```
 
 ## 岩石方块
@@ -314,12 +314,12 @@ python 'C:\Users\du_ji\.codex\skills\.system\imagegen\scripts\image_gen.py' gene
   --force
 ```
 
-规则：`C:\Users\du_ji\.agents\secrets\image2-openai-key.clixml` 是当前优先使用的 `image-2` 密钥来源。它是当前 Windows 用户可解密的 DPAPI 加密文件；`C:\_dx\files\ls.txt` 只作为临时迁移来源。任何情况下都不要打印、提交或复制密钥内容。
+规则：`C:\Users\du_ji\.agents\secrets\image2-openai-key.clixml` 是主 `image-2` 凭据，`C:\Users\du_ji\.agents\secrets\image2-backup-key.clixml` 是备用凭据；两者都是仅当前 Windows 用户可解密的 DPAPI 文件。备用兼容端点为 `https://api.xxssxx.top/v1`。`tools/start-image2-batch.ps1` 默认使用 `ProviderMode=auto`，主接口失败后自动切换备用接口；已知主接口故障时可显式使用 `ProviderMode=backup`，避免每张图重复等待主接口失败。`C:\_dx\files\ls.txt` 只属于 Agnes 临时迁移路径，不能用于 `gpt-image-*`。任何情况下都不要打印、提交或复制密钥内容。
 
 规则：
 
-- 方块、机器、多方块成型外观先生成高分辨率方形源图，再裁切/缩放到 `64x64` 或 `128x128`；不要默认压回 `16x16`。
-- 小型材料物品可以继续用 `16x16/32x32`，但 JEI 高频、路线关键、玩家常看的物品优先做 `64x64` 源图再下采样。
+- 方块、机器、多方块成型外观生成并永久保留 `1024x1024` 母版，运行时统一输出为 `256x256`；不要默认压回 `16x16`，也不要直接把全部 1024 母版塞进 Minecraft 图集。
+- 物品生成并保留 `1024x1024` 母版，运行时统一输出为 `128x128`。只有明确追求原版低分辨率风格或性能兼容包时才另做 `16x16/32x32/64x64` 版本。
 - Python/Pillow 只负责裁切、缩放、透明清理、拼图和校验，不作为最终精致贴图的绘制方式。
 - 所有批次都要生成 contact sheet，检查是否有伪文字、复古蒸汽朋克感、过度写实照片感、风格跳变或远看不可读。
 - 机器 prompt 必须绑定现实原型和唯一主视觉，不允许只写 `modern machine`、`pipes`、`vents`、`indicator lights` 这类通用词。
@@ -518,7 +518,7 @@ original 16x16 pixel art item icon, handheld mineral analyzer device, small scre
 
 ## 使用建议
 
-- 方块贴图优先生成 `64x64` 或 `128x128` 成品源图；只有严格需要原版低分辨率风格时才缩到 `16x16`。
+- 方块贴图保留 `1024x1024` 母版并输出 `256x256` 运行时版本；只有严格需要原版低分辨率风格时才额外提供 `16x16/32x32/64x64` 兼容资源。
 - 矿物同系列要先固定调色板，例如磁铁矿全系使用黑、蓝灰、深灰，不要每张图都随机偏色。
 - 矿石贴图的矿物占比要对应纯度：贫矿稀疏，普通矿适中，富矿密集。
 - 机器贴图要先生成正面，再用同风格扩展侧面、顶部、底部；形成多方块结构后应有连续机壳、管线、控制面板的成型态贴图。

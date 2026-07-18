@@ -1,0 +1,18 @@
+{
+  "title_key": "resident.earth_on_minecraft.role.warehouse_manager",
+  "identity_key": "resident.earth_on_minecraft.identity.merchant",
+  "vanilla_professions": [
+    "minecraft:farmer",
+    "minecraft:shepherd",
+    "minecraft:butcher",
+    "minecraft:leatherworker",
+    "minecraft:fletcher"
+  ],
+  "settlement_profiles": [],
+  "weight": 3,
+  "trades": [
+    { "level": 1, "input": "minecraft:paper", "input_count": 16, "output": "minecraft:emerald", "output_count": 1, "max_uses": 12, "xp": 2 },
+    { "level": 2, "input": "minecraft:emerald", "input_count": 3, "output": "earth_on_minecraft:conveyor_drive", "output_count": 1, "max_uses": 8, "xp": 10 },
+    { "level": 3, "input": "minecraft:emerald", "input_count": 4, "output": "minecraft:chest", "output_count": 4, "max_uses": 8, "xp": 20 }
+  ]
+}

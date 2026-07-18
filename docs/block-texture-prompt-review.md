@@ -2,7 +2,7 @@
 
 ## 结论
 
-上一轮翻新的单张质量基本可用，尤其是机器正面已经比早期占位图好很多；主要问题不是清晰度，而是“机器之间的工程差异不够大”。很多提示词仍在共同使用黑灰机壳、窗口、管线、仪表、蓝色灯这些通用元素，导致远看像同一个机器系列换了中心装饰。
+上一轮翻新的单张质量基本可用，尤其是机器正面已经比早期临时图好很多；主要问题不是清晰度，而是“机器之间的工程差异不够大”。很多提示词仍在共同使用黑灰机壳、窗口、管线、仪表、蓝色灯这些通用元素，导致远看像同一个机器系列换了中心装饰。
 
 后续正式方块贴图应以 `image-2` 为首选。Agnes 可以继续用于低成本草稿、风格探索或非关键补量，但机器、能源设备、多方块成型态、矿床代表块这些高可见资产不应再默认走 Agnes。
 
@@ -23,7 +23,7 @@
 - `Functional landmark`: 玩家能理解“这是干什么”的结构特征。
 - `Shared style constraints`: 统一现代工业风、黑灰钢材、清晰小尺度、无文字。
 - `Differentiation lock`: 明确禁止与其他机器共用的主视觉。
-- `Downscale target`: 先生成 1024 源图，最终保留 128x128；只有小物品才降到 32/64。
+- `Resolution target`: 永久保留 1024x1024 AI 源图；方块、机器和多方块运行时资源输出为 256x256，物品输出为 128x128。不要把所有 1024 源图直接塞进游戏纹理图集。
 
 ## 机器主视觉表
 
@@ -75,7 +75,7 @@ Use case: stylized-concept
 Asset type: Minecraft mod block texture source art for Earth on Minecraft
 Primary request: <machine id> front face, based on a real <real machine archetype>
 Real machine archetype: <specific equipment>
-Primary silhouette: <one shape readable at 128x128 and 64x64>
+Primary silhouette: <one shape readable at 256x256, 128x128 and 64x64>
 Functional landmark: <parts that explain the machine's function>
 Style/medium: high-quality modern Minecraft mod block texture, orthographic square block face, crisp pixel-art-friendly source, contemporary industrial design
 Composition/framing: perfectly front-facing flat square texture, fills the square, no full cube render, no scene background
@@ -83,7 +83,7 @@ Materials/textures: graphite painted steel, brushed stainless, rubber seals, con
 Differentiation lock: must not look like <nearby similar machine>; emphasize <unique feature>
 Constraints: no text, no letters, no pseudo-letters, no numbers, no labels, no watermark, no logo, no UI frame
 Avoid: generic sci-fi panel, random decorative vents, steampunk, medieval, rusty junk, photoreal scene, blurry details
-Downscale target: generated at 1024x1024, final source texture kept at 128x128
+Resolution target: preserve the 1024x1024 master; export the runtime block texture at 256x256
 ```
 
 ## 标准 image-2 多方块 formed prompt 模板
@@ -96,7 +96,7 @@ Structure role: <outer shell / pipe corridor / connected control console / colum
 Real-world reference: <large plant skid, pressure vessel, furnace train, packed column, pipe rack>
 Visual requirement: looks like one section of a larger assembled machine, not a standalone decorative cube
 Continuity cues: panel seams continue across neighboring blocks, pipe flanges align, shell ribs continue, control lights show connected state
-Style/medium: modern industrial Minecraft block texture, orthographic square face, crisp 128x128 source texture
+Style/medium: modern industrial Minecraft block texture, orthographic square face, crisp 256x256 runtime texture from a preserved 1024x1024 master
 Constraints: no text, no letters, no pseudo-letters, no numbers, no labels, no watermark, no full cube render
 Avoid: loose pile of blocks, generic stone wall, retro factory, rusty steampunk, random sci-fi greebles
 ```

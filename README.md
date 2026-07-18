@@ -25,18 +25,24 @@
 - [近现代化工扩展计划](docs/modern-chemical-industry-plan.md)
 - [第二轮工业扩展计划](docs/round-2-industrial-expansion-plan.md)
 - [本体与附属边界](docs/core-and-addons-boundary.md)
+- [四模块生态联动契约 v1](docs/ecosystem-integration-contract-v1.md)
 - [玩家入门流程](docs/player-guide.md)
 - [贴图 AI 提示词](docs/asset-prompts.md)
 - [扩展路线图：核能、电网、自动化和科幻附属边界](docs/earth-on-minecraft-expanded-roadmap.md)
 - [科幻附属路线图](docs/scifi-addon-roadmap.md)
-- [0.1.6 Beta 发布说明](docs/release-notes-0.1.6-beta.md)
+- [0.1.9 Beta 发布说明](docs/release-notes-0.1.9-beta.md)
 - [地质生成与世界高度计划](docs/geology-worldgen-notes.md)
+- [生物、居民与聚落计划](docs/living-world-settlement-plan.md)
 
 ## 本体与附属边界
 
 本体只做现实地球的自然来源、物质流、工业、电力、物流、基础设施、手册和 JEI 路线。核动力、电网、PLC、传感器、输送和现代自动化属于本体；人物属性、食物保存、修仙、魔法、太空、AI 自治社会、纳米制造、反物质和曲率等属于独立路线或未来附属。
 
 新增内容优先保证本体可玩、可查、可兼容：玩家看到一个材料时，tooltip、机器界面、手册和 JEI 都应该告诉他下一步做什么。
+
+## 可选模块生态
+
+本体、`Earth Human`、`Earth Online: Magic` 和 `地球 Online：玄幻` 是可独立安装的同一生态。拆分用于并行开发和玩家自由选装，不代表互不联动：本体发布材料与环境角色标签，Human 消费现实环境接口，Magic/玄幻消费本体材料并通过共享持久化键协作。任何缺失组合都必须正常启动，详细规则见 [联动契约 v1](docs/ecosystem-integration-contract-v1.md)。
 
 ## 本地验证
 
@@ -51,9 +57,9 @@ python tools\validate_resources.py
 
 - GitHub: https://github.com/xxsxjt/xxsx-mc-earth-on-minecraft
 - `neoforge-26.2/` — NeoForge `26.2.0.7-beta` / Minecraft `26.2`，Java 25。
-- 构建产物：`neoforge-26.2/build/libs/earth-on-minecraft-neoforge-26.2-0.1.6.jar`
+- 构建产物：`neoforge-26.2/build/libs/earth-on-minecraft-neoforge-26.2-0.1.9.jar`
 - 测试部署：`D:\_dx\_Games\MC\xxxxxx\.minecraft\versions\26.2-NeoForge_26.2.0.7-beta\mods`
-- 发布状态：`0.1.6` 是开发中测试版，用于验证现实矿床、围岩/伴生特征、工业机器、电力、手册、JEI 联动、旧命名空间兼容和可复现打包流程。
+- 发布状态：`0.1.9` 是开发中测试版，用于验证现实矿床、工业/电力/物流、Living World 居民与聚落底座、双语手册、JEI 联动和四项目可选组合兼容。
 
 第一版已实现：
 
@@ -66,7 +72,7 @@ python tools\validate_resources.py
 - 已接入 JEI：显示 Earth on Minecraft 工业处理分类，并把所有处理机器作为配方催化剂。
 - 扩展常见化学工业入口：氯碱、硫酸、硝酸、氮磷钾肥、水泥、玻璃、煤化工、铝工业、钢坯、合成氨、尿素、甲醇/甲醛、聚乙烯、聚丙烯、PVC、石油炼化、造纸纤维、颜料涂料、PS、PET、合成橡胶、尼龙、电池材料、水处理、尾矿稳定化、橡胶硫化、有机溶剂、酚醛/环氧树脂、现代合金、钛、半导体前置材料、稀土磁材、工业催化剂、日化洗涤、PCB 电子材料、铅锌锡焊料、陶瓷耐火材料和合成气路线。
 - 新增核动力和现代自动化第一批可玩闭环：独居石/稀土尾渣进入铀矿物粉、黄饼、六氟化铀、低浓缩铀、二氧化铀、燃料芯块、燃料棒、燃料组件、核热模块和乏燃料封装；铜母排、变压器核心、开关柜、发电机定子、蒸汽轮机组件、PLC、传感器、伺服、执行器、机器人臂、视觉检测模块、自动化总线、红石 I/O 网关和输送驱动机构形成电网/自动化材料链。
-- 新增可测试电力与物流功能：汽轮发电机可使用核热模块接入 EOU 电网；工业输送机是低矮方块，会按放置朝向推动掉落物和实体。
+- 新增可测试电力与物流功能：汽轮发电机可使用核热模块接入 EOU 电网；工业输送机以可见单格货物方式搬运物品，不依赖推动掉落物实体。
 - 补全下游闭环：长石/云母/铝硅酸盐进入玻璃与陶瓷，矿渣进入水泥，塑料树脂可压制为 MC 兼容材料。
 - 新增现代工业副产物流：原油分馏会同时产生天然气、石脑油、煤油、柴油、润滑油、沥青、石油焦；颜料和炭黑可接回染料/涂料；纸浆可接回纸和线。
 - 第二轮新增电池/环保闭环：石油焦和炭黑进入石墨、活性炭和电池级碳粉；盐卤、红石精矿、镁铁质硅酸盐进入锂盐、锰氧化物和镍前驱体；硬水、酸碱废液、尾粉和污泥进入软化水、中和盐、稳定化尾矿与建材。
@@ -76,6 +82,10 @@ python tools\validate_resources.py
 - 改用 Earth on Minecraft 的稀疏大矿床 placed features，并追加围岩/伴生地质特征，如磁铁矿-凝灰岩、黄铜矿-花岗质围岩、含金石英-方解石、金伯利岩-凝灰质角砾、烟煤-砂岩围岩、无烟煤-深板岩围岩等。
 - 0.1.5 新增自然矿床来源：铝土矿风化壳、磷块岩沉积层、蒸发岩盐层、锡石砂矿和稀土碳酸岩矿体，分别接入铝工业、磷肥/石膏、氯碱/盐卤、锡焊料、稀土/核燃料材料链。
 - 0.1.6 新增旧命名空间兼容别名：旧测试存档中的 `earth_online:*` 方块、物品、机器方块实体和菜单会映射到新的 `earth_on_minecraft:*`。
+- 0.1.7 修正普通石头/圆石材料定位：普通石头是未分类地层石料，圆石是破碎采石骨料，不再像花岗岩；新增高地层/智能核心高度倍率联动规划数据，但默认不强改旧世界高度。
+- 0.1.8 新增默认高度下的真实地质背景层：沉积砂岩/石灰质层、花岗质/闪长质侵入体、安山岩/凝灰岩火山带、玄武质镁铁质岩脉，并按地层重调矿床高度带。
+- 0.1.9 细化原版岩石 Shift 材料卡：圆石明确为破碎采石骨料，普通石头为本地混合地层石料，花岗岩才使用明确花岗质矿物组合。
+- 0.1.9 新增 Living World 第一轮纵向切片：12 个双语姓名、6 个现实工作角色与普通居民兜底、3 类聚落档案、聚落公告板、角色专属数据驱动交易、居民/掠夺者掉落、设施登记和角色工作反馈。
 - 保留原版物品生态：矿物处理最终输出 `minecraft:iron_ingot`、`minecraft:copper_ingot`、`minecraft:gold_ingot`、`minecraft:diamond` 等。
 - 使用 26.2 新版 `assets/<modid>/items/*.json` 物品模型定义。
 - 已用 Agnes 生成并接入机器、新材料和精矿贴图；同时覆盖部分原版岩石视觉以强化真实岩石体系。新增贴图可用 `tools/generate_agnes_item_textures.py` 续跑。

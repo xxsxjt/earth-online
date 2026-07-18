@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "earth_on_minecraft:block/tower_machine_side",
+    "down": "earth_on_minecraft:block/industrial_machine_casing_assembled",
+    "up": "earth_on_minecraft:block/tower_machine_top",
+    "north": "earth_on_minecraft:block/tower_machine_side",
+    "south": "earth_on_minecraft:block/tower_machine_side",
+    "west": "earth_on_minecraft:block/tower_machine_side",
+    "east": "earth_on_minecraft:block/tower_machine_side"
+  }
+}

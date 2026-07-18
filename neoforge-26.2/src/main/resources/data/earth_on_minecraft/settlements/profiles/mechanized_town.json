@@ -1,0 +1,22 @@
+{
+  "display_name_key": "settlement.earth_on_minecraft.profile.mechanized_town",
+  "scale_key": "settlement.earth_on_minecraft.scale.town",
+  "technology_key": "settlement.earth_on_minecraft.technology.mechanized",
+  "name_keys": [
+    "settlement.earth_on_minecraft.name.pine_ridge_works",
+    "settlement.earth_on_minecraft.name.ironbridge"
+  ],
+  "industry_keys": [
+    "settlement.earth_on_minecraft.industry.manufacturing",
+    "settlement.earth_on_minecraft.industry.logistics"
+  ],
+  "demand_keys": [
+    "settlement.earth_on_minecraft.material.coal",
+    "settlement.earth_on_minecraft.material.lubricant"
+  ],
+  "supply_keys": [
+    "settlement.earth_on_minecraft.material.machine_parts",
+    "settlement.earth_on_minecraft.material.cable"
+  ],
+  "weight": 2
+}

@@ -1,5 +1,6 @@
 package com.xxsx.earthonminecraft.client;
 
+import com.xxsx.earthonminecraft.EarthOnMinecraft;
 import com.xxsx.earthonminecraft.EnergyGeneratorMenu;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -8,12 +9,10 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
 public class EnergyGeneratorScreen extends AbstractContainerScreen<EnergyGeneratorMenu> {
     private static final Identifier BG_LOCATION = Identifier.fromNamespaceAndPath("earth_on_minecraft", "textures/gui/container/energy_generator.png");
     private static final Identifier FUEL_SPRITE = Identifier.withDefaultNamespace("container/furnace/lit_progress");
@@ -37,6 +36,7 @@ public class EnergyGeneratorScreen extends AbstractContainerScreen<EnergyGenerat
     @Override
     protected void init() {
         super.init();
+        this.titleLabelX = Math.max(8, 87 - this.font.width(trimmedTitle()) / 2);
         addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.button.notebook"), button -> {
                     this.onClose();
                     EarthOnMinecraftClient.openNotebook();
@@ -49,6 +49,7 @@ public class EnergyGeneratorScreen extends AbstractContainerScreen<EnergyGenerat
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         super.extractBackground(g, mouseX, mouseY, delta);
         g.blit(RenderPipelines.GUI_TEXTURED, BG_LOCATION, this.leftPos, this.topPos, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
+        drawGeneratorChrome(g);
         drawFuel(g);
         drawEnergy(g, this.leftPos + ENERGY_X, this.topPos + ENERGY_Y, ENERGY_W, ENERGY_H, this.menu.energy(), this.menu.capacity());
     }
@@ -62,13 +63,34 @@ public class EnergyGeneratorScreen extends AbstractContainerScreen<EnergyGenerat
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        g.text(this.font, this.title, this.titleLabelX, this.titleLabelY, VANILLA_TEXT, false);
+        g.text(this.font, trimmedTitle(), this.titleLabelX, this.titleLabelY, VANILLA_TEXT, false);
         g.text(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, VANILLA_TEXT, false);
-        g.text(this.font, Component.translatable("screen.earth_on_minecraft.energy.fuel"), 38, 48, MUTED, false);
+        g.text(this.font, Component.translatable(this.menu.steamTurbineGenerator()
+                ? "screen.earth_on_minecraft.energy.steam_source"
+                : "screen.earth_on_minecraft.energy.fuel"), 38, 48, MUTED, false);
         g.text(this.font, Component.literal(compactEnergy(this.menu.energy(), this.menu.capacity())), ENERGY_X, 22, VANILLA_TEXT, false);
     }
 
+    private void drawGeneratorChrome(GuiGraphicsExtractor g) {
+        int accent = this.menu.steamTurbineGenerator() ? 0xFF2B91AA : 0xFFB05B27;
+        int x = this.leftPos + 8;
+        int y = this.topPos + 20;
+        g.fill(x, y, x + 58, y + 17, 0x66303030);
+        g.fill(x, y, x + 58, y + 2, accent);
+        ItemStack icon = new ItemStack(this.menu.steamTurbineGenerator()
+                ? EarthOnMinecraft.STEAM_TURBINE_GENERATOR.get()
+                : EarthOnMinecraft.COMBUSTION_GENERATOR.get());
+        g.item(icon, x + 1, y + 1);
+        String type = Component.translatable(this.menu.steamTurbineGenerator()
+                ? "screen.earth_on_minecraft.energy.type.steam_turbine"
+                : "screen.earth_on_minecraft.energy.type.combustion").getString();
+        g.text(this.font, fit(type, 37), x + 19, y + 5, accent, false);
+    }
+
     private void drawFuel(GuiGraphicsExtractor g) {
+        if (this.menu.burnTimeTotal() <= 0) {
+            return;
+        }
         int lit = Math.min(14, 14 * this.menu.burnTime() / this.menu.burnTimeTotal());
         if (lit > 0) {
             g.blitSprite(RenderPipelines.GUI_TEXTURED, FUEL_SPRITE, 14, 14, 0, 14 - lit,
@@ -115,8 +137,12 @@ public class EnergyGeneratorScreen extends AbstractContainerScreen<EnergyGenerat
     private void drawTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         if (isHovering(38, 57, 18, 18, mouseX, mouseY)) {
             g.setComponentTooltipForNextFrame(this.font, List.of(
-                    Component.translatable("screen.earth_on_minecraft.energy.generator_fuel"),
-                    Component.translatable("screen.earth_on_minecraft.machine.fuel.examples")
+                    Component.translatable(this.menu.steamTurbineGenerator()
+                            ? "screen.earth_on_minecraft.energy.steam_source.tooltip"
+                            : "screen.earth_on_minecraft.energy.generator_fuel"),
+                    Component.translatable(this.menu.steamTurbineGenerator()
+                            ? "screen.earth_on_minecraft.energy.steam_source.examples"
+                            : "screen.earth_on_minecraft.machine.fuel.examples")
             ), mouseX, mouseY);
         }
         if (isHovering(ENERGY_X, ENERGY_Y, ENERGY_W, ENERGY_H, mouseX, mouseY)) {
@@ -155,5 +181,20 @@ public class EnergyGeneratorScreen extends AbstractContainerScreen<EnergyGenerat
             return value / 1000 + "k";
         }
         return Integer.toString(value);
+    }
+
+    private Component trimmedTitle() {
+        String text = this.title.getString();
+        if (this.font.width(text) > 100) {
+            return Component.literal(this.font.plainSubstrByWidth(text, 97) + "...");
+        }
+        return this.title;
+    }
+
+    private String fit(String text, int width) {
+        if (this.font.width(text) <= width) {
+            return text;
+        }
+        return this.font.plainSubstrByWidth(text, Math.max(0, width - this.font.width("..."))) + "...";
     }
 }

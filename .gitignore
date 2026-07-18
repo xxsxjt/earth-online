@@ -2,6 +2,7 @@
 build/
 .gradle/
 run/
+**/runs/
 !gradle/wrapper/gradle-wrapper.jar
 
 # IDE
@@ -21,6 +22,8 @@ Thumbs.db
 # Logs
 logs/
 *.log
+**/__pycache__/
+*.pyc
 
 # Local generated previews and raw AI outputs
 tmp/

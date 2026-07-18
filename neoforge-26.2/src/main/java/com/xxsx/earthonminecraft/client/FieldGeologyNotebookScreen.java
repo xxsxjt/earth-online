@@ -8,14 +8,11 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-@OnlyIn(Dist.CLIENT)
 public class FieldGeologyNotebookScreen extends Screen {
     private static final int PAPER = 0xFFF0DFBA;
     private static final int PAPER_EDGE = 0xFFD6B77D;
@@ -31,8 +28,10 @@ public class FieldGeologyNotebookScreen extends Screen {
 
     private final List<Page> pages = createLocalizedPages();
     private final List<Button> tabButtons = new ArrayList<>();
+    private final List<Button> sectionButtons = new ArrayList<>();
 
     private int page;
+    private int section;
     private int scroll;
     private Button prevButton;
     private Button nextButton;
@@ -69,34 +68,62 @@ public class FieldGeologyNotebookScreen extends Screen {
             new PageSpec("ceramics", GOLD),
             new PageSpec("nuclear_power", RED),
             new PageSpec("grid_automation", BLUE),
+            new PageSpec("living_world", GREEN),
             new PageSpec("future", MUTED),
             new PageSpec("boundaries", BLUE),
             new PageSpec("soil_water", GREEN),
             new PageSpec("vanilla_clutter", GOLD)
     };
+    private static final Section[] SECTIONS = {
+            new Section("start", 0, 5),
+            new Section("geology", 5, 9),
+            new Section("industry", 9, 18),
+            new Section("advanced", 18, 28),
+            new Section("reference", 28, 32)
+    };
 
     @Override
     protected void init() {
         this.tabButtons.clear();
+        this.sectionButtons.clear();
+        this.section = sectionForPage(this.page);
         int left = bookLeft();
         int top = bookTop();
         int tabX = left + 10;
         int tabY = top + 42;
         int navW = Math.max(68, contentLeft() - left - 20);
-        int tabCols = pages.size() > 14 ? 3 : pages.size() > 7 ? 2 : 1;
-        int tabRows = (pages.size() + tabCols - 1) / tabCols;
-        int tabW = Math.max(22, (navW - (tabCols - 1) * 3) / tabCols);
         int bottom = top + bookHeight() - 28;
-        int tabGap = tabCols == 1 ? 3 : bookHeight() <= 240 ? 1 : 2;
-        int availableTabH = Math.max(10, bottom - 6 - tabY);
-        int tabH = tabCols == 1 ? 18 : Math.max(10, Math.min(14, (availableTabH - (tabRows - 1) * tabGap) / tabRows));
+        int sectionCols = 2;
+        int sectionGap = 3;
+        int sectionW = Math.max(30, (navW - sectionGap) / sectionCols);
+        int sectionH = 16;
+
+        for (int i = 0; i < SECTIONS.length; i++) {
+            final int index = i;
+            int col = i % sectionCols;
+            int row = i / sectionCols;
+            Button button = addRenderableWidget(Button.builder(
+                            Component.translatable("screen.earth_on_minecraft.notebook.section." + SECTIONS[i].key()),
+                            b -> setSection(index))
+                    .bounds(tabX + col * (sectionW + sectionGap), tabY + row * 18, sectionW, sectionH)
+                    .build());
+            sectionButtons.add(button);
+        }
+
+        int pageY = tabY + 56;
+        int pageCols = 2;
+        int pageGap = 3;
+        int pageW = Math.max(30, (navW - pageGap) / pageCols);
+        int pageH = bookHeight() <= 240 ? 14 : 16;
 
         for (int i = 0; i < pages.size(); i++) {
             final int index = i;
-            int col = i % tabCols;
-            int row = i / tabCols;
+            Section owner = SECTIONS[sectionForPage(i)];
+            int localIndex = i - owner.startInclusive();
+            int col = localIndex % pageCols;
+            int row = localIndex / pageCols;
             Button button = addRenderableWidget(Button.builder(Component.literal(pages.get(i).shortTitle), b -> setPage(index))
-                    .bounds(tabX + col * (tabW + 3), tabY + row * (tabH + tabGap), tabW, tabH)
+                    .bounds(tabX + col * (pageW + pageGap), pageY + row * (pageH + 2), pageW, pageH)
                     .build());
             tabButtons.add(button);
         }
@@ -210,13 +237,27 @@ public class FieldGeologyNotebookScreen extends Screen {
             return;
         }
         this.page = next;
+        this.section = sectionForPage(next);
         this.scroll = 0;
         updateButtonState();
     }
 
+    private void setSection(int nextSection) {
+        if (nextSection < 0 || nextSection >= SECTIONS.length) {
+            return;
+        }
+        Section target = SECTIONS[nextSection];
+        setPage(target.startInclusive());
+    }
+
     private void updateButtonState() {
         for (int i = 0; i < tabButtons.size(); i++) {
-            tabButtons.get(i).active = i != page;
+            Button button = tabButtons.get(i);
+            button.visible = sectionForPage(i) == section;
+            button.active = i != page;
+        }
+        for (int i = 0; i < sectionButtons.size(); i++) {
+            sectionButtons.get(i).active = i != section;
         }
         if (prevButton != null) {
             prevButton.active = page > 0;
@@ -263,10 +304,7 @@ public class FieldGeologyNotebookScreen extends Screen {
     }
 
     private int contentLeft() {
-        if (pages.size() > 14) {
-            return bookLeft() + Math.min(138, Math.max(118, bookWidth() / 3 + 18));
-        }
-        return bookLeft() + Math.min(124, Math.max(92, bookWidth() / 4 + 18));
+        return bookLeft() + Math.min(138, Math.max(118, bookWidth() / 3 + 18));
     }
 
     private int contentWidth() {
@@ -309,7 +347,7 @@ public class FieldGeologyNotebookScreen extends Screen {
                 "",
                 "手册获取：一块泥土、任意木板或任意石头都能合成野外地质手册。",
                 "新玩家只需要记住一条线：挖矿床 -> 机器处理 -> 得到原版兼容产物。",
-                "右键机器会打开像熔炉一样的界面：左上放材料，接电网优先工作；离网时左下放燃料兜底。"));
+                "右键机器会打开接近原版熔炉大小的界面：左侧放材料，右侧收产物；顶部会写明工艺、耗时和动力要求。"));
 
         result.add(page("第一天", "2. 第一天路线：第一块铁怎么来？", GOLD,
                 "0. 先合成手册：一块泥土、任意木板或任意石头都可以直接合成。",
@@ -351,22 +389,23 @@ public class FieldGeologyNotebookScreen extends Screen {
                 "压粉机：把粉末或精矿压回 MC 物品，减少背包折磨。",
                 "化工机器：反应釜、精馏塔、混合机、结晶器、工业窑炉、气体分离器、肥料造粒机、聚合釜。",
                 "新增化工设备：蒸汽裂解炉、合成塔、吸收塔，用来支撑塑料、合成氨、尿素、酸气吸收等路线。",
-                "大型机器现在尽量做成长方体，不再是小堆：机器本体是正面底部中心，控制面板放在正前方。",
-                "重型机架：3宽 x 2深 x 2高机壳盒体；湿法槽体：下层机壳、上层管线。",
-                "热处理线：3宽 x 3深 x 2高；塔器：3宽 x 3深 x 3高，下层机壳、上层管线。",
-                "机器输入接口/输出接口可以替代机壳位置，成型后分别给外部管线塞材料/抽产物。",
-                "右键任何成型部件都会打开连接机器；机器优先使用 EOU 电网，离网时才烧本地燃料。",
+                "大型机器的控制面板是正面底层中心，机器本体紧邻其后；缺块会显示不可破坏、可以穿过的半透明投影。",
+                "压力撬装 3x2x2；湿法槽 3x2x2；电解槽组 3x3x2。",
+                "立式反应釜/高压循环 3x3x3；热处理线 3x3x2；裂解炉 3x3x3。",
+                "精馏塔/吸收塔为 3x3x4：第0层机壳，第1-3层塔器管线。",
+                "输入/输出接口可替代任意机壳位置并朝六个方向放置；相邻输送机、漏斗或容器自动传输。",
+                "右键任何成型部件都会打开连接机器；破碎/热工可用燃料或 EOU，湿法、电解和高压设备必须接电网。",
                 "运行中：方块外观会亮灯、发热、液窗变亮或端子带电；界面状态灯显示绿色/蓝色。",
                 "待机：外观保持暗色，通常是没材料、输出满、缺电/燃料、结构未成型，或红石模式不允许。",
-                "JEI 会显示 Earth on Minecraft 工业处理分类，并标出机器需要燃料。"));
+                "JEI 按机器分别显示配方、工艺族、耗时、功率和动力模式。"));
 
         result.add(page("动力", "5. 动力和产物用途：不要只堆中间物", GOLD,
                 "Earth on Minecraft Unit，简称 EOU，是第一版内置电力单位。先不强绑其他科技 mod，保证本体能独立跑起来。",
                 "最小电网：燃烧发电机 -> 铜制电缆 -> 电池箱 -> 任意处理机器。",
-                "发电机：放煤、煤粉、焦炭、石油焦、煤气单元、天然气单元或岩浆桶，烧成 EOU。",
-                "电池箱：缓存电力。机器会先从相邻电池箱/铜线网络取电，电不够时才烧本地燃料。",
-                "铜制电缆：延长网络。机器会扫描附近铜线连接到的电池箱和发电机。",
-                "离网兜底：处理机左下仍可放燃料，防止新手还没做电网就完全卡死。",
+                "燃烧发电机使用煤、煤粉、焦炭、石油焦、气体单元或岩浆；汽轮发电机使用核热模块或蒸汽轮机组件。",
+                "电池箱双向缓存 EOU，所有方位都可接线；铜制电缆延长网络。",
+                "细/标准/重型铜制电缆都能延长网络，粗细主要用于区分布线和机房层级。",
+                "动力分三类：机械设备可用常见燃料或电网；热工设备可用工业燃料/热源或电网；湿法、电解和高压设备仅接受电网。",
                 "不浪费规则：只有原料正确、输出有空间、结构完整、红石模式允许时，机器才消耗电力或燃料。",
                 "",
                 "产物出口：",
@@ -639,7 +678,7 @@ public class FieldGeologyNotebookScreen extends Screen {
                 "The main loop is simple: find a deposit, process it in machines, then get compatible Minecraft products.",
                 "",
                 "Notebook recipe: one dirt, any plank, or any stone creates the Field Geology Notebook.",
-                "Machines work like furnaces: input upper-left, grid power first, lower-left fuel as off-grid fallback."));
+                "Machine screens stay close to vanilla furnace size: materials on the left, products on the right, with process, cycle time, and power requirements shown at the top."));
         result.add(page("Day 1", "2. Day one: how do I get the first iron?", GOLD,
                 "0. Craft this notebook from one dirt, any plank, or any stone.",
                 "1. Make a stone pickaxe and a vanilla furnace. The furnace is intentionally kept as the beginner bridge.",
@@ -660,26 +699,24 @@ public class FieldGeologyNotebookScreen extends Screen {
         result.add(page("Machines", "4. Machine and multiblock basics", BLUE,
                 "The Jaw Crusher is the first machine: stone + cobblestone + furnace, no iron required.",
                 "The Ball Mill is the second machine: one iron, one copper, stone, and a furnace.",
-                "Small machines can run as compact blocks.",
-                "Large real-world equipment now uses boxy footprints instead of loose piles.",
-                "The controller is the front-bottom center; place the Control Panel directly in front.",
-                "Heavy frame: 3 wide x 2 deep x 2 high casing box.",
-                "Wet vessel: 3 wide x 2 deep x 2 high, casing lower layer and pipe upper layer.",
-                "Heated line: 3 wide x 3 deep x 2 high, casing below and pipes above.",
-                "Tall column: 3 wide x 3 deep x 3 high, casing below and pipes above.",
-                "Input and output interfaces may replace casing positions and forward automation to the controller.",
+                "Large equipment uses clear boxy footprints: the Control Panel is the front-bottom center and the controller sits directly behind it.",
+                "Missing parts appear as pass-through, unbreakable translucent projections.",
+                "Pressure skid 3x2x2; wet vessel 3x2x2; electrolysis bank 3x3x2.",
+                "Vertical reactor/pressure loop 3x3x3; heated line 3x3x2; cracking furnace 3x3x3.",
+                "Distillation/absorption tower is 3x3x4: layer 0 casing and layers 1-3 tower pipework.",
+                "Input/output interfaces may replace any casing position, face any of six directions, and connect adjacent automation.",
                 "The GUI shows the required pattern if the structure is missing.",
-                "Right-click any formed part to open the connected machine. Machines prefer EOU grid power; local fuel is the off-grid fallback.",
+                "Right-click any formed part to open the controller. Crushing/thermal machines may use fuel or EOU; wet, electrolytic, and high-pressure machines require the grid.",
                 "Running: the block lights up, shows heat seams, brighter liquid windows, or energized terminals; the GUI status lamp turns green/blue.",
                 "Idle: the block stays dark. It usually needs input, output space, power/fuel, a formed structure, or a matching redstone mode."));
 
         result.add(page("Power", "5. Power and useful outputs", GOLD,
                 "Earth on Minecraft Unit, or EOU, is the first built-in power unit. It keeps the mod playable without guessing another tech mod's API.",
                 "Minimal grid: Combustion Generator -> Copper Power Cable -> Battery Box -> any processing machine.",
-                "Generator: burns coal, coal dust, coke, petroleum coke, gas cells, or lava into EOU.",
-                "Battery Box: buffers power. Machines draw from adjacent or cable-connected batteries before burning local fuel.",
+                "Combustion generators use coal, dust, coke, petroleum coke, gas cells, or lava; steam turbines use nuclear heat modules or turbine assemblies.",
+                "Battery boxes buffer EOU in both directions and accept cables on every side.",
                 "Copper Power Cable: extends the network between generators, batteries, and machines.",
-                "Off-grid fallback: processing machines still have a lower-left fuel slot so early players do not get stuck.",
+                "Mechanical machines may use common fuel or EOU; thermal machines use industrial fuel/heat or EOU; wet, electrolytic, and high-pressure equipment requires stable grid power.",
                 "No-waste rule: energy or fuel is consumed only when input, output space, structure, and redstone mode allow work.",
                 "",
                 "Useful outputs:",
@@ -747,7 +784,7 @@ public class FieldGeologyNotebookScreen extends Screen {
                 "Printed circuit board -> industrial sensor plus PLC controller; PLCs bridge into automation buses and redstone I/O.",
                 "NdFeB magnets -> servo motors -> actuator modules and robotic arms.",
                 "Silicon wafers -> machine vision cameras -> quality inspection modules.",
-                "Conveyor drive + rubber + steel + copper wire -> industrial conveyor; conveyors push item drops and entities forward."));
+                "Conveyor drive + rubber + steel + copper wire -> industrial conveyor; conveyors carry one visible controlled stack like an item-frame transport."));
         result.add(page("Scope", "13. Core vs addons", BLUE,
                 "Core Earth on Minecraft covers realistic Earth basics: geology, deposits, rocks, soil, hydrology, modern industry, nuclear power, electricity, automation, infrastructure, handbook, and JEI routes.",
                 "Earthling addon: player attributes, body temperature, nutrition, disease, food preservation, and medical systems. Not in core now.",
@@ -789,6 +826,19 @@ public class FieldGeologyNotebookScreen extends Screen {
     }
 
     private record PageSpec(String key, int color) {
+    }
+
+    private static int sectionForPage(int pageIndex) {
+        for (int i = 0; i < SECTIONS.length; i++) {
+            Section section = SECTIONS[i];
+            if (pageIndex >= section.startInclusive() && pageIndex < section.endExclusive()) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    private record Section(String key, int startInclusive, int endExclusive) {
     }
 
     private record Entry(String text, int indent, int color, boolean heading) {

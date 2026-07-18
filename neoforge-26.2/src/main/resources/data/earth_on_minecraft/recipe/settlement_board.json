@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "WSW",
+    " W "
+  ],
+  "key": {
+    "P": "minecraft:paper",
+    "W": "#minecraft:planks",
+    "S": "#minecraft:wooden_slabs"
+  },
+  "result": {
+    "id": "earth_on_minecraft:settlement_board"
+  }
+}

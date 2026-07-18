@@ -28,7 +28,9 @@ public class MachineBlockItem extends BlockItem {
         RouteGuide.addBeginnerShortcutTips(stack.getItem(), lines);
         lines.accept(Component.translatable(kind.descriptionKey()).withStyle(ChatFormatting.GRAY));
         lines.accept(Component.translatable("tooltip.earth_on_minecraft.machine.use").withStyle(ChatFormatting.AQUA));
-        lines.accept(Component.translatable("tooltip.earth_on_minecraft.machine.fuel").withStyle(ChatFormatting.YELLOW));
+        lines.accept(Component.translatable(kind.powerMode().labelKey()).withStyle(ChatFormatting.YELLOW));
+        lines.accept(Component.translatable("screen.earth_on_minecraft.machine.spec",
+                Math.max(1, (kind.processTicks() + 19) / 20), kind.energyPerTick()).withStyle(ChatFormatting.AQUA));
         lines.accept(Component.translatable(MachineMultiblock.patternFor(kind).descriptionKey()).withStyle(ChatFormatting.GREEN));
         lines.accept(Component.translatable("tooltip.earth_on_minecraft.multiblock.legend").withStyle(ChatFormatting.DARK_GREEN));
         lines.accept(Component.translatable("tooltip.earth_on_minecraft.machine.redstone").withStyle(ChatFormatting.GREEN));

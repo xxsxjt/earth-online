@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_table",
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:entities/pillager"
+    }
+  ],
+  "table": "earth_on_minecraft:living/pillager_stolen_supplies"
+}

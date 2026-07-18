@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_table",
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:entities/villager"
+    }
+  ],
+  "table": "earth_on_minecraft:living/villager_work_items"
+}

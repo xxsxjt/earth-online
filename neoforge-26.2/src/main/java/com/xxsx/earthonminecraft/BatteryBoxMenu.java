@@ -9,9 +9,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public class BatteryBoxMenu extends AbstractContainerMenu {
+    private static final int PLAYER_INV_START = BatteryBoxBlockEntity.SLOT_COUNT;
+    private static final int PLAYER_INV_END = PLAYER_INV_START + 27;
+    private static final int HOTBAR_END = PLAYER_INV_END + 9;
     private final Container container;
     private final ContainerData data;
     private final BlockPos pos;
@@ -44,7 +48,31 @@ public class BatteryBoxMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        return ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        if (slot == null || !slot.hasItem()) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack stack = slot.getItem();
+        ItemStack moved = stack.copy();
+        if (index >= PLAYER_INV_START && index < PLAYER_INV_END) {
+            if (!moveItemStackTo(stack, PLAYER_INV_END, HOTBAR_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (index >= PLAYER_INV_END && index < HOTBAR_END) {
+            if (!moveItemStackTo(stack, PLAYER_INV_START, PLAYER_INV_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else {
+            return ItemStack.EMPTY;
+        }
+
+        if (stack.isEmpty()) {
+            slot.setByPlayer(ItemStack.EMPTY);
+        } else {
+            slot.setChanged();
+        }
+        return moved;
     }
 
     @Override

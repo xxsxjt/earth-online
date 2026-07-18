@@ -29,21 +29,21 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
     public static final int SLOT_OUTPUT_START = 2;
     public static final int OUTPUT_SLOT_COUNT = 7;
     public static final int SLOT_COUNT = SLOT_OUTPUT_START + OUTPUT_SLOT_COUNT;
-    public static final int DATA_COUNT = 14;
-    private static final int PROCESS_TIME = 60;
-    private static final int ENERGY_PER_TICK = 40;
+    public static final int DATA_COUNT = 16;
     private static final String HAS_FUEL_SLOT_KEY = "HasFuelSlotV1";
     private static final int[] EMPTY_SLOTS = new int[0];
+    private static final int[] MATERIAL_INPUT_SLOTS = {SLOT_INPUT};
     private static final int[] INPUT_SLOTS = {SLOT_INPUT, SLOT_FUEL};
     private static final int[] OUTPUT_SLOTS = createOutputSlots();
     private static final int[] ALL_AUTOMATION_SLOTS = createAllAutomationSlots();
+    private static final int[] AUTOMATION_SLOTS_WITHOUT_FUEL = createAutomationSlotsWithoutFuel();
 
     private final ContainerData data = new ContainerData() {
         @Override
         public int get(int index) {
             return switch (index) {
                 case 0 -> progress;
-                case 1 -> PROCESS_TIME;
+                case 1 -> kind().processTicks();
                 case 2 -> redstoneMode.id;
                 case 3 -> active ? 1 : 0;
                 case 4 -> structureValid ? 1 : 0;
@@ -51,6 +51,8 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
                 case 6 -> Math.max(1, burnTimeTotal);
                 case 7 -> gridPowered ? 1 : 0;
                 case 8, 9, 10, 11, 12, 13 -> sideModes[index - 8].id;
+                case 14 -> selectedRouteIndex;
+                case 15 -> currentRouteCount();
                 default -> 0;
             };
         }
@@ -65,6 +67,7 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
                 case 6 -> burnTimeTotal = Math.max(0, value);
                 case 7 -> gridPowered = value != 0;
                 case 8, 9, 10, 11, 12, 13 -> sideModes[index - 8] = SideMode.byId(value);
+                case 14 -> selectedRouteIndex = Math.max(0, value);
                 default -> {
                 }
             }
@@ -86,6 +89,11 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
     private boolean structureValid = true;
     private boolean assemblySynced;
     private boolean lastAssemblyComplete;
+    private boolean panelStateSynced;
+    private boolean lastPanelActive;
+    private int structureCheckCooldown;
+    private int selectedRouteIndex;
+    private ItemStack lastRouteInput = ItemStack.EMPTY;
     private final SideMode[] sideModes = createDefaultSideModes();
 
     public ProcessingMachineBlockEntity(BlockPos pos, BlockState state) {
@@ -100,18 +108,22 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         machine.active = false;
         machine.gridPowered = false;
 
-        boolean completeStructure = MachineMultiblock.isComplete(level, pos, machine.kind());
-        if (!machine.assemblySynced || machine.lastAssemblyComplete != completeStructure) {
-            MachineMultiblock.syncAssembly(level, pos, machine.kind(), completeStructure);
-            machine.assemblySynced = true;
-            machine.lastAssemblyComplete = completeStructure;
+        if (!machine.assemblySynced || machine.structureCheckCooldown-- <= 0) {
+            boolean completeStructure = MachineMultiblock.isComplete(level, pos, machine.kind());
+            if (!machine.assemblySynced || machine.lastAssemblyComplete != completeStructure) {
+                MachineMultiblock.syncAssembly(level, pos, machine.kind(), completeStructure);
+                machine.assemblySynced = true;
+                machine.lastAssemblyComplete = completeStructure;
+                machine.panelStateSynced = false;
+            }
+            MachineMultiblock.refreshProjection(level, pos, machine.kind());
+            if (machine.structureValid != completeStructure) {
+                machine.structureValid = completeStructure;
+                changed = true;
+            }
+            machine.structureCheckCooldown = 20;
         }
-        MachineMultiblock.refreshProjection(level, pos, machine.kind());
-        if (machine.structureValid != completeStructure) {
-            machine.structureValid = completeStructure;
-            changed = true;
-        }
-        if (!completeStructure) {
+        if (!machine.structureValid) {
             if (machine.progress != 0) {
                 machine.progress = 0;
                 changed = true;
@@ -126,7 +138,11 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         }
 
         ItemStack input = machine.items.get(SLOT_INPUT);
-        Optional<ProcessingMachineBlock.Recipe> match = ProcessingMachineBlock.findRecipe(machine.kind(), input);
+        List<ProcessingMachineBlock.Recipe> routes = ProcessingMachineBlock.matchingRecipes(machine.kind(), input);
+        machine.syncSelectedRoute(input, routes.size());
+        Optional<ProcessingMachineBlock.Recipe> match = routes.isEmpty()
+                ? Optional.empty()
+                : Optional.of(routes.get(machine.selectedRouteIndex));
         if (match.isEmpty()) {
             if (machine.progress != 0) {
                 machine.progress = 0;
@@ -142,9 +158,10 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
             return;
         }
 
-        if (EnergyNetwork.consume(level, pos, ENERGY_PER_TICK)) {
+        ProcessingMachineBlock.Kind kind = machine.kind();
+        if (EnergyNetwork.consume(level, pos, kind.energyPerTick())) {
             machine.gridPowered = true;
-        } else {
+        } else if (kind.acceptsLocalFuel()) {
             if (machine.burnTime <= 0 && machine.tryConsumeFuel()) {
                 changed = true;
             }
@@ -154,13 +171,21 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
                 return;
             }
             machine.burnTime--;
+        } else {
+            if (machine.burnTime != 0 || machine.burnTimeTotal != 0) {
+                machine.burnTime = 0;
+                machine.burnTimeTotal = 0;
+                changed = true;
+            }
+            machine.finishTick(level, pos, state, changed);
+            return;
         }
 
         machine.active = true;
         machine.progress++;
         changed = true;
 
-        if (machine.progress >= PROCESS_TIME) {
+        if (machine.progress >= kind.processTicks()) {
             input.shrink(1);
             if (input.isEmpty()) {
                 machine.items.set(SLOT_INPUT, ItemStack.EMPTY);
@@ -195,8 +220,16 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         return gridPowered;
     }
 
-    public static int energyPerTick() {
-        return ENERGY_PER_TICK;
+    public int selectedRouteIndex() {
+        return selectedRouteIndex;
+    }
+
+    public int currentRouteCount() {
+        return ProcessingMachineBlock.matchingRecipes(kind(), items.get(SLOT_INPUT)).size();
+    }
+
+    public int energyPerTick() {
+        return kind().energyPerTick();
     }
 
     public void cycleRedstoneMode() {
@@ -217,6 +250,16 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         setChanged();
     }
 
+    public void cycleSelectedRoute() {
+        int routeCount = currentRouteCount();
+        if (routeCount <= 1) {
+            return;
+        }
+        this.selectedRouteIndex = (this.selectedRouteIndex + 1) % routeCount;
+        this.progress = 0;
+        setChanged();
+    }
+
     public SideMode sideMode(Direction side) {
         if (side == null) {
             return SideMode.BOTH;
@@ -234,15 +277,15 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         if (slot == SLOT_INPUT) {
             return ProcessingMachineBlock.findRecipe(kind(), stack).isPresent();
         }
-        return slot == SLOT_FUEL && getFuelTicks(stack) > 0;
+        return slot == SLOT_FUEL && kind().acceptsLocalFuel() && getFuelTicks(stack) > 0;
     }
 
     @Override
     public int[] getSlotsForFace(Direction side) {
         return switch (sideMode(side)) {
-            case INPUT -> INPUT_SLOTS;
+            case INPUT -> kind().acceptsLocalFuel() ? INPUT_SLOTS : MATERIAL_INPUT_SLOTS;
             case OUTPUT -> OUTPUT_SLOTS;
-            case BOTH -> ALL_AUTOMATION_SLOTS;
+            case BOTH -> kind().acceptsLocalFuel() ? ALL_AUTOMATION_SLOTS : AUTOMATION_SLOTS_WITHOUT_FUEL;
             case OFF -> EMPTY_SLOTS;
         };
     }
@@ -290,6 +333,7 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         this.burnTime = input.getIntOr("BurnTime", 0);
         this.burnTimeTotal = input.getIntOr("BurnTimeTotal", burnTime);
         this.redstoneMode = RedstoneMode.byId(input.getIntOr("RedstoneMode", 0));
+        this.selectedRouteIndex = Math.max(0, input.getIntOr("SelectedRouteIndex", 0));
         for (int i = 0; i < sideModes.length; i++) {
             this.sideModes[i] = SideMode.byId(input.getIntOr("SideMode" + i, SideMode.BOTH.id));
         }
@@ -304,6 +348,7 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         output.putInt("BurnTime", this.burnTime);
         output.putInt("BurnTimeTotal", this.burnTimeTotal);
         output.putInt("RedstoneMode", this.redstoneMode.id);
+        output.putInt("SelectedRouteIndex", this.selectedRouteIndex);
         for (int i = 0; i < sideModes.length; i++) {
             output.putInt("SideMode" + i, this.sideModes[i].id);
         }
@@ -355,6 +400,9 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
     }
 
     private boolean tryConsumeFuel() {
+        if (!kind().acceptsLocalFuel()) {
+            return false;
+        }
         ItemStack fuel = this.items.get(SLOT_FUEL);
         int ticks = getFuelTicks(fuel);
         if (ticks <= 0) {
@@ -382,6 +430,21 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
             }
         }
         return true;
+    }
+
+    private void syncSelectedRoute(ItemStack input, int routeCount) {
+        if (!ItemStack.isSameItemSameComponents(input, lastRouteInput)) {
+            this.lastRouteInput = input.isEmpty() ? ItemStack.EMPTY : input.copyWithCount(1);
+            this.selectedRouteIndex = 0;
+            this.progress = 0;
+        }
+        if (routeCount <= 0) {
+            this.selectedRouteIndex = 0;
+            return;
+        }
+        if (this.selectedRouteIndex >= routeCount) {
+            this.selectedRouteIndex = routeCount - 1;
+        }
     }
 
     private void insertOutputs(List<ItemStack> outputs) {
@@ -425,6 +488,12 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         if (syncActiveState(level, pos, state)) {
             changed = true;
         }
+        boolean panelActive = structureValid && active;
+        if (!panelStateSynced || lastPanelActive != panelActive) {
+            MachineMultiblock.syncPanelActive(level, pos, kind(), panelActive);
+            panelStateSynced = true;
+            lastPanelActive = panelActive;
+        }
         setChangedIfNeeded(changed);
     }
 
@@ -456,6 +525,15 @@ public class ProcessingMachineBlockEntity extends BaseContainerBlockEntity imple
         int[] slots = new int[SLOT_COUNT];
         for (int i = 0; i < slots.length; i++) {
             slots[i] = i;
+        }
+        return slots;
+    }
+
+    private static int[] createAutomationSlotsWithoutFuel() {
+        int[] slots = new int[SLOT_COUNT - 1];
+        slots[0] = SLOT_INPUT;
+        for (int i = 1; i < slots.length; i++) {
+            slots[i] = SLOT_OUTPUT_START + i - 1;
         }
         return slots;
     }
