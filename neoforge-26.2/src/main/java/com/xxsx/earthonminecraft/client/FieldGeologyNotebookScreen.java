@@ -89,54 +89,81 @@ public class FieldGeologyNotebookScreen extends Screen {
         this.section = sectionForPage(this.page);
         int left = bookLeft();
         int top = bookTop();
-        int tabX = left + 10;
-        int tabY = top + 42;
-        int navW = Math.max(68, contentLeft() - left - 20);
-        int bottom = top + bookHeight() - 28;
-        int sectionCols = 2;
-        int sectionGap = 3;
-        int sectionW = Math.max(30, (navW - sectionGap) / sectionCols);
-        int sectionH = 16;
+        int bw = bookWidth();
+        int bh = bookHeight();
+        boolean compact = compactLayout();
 
-        for (int i = 0; i < SECTIONS.length; i++) {
-            final int index = i;
-            int col = i % sectionCols;
-            int row = i / sectionCols;
-            Button button = addRenderableWidget(Button.builder(
-                            Component.translatable("screen.earth_on_minecraft.notebook.section." + SECTIONS[i].key()),
-                            b -> setSection(index))
-                    .bounds(tabX + col * (sectionW + sectionGap), tabY + row * 18, sectionW, sectionH)
+        if (compact) {
+            int gap = 2;
+            int sectionX = left + 8;
+            int sectionY = top + 24;
+            int sectionW = Math.max(22, (bw - 16 - gap * (SECTIONS.length - 1)) / SECTIONS.length);
+            for (int i = 0; i < SECTIONS.length; i++) {
+                final int index = i;
+                Button button = addRenderableWidget(Button.builder(
+                                sectionLabel(i, true),
+                                b -> setSection(index))
+                        .bounds(sectionX + i * (sectionW + gap), sectionY, sectionW, 14)
+                        .build());
+                sectionButtons.add(button);
+            }
+
+            int bottom = top + bh - 21;
+            addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.close"), b -> onClose())
+                    .bounds(left + 8, bottom, 36, 16)
                     .build());
-            sectionButtons.add(button);
-        }
-
-        int pageY = tabY + 56;
-        int pageCols = 2;
-        int pageGap = 3;
-        int pageW = Math.max(30, (navW - pageGap) / pageCols);
-        int pageH = bookHeight() <= 240 ? 14 : 16;
-
-        for (int i = 0; i < pages.size(); i++) {
-            final int index = i;
-            Section owner = SECTIONS[sectionForPage(i)];
-            int localIndex = i - owner.startInclusive();
-            int col = localIndex % pageCols;
-            int row = localIndex / pageCols;
-            Button button = addRenderableWidget(Button.builder(Component.literal(pages.get(i).shortTitle), b -> setPage(index))
-                    .bounds(tabX + col * (pageW + pageGap), pageY + row * (pageH + 2), pageW, pageH)
+            prevButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.prev"), b -> setPage(page - 1))
+                    .bounds(left + bw - 112, bottom, 50, 16)
                     .build());
-            tabButtons.add(button);
-        }
+            nextButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.next"), b -> setPage(page + 1))
+                    .bounds(left + bw - 58, bottom, 50, 16)
+                    .build());
+        } else {
+            int tabX = left + 10;
+            int tabY = top + 42;
+            int navW = Math.max(68, contentLeft() - left - 20);
+            int sectionCols = 2;
+            int sectionGap = 3;
+            int sectionW = Math.max(30, (navW - sectionGap) / sectionCols);
+            for (int i = 0; i < SECTIONS.length; i++) {
+                final int index = i;
+                int col = i % sectionCols;
+                int row = i / sectionCols;
+                Button button = addRenderableWidget(Button.builder(
+                                sectionLabel(i, false),
+                                b -> setSection(index))
+                        .bounds(tabX + col * (sectionW + sectionGap), tabY + row * 18, sectionW, 16)
+                        .build());
+                sectionButtons.add(button);
+            }
 
-        prevButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.prev"), b -> setPage(page - 1))
-                .bounds(left + bookWidth() - 182, bottom, 76, 20)
-                .build());
-        nextButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.next"), b -> setPage(page + 1))
-                .bounds(left + bookWidth() - 100, bottom, 76, 20)
-                .build());
-        addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.close"), b -> onClose())
-                .bounds(left + 12, bottom, 54, 20)
-                .build());
+            int pageY = tabY + 56;
+            int pageGap = 3;
+            int pageW = Math.max(30, (navW - pageGap) / 2);
+            int pageH = bh <= 240 ? 14 : 16;
+            for (int i = 0; i < pages.size(); i++) {
+                final int index = i;
+                Section owner = SECTIONS[sectionForPage(i)];
+                int localIndex = i - owner.startInclusive();
+                int col = localIndex % 2;
+                int row = localIndex / 2;
+                Button button = addRenderableWidget(Button.builder(Component.literal(pages.get(i).shortTitle), b -> setPage(index))
+                        .bounds(tabX + col * (pageW + pageGap), pageY + row * (pageH + 2), pageW, pageH)
+                        .build());
+                tabButtons.add(button);
+            }
+
+            int bottom = top + bh - 28;
+            prevButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.prev"), b -> setPage(page - 1))
+                    .bounds(left + bw - 182, bottom, 76, 20)
+                    .build());
+            nextButton = addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.next"), b -> setPage(page + 1))
+                    .bounds(left + bw - 100, bottom, 76, 20)
+                    .build());
+            addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.notebook.close"), b -> onClose())
+                    .bounds(left + 12, bottom, 54, 20)
+                    .build());
+        }
         updateButtonState();
     }
 
@@ -148,30 +175,39 @@ public class FieldGeologyNotebookScreen extends Screen {
         int top = bookTop();
         int bw = bookWidth();
         int bh = bookHeight();
+        boolean compact = compactLayout();
 
         g.fill(left, top, left + bw, top + bh, PAPER_EDGE);
         g.fill(left + 3, top + 3, left + bw - 3, top + bh - 3, PAPER);
-        g.fill(left + 8, top + 32, contentLeft() - 8, top + bh - 36, 0x18FFFFFF);
-        g.fill(contentLeft() - 10, top + 36, left + bw - 12, top + bh - 38, PAPER_SOFT);
         g.outline(left, top, bw, bh, 0xFF50351F);
-        g.outline(contentLeft() - 10, top + 36, left + bw - contentLeft() - 2, bh - 74, 0x3050351F);
-        g.fill(contentLeft() - 18, top + 24, contentLeft() - 17, top + bh - 34, 0x553B2A1B);
         g.fill(left + 4, top + 4, left + bw - 4, top + 20, 0x1F2A2118);
 
-        drawCenteredTitle(g, tr("screen.earth_on_minecraft.notebook.title"), left + bw / 2, top + 8, INK);
-        draw(g, tr("screen.earth_on_minecraft.notebook.subtitle"), left + 14, top + 24, MUTED);
-        draw(g, tr("screen.earth_on_minecraft.notebook.page", page + 1, pages.size()), left + bw - 70, top + 24, MUTED);
+        String pageText = tr("screen.earth_on_minecraft.notebook.page", page + 1, pages.size());
+        if (compact) {
+            g.fill(left + 7, top + 41, left + bw - 7, top + 42, PAPER_EDGE);
+            draw(g, EarthGuiSupport.fit(font, tr("screen.earth_on_minecraft.notebook.title"), bw - 76),
+                    left + 10, top + 8, INK);
+            draw(g, pageText, left + bw - 10 - font.width(pageText), top + 8, MUTED);
+        } else {
+            g.fill(left + 8, top + 32, contentLeft() - 8, top + bh - 36, 0x18FFFFFF);
+            g.fill(contentLeft() - 10, top + 36, left + bw - 12, top + bh - 38, PAPER_SOFT);
+            g.outline(contentLeft() - 10, top + 36, left + bw - contentLeft() - 2, bh - 74, 0x3050351F);
+            g.fill(contentLeft() - 18, top + 24, contentLeft() - 17, top + bh - 34, 0x553B2A1B);
+            drawCenteredTitle(g, tr("screen.earth_on_minecraft.notebook.title"), left + bw / 2, top + 8, INK);
+            draw(g, tr("screen.earth_on_minecraft.notebook.subtitle"), left + 14, top + 24, MUTED);
+            draw(g, pageText, left + bw - 70, top + 24, MUTED);
+        }
 
         super.extractRenderState(g, mouseX, mouseY, delta);
 
         Page current = pages.get(page);
         int contentX = contentLeft();
-        int contentY = top + 46;
+        int contentY = top + (compact ? 49 : 46);
         int contentW = contentWidth();
-        int contentH = Math.max(80, bh - 84);
+        int contentH = Math.max(54, bh - (compact ? 77 : 84));
         g.fill(contentX - 6, contentY - 6, contentX + contentW - 2, contentY + 14, 0x20FFFFFF);
         g.fill(contentX - 6, contentY - 6, contentX - 2, contentY + 14, current.color);
-        drawHeading(g, current.title, contentX, contentY - 3, current.color);
+        drawHeading(g, EarthGuiSupport.fit(font, current.title, contentW - 8), contentX, contentY - 3, current.color);
         g.fill(contentX, contentY + 12, contentX + Math.min(contentW, 146), contentY + 13, current.color);
         List<Line> wrapped = wrap(current);
         int visible = visibleLines(contentH);
@@ -205,7 +241,9 @@ public class FieldGeologyNotebookScreen extends Screen {
             g.fill(barX, knobY, barX + 3, knobY + knobH, 0xAA50351F);
         }
 
-        draw(g, tr("screen.earth_on_minecraft.notebook.footer"), contentX, top + bh - 17, MUTED);
+        if (!compact) {
+            draw(g, tr("screen.earth_on_minecraft.notebook.footer"), contentX, top + bh - 17, MUTED);
+        }
     }
 
     @Override
@@ -267,6 +305,11 @@ public class FieldGeologyNotebookScreen extends Screen {
         }
     }
 
+    private Component sectionLabel(int index, boolean compact) {
+        String key = "screen.earth_on_minecraft.notebook.section." + SECTIONS[index].key();
+        return Component.translatable(compact ? key + ".short" : key);
+    }
+
     private List<Line> wrap(Page current) {
         List<Line> result = new ArrayList<>();
         int width = contentWidth();
@@ -288,11 +331,11 @@ public class FieldGeologyNotebookScreen extends Screen {
     }
 
     private int bookWidth() {
-        return Math.min(560, Math.max(320, this.width - 18));
+        return Math.max(120, Math.min(560, this.width - 12));
     }
 
     private int bookHeight() {
-        return Math.min(336, Math.max(224, this.height - 18));
+        return Math.max(120, Math.min(336, this.height - 12));
     }
 
     private int bookLeft() {
@@ -304,11 +347,21 @@ public class FieldGeologyNotebookScreen extends Screen {
     }
 
     private int contentLeft() {
+        if (compactLayout()) {
+            return bookLeft() + 12;
+        }
         return bookLeft() + Math.min(138, Math.max(118, bookWidth() / 3 + 18));
     }
 
     private int contentWidth() {
+        if (compactLayout()) {
+            return bookWidth() - 24;
+        }
         return bookLeft() + bookWidth() - contentLeft() - 20;
+    }
+
+    private boolean compactLayout() {
+        return bookWidth() < 360 || bookHeight() < 250;
     }
 
     private void draw(GuiGraphicsExtractor g, String text, int x, int y, int color) {

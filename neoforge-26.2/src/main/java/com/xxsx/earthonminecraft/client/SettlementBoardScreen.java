@@ -4,6 +4,7 @@ import com.xxsx.earthonminecraft.SettlementBoardMenu;
 import com.xxsx.earthonminecraft.living.SettlementSavedData;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -23,8 +24,11 @@ public class SettlementBoardScreen extends AbstractContainerScreen<SettlementBoa
     private static final int MUTED = 0xFF665E51;
     private static final int ACCENT = 0xFF2E6F62;
     private static final int WARNING = 0xFFA85C32;
+    private static final int SECURITY_Y = 124;
+    private static final int BOTTOM_DIVIDER_Y = 144;
 
     private int tab;
+    private final List<Button> tabButtons = new ArrayList<>();
 
     public SettlementBoardScreen(SettlementBoardMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -35,15 +39,17 @@ public class SettlementBoardScreen extends AbstractContainerScreen<SettlementBoa
     @Override
     protected void init() {
         super.init();
+        tabButtons.clear();
         int tabY = topPos + 28;
-        addRenderableWidget(tabButton("screen.earth_on_minecraft.settlement_board.tab.overview", leftPos + 8, tabY, 0));
-        addRenderableWidget(tabButton("screen.earth_on_minecraft.settlement_board.tab.people", leftPos + 62, tabY, 1));
-        addRenderableWidget(tabButton("screen.earth_on_minecraft.settlement_board.tab.facilities", leftPos + 116, tabY, 2));
-        addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.button.notebook"), button -> {
+        tabButtons.add(addRenderableWidget(tabButton("screen.earth_on_minecraft.settlement_board.tab.overview", leftPos + 8, tabY, 0)));
+        tabButtons.add(addRenderableWidget(tabButton("screen.earth_on_minecraft.settlement_board.tab.people", leftPos + 62, tabY, 1)));
+        tabButtons.add(addRenderableWidget(tabButton("screen.earth_on_minecraft.settlement_board.tab.facilities", leftPos + 116, tabY, 2)));
+        addRenderableWidget(Button.builder(Component.empty(), button -> {
                     this.onClose();
                     EarthOnMinecraftClient.openNotebook();
                 })
-                .bounds(leftPos + 126, topPos + 146, 42, 14)
+                .bounds(leftPos + 154, topPos + 146, 14, 14)
+                .tooltip(Tooltip.create(Component.translatable("screen.earth_on_minecraft.button.notebook.tooltip")))
                 .build());
         refreshTabButtons();
     }
@@ -54,19 +60,20 @@ public class SettlementBoardScreen extends AbstractContainerScreen<SettlementBoa
         g.fill(leftPos, topPos, leftPos + WIDTH, topPos + HEIGHT, WOOD);
         g.fill(leftPos + 3, topPos + 3, leftPos + WIDTH - 3, topPos + HEIGHT - 3, PAPER_DARK);
         g.fill(leftPos + 6, topPos + 6, leftPos + WIDTH - 6, topPos + HEIGHT - 6, PAPER);
-        g.fill(leftPos + 7, topPos + 24, leftPos + WIDTH - 7, topPos + 25, WOOD);
+        g.fill(leftPos + 7, topPos + 26, leftPos + WIDTH - 7, topPos + 27, WOOD);
         g.fill(leftPos + 7, topPos + 46, leftPos + WIDTH - 7, topPos + 47, PAPER_DARK);
-        g.fill(leftPos + 7, topPos + 142, leftPos + WIDTH - 7, topPos + 143, PAPER_DARK);
+        g.fill(leftPos + 7, topPos + BOTTOM_DIVIDER_Y,
+                leftPos + WIDTH - 7, topPos + BOTTOM_DIVIDER_Y + 1, PAPER_DARK);
     }
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         SettlementSavedData.SettlementSnapshot snapshot = menu.snapshot();
-        Component settlementName = Component.translatable(snapshot.nameKey());
-        g.centeredText(font, settlementName, WIDTH / 2, 8, INK);
-        Component subtitle = Component.translatable("screen.earth_on_minecraft.settlement_board.subtitle",
-                Component.translatable(snapshot.scaleKey()), Component.translatable(snapshot.technologyKey()));
-        g.centeredText(font, subtitle, WIDTH / 2, 18, MUTED);
+        Component settlementName = EarthGuiSupport.trim(font, Component.translatable(snapshot.nameKey()), 154);
+        g.centeredText(font, settlementName, WIDTH / 2, 7, INK);
+        Component subtitle = EarthGuiSupport.trim(font, Component.translatable("screen.earth_on_minecraft.settlement_board.subtitle",
+                Component.translatable(snapshot.scaleKey()), Component.translatable(snapshot.technologyKey())), 154);
+        g.centeredText(font, subtitle, WIDTH / 2, 17, MUTED);
 
         switch (tab) {
             case 1 -> drawPeople(g, snapshot);
@@ -78,7 +85,8 @@ public class SettlementBoardScreen extends AbstractContainerScreen<SettlementBoa
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         super.extractRenderState(g, mouseX, mouseY, delta);
-        if (tab == 0 && isHovering(10, 111, 156, 10, mouseX, mouseY)) {
+        EarthGuiSupport.drawNotebookGlyph(g, leftPos + 156, topPos + 148);
+        if (tab == 0 && isHovering(10, SECURITY_Y, 156, 10, mouseX, mouseY)) {
             SettlementSavedData.SettlementSnapshot snapshot = menu.snapshot();
             g.setComponentTooltipForNextFrame(font, List.of(
                     Component.translatable("screen.earth_on_minecraft.settlement_board.security", snapshot.security()),
@@ -105,9 +113,9 @@ public class SettlementBoardScreen extends AbstractContainerScreen<SettlementBoa
         g.text(font, Component.translatable("screen.earth_on_minecraft.settlement_board.supplies"), 10, y, ACCENT, false);
         g.text(font, joinKeys(snapshot.supplyKeys()), 48, y, INK, false);
         y += 17;
-        drawSecurityBar(g, 10, y, 156, snapshot.security());
+        drawSecurityBar(g, 10, SECURITY_Y, 156, snapshot.security());
         g.text(font, Component.translatable("screen.earth_on_minecraft.settlement_board.reputation",
-                snapshot.reputation()), 10, y + 10, MUTED, false);
+                snapshot.reputation()), 10, SECURITY_Y + 9, MUTED, false);
     }
 
     private void drawPeople(GuiGraphicsExtractor g, SettlementSavedData.SettlementSnapshot snapshot) {
@@ -150,7 +158,8 @@ public class SettlementBoardScreen extends AbstractContainerScreen<SettlementBoa
         }
         for (Map.Entry<String, Integer> entry : snapshot.facilityCounts().entrySet()) {
             g.fill(11, y + 1, 17, y + 7, facilityColor(entry.getKey()));
-            g.text(font, Component.translatable(entry.getKey()), 22, y, INK, false);
+            Component facility = EarthGuiSupport.trim(font, Component.translatable(entry.getKey()), 126);
+            g.text(font, facility, 22, y, INK, false);
             String count = "x" + entry.getValue();
             g.text(font, count, 164 - font.width(count), y, ACCENT, false);
             y += 13;
@@ -181,10 +190,8 @@ public class SettlementBoardScreen extends AbstractContainerScreen<SettlementBoa
     }
 
     private void refreshTabButtons() {
-        for (int i = 0; i < Math.min(3, renderables.size()); i++) {
-            if (renderables.get(i) instanceof Button button) {
-                button.active = i != tab;
-            }
+        for (int i = 0; i < tabButtons.size(); i++) {
+            tabButtons.get(i).active = i != tab;
         }
     }
 
@@ -197,7 +204,7 @@ public class SettlementBoardScreen extends AbstractContainerScreen<SettlementBoa
             values.add(Component.translatable(key).getString());
         }
         String joined = String.join(" / ", values);
-        return Component.literal(font.plainSubstrByWidth(joined, 94));
+        return Component.literal(EarthGuiSupport.fit(font, joined, 94));
     }
 
     private void drawWrapped(GuiGraphicsExtractor g, Component text, int x, int y, int width, int color) {

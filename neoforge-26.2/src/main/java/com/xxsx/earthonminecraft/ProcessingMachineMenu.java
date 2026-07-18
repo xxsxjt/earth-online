@@ -13,6 +13,9 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProcessingMachineMenu extends AbstractContainerMenu {
     public static final int BUTTON_REDSTONE_ALWAYS = 0;
     public static final int BUTTON_REDSTONE_REQUIRE_SIGNAL = 1;
@@ -206,6 +209,10 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
         return ProcessingMachineBlock.findRecipe(kind, getSlot(ProcessingMachineBlockEntity.SLOT_INPUT).getItem(), selectedRouteIndex());
     }
 
+    public boolean outputsBlocked() {
+        return selectedRecipe().map(recipe -> !canFitOutputs(recipe.outputStacks())).orElse(false);
+    }
+
     public int energyPerTick() {
         return kind.energyPerTick();
     }
@@ -224,6 +231,37 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
 
     public ProcessingMachineBlockEntity.SideMode sideMode(Direction side) {
         return ProcessingMachineBlockEntity.SideMode.byId(data.get(8 + side.ordinal()));
+    }
+
+    private boolean canFitOutputs(List<ItemStack> outputs) {
+        List<ItemStack> simulated = new ArrayList<>(ProcessingMachineBlockEntity.OUTPUT_SLOT_COUNT);
+        for (int i = 0; i < ProcessingMachineBlockEntity.OUTPUT_SLOT_COUNT; i++) {
+            simulated.add(getSlot(ProcessingMachineBlockEntity.SLOT_OUTPUT_START + i).getItem().copy());
+        }
+        for (ItemStack output : outputs) {
+            if (!fitInto(simulated, output.copy())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean fitInto(List<ItemStack> stacks, ItemStack output) {
+        for (ItemStack existing : stacks) {
+            if (!output.isEmpty() && !existing.isEmpty() && ItemStack.isSameItemSameComponents(existing, output)) {
+                int move = Math.min(output.getCount(), existing.getMaxStackSize() - existing.getCount());
+                existing.grow(move);
+                output.shrink(move);
+            }
+        }
+        for (int i = 0; i < stacks.size() && !output.isEmpty(); i++) {
+            if (stacks.get(i).isEmpty()) {
+                int move = Math.min(output.getCount(), output.getMaxStackSize());
+                stacks.set(i, output.copyWithCount(move));
+                output.shrink(move);
+            }
+        }
+        return output.isEmpty();
     }
 
     private static ProcessingMachineBlock.Kind kindFromClientLevel(Inventory inventory, BlockPos pos) {

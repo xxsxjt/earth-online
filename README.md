@@ -30,7 +30,8 @@
 - [贴图 AI 提示词](docs/asset-prompts.md)
 - [扩展路线图：核能、电网、自动化和科幻附属边界](docs/earth-on-minecraft-expanded-roadmap.md)
 - [科幻附属路线图](docs/scifi-addon-roadmap.md)
-- [0.1.9 Beta 发布说明](docs/release-notes-0.1.9-beta.md)
+- [0.1.10 Beta 发布说明](docs/release-notes-0.1.10-beta.md)
+- [0.1.10 界面与基础设施审计](docs/ui-foundation-audit-0.1.10.md)
 - [地质生成与世界高度计划](docs/geology-worldgen-notes.md)
 - [生物、居民与聚落计划](docs/living-world-settlement-plan.md)
 
@@ -51,15 +52,16 @@ cd neoforge-26.2
 .\gradlew.bat build
 cd ..
 python tools\validate_resources.py
+powershell -ExecutionPolicy Bypass -File tools\render_gui_previews.ps1
 ```
 
 ## 当前模块
 
 - GitHub: https://github.com/xxsxjt/xxsx-mc-earth-on-minecraft
 - `neoforge-26.2/` — NeoForge `26.2.0.7-beta` / Minecraft `26.2`，Java 25。
-- 构建产物：`neoforge-26.2/build/libs/earth-on-minecraft-neoforge-26.2-0.1.9.jar`
+- 构建产物：`neoforge-26.2/build/libs/earth-on-minecraft-neoforge-26.2-0.1.10.jar`
 - 测试部署：`D:\_dx\_Games\MC\xxxxxx\.minecraft\versions\26.2-NeoForge_26.2.0.7-beta\mods`
-- 发布状态：`0.1.9` 是开发中测试版，用于验证现实矿床、工业/电力/物流、Living World 居民与聚落底座、双语手册、JEI 联动和四项目可选组合兼容。
+- 发布状态：`0.1.10` 是开发中测试版，重点验证原版尺寸机器界面、六面 IO、红石/路线控制、阻塞原因反馈、紧凑双语手册和聚落公告板基础体验。
 
 第一版已实现：
 
@@ -86,6 +88,7 @@ python tools\validate_resources.py
 - 0.1.8 新增默认高度下的真实地质背景层：沉积砂岩/石灰质层、花岗质/闪长质侵入体、安山岩/凝灰岩火山带、玄武质镁铁质岩脉，并按地层重调矿床高度带。
 - 0.1.9 细化原版岩石 Shift 材料卡：圆石明确为破碎采石骨料，普通石头为本地混合地层石料，花岗岩才使用明确花岗质矿物组合。
 - 0.1.9 新增 Living World 第一轮纵向切片：12 个双语姓名、6 个现实工作角色与普通居民兜底、3 类聚落档案、聚落公告板、角色专属数据驱动交易、居民/掠夺者掉落、设施登记和角色工作反馈。
+- 0.1.10 全面重做基础 GUI：处理机、发电机和电池箱回归原版 `176x166` 容器语义；六面 IO 移入独立方块展开页；状态栏可直接区分输入、动力、红石、结构、配方和产物槽阻塞；手册与公告板增加高 GUI 缩放适配和中英文裁切保护。
 - 保留原版物品生态：矿物处理最终输出 `minecraft:iron_ingot`、`minecraft:copper_ingot`、`minecraft:gold_ingot`、`minecraft:diamond` 等。
 - 使用 26.2 新版 `assets/<modid>/items/*.json` 物品模型定义。
 - 已用 Agnes 生成并接入机器、新材料和精矿贴图；同时覆盖部分原版岩石视觉以强化真实岩石体系。新增贴图可用 `tools/generate_agnes_item_textures.py` 续跑。

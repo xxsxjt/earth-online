@@ -1,45 +1,46 @@
 package com.xxsx.earthonminecraft.client;
 
+import com.xxsx.earthonminecraft.MachineMultiblock;
 import com.xxsx.earthonminecraft.ProcessingMachineBlock;
 import com.xxsx.earthonminecraft.ProcessingMachineBlockEntity;
 import com.xxsx.earthonminecraft.ProcessingMachineMenu;
-import com.xxsx.earthonminecraft.MachineMultiblock;
 import com.xxsx.earthonminecraft.RouteGuide;
-import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 
 public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingMachineMenu> {
-    private static final Identifier BG_LOCATION = Identifier.fromNamespaceAndPath("earth_on_minecraft", "textures/gui/container/processing_machine.png");
+    private static final Identifier BG_LOCATION = Identifier.fromNamespaceAndPath(
+            "earth_on_minecraft", "textures/gui/container/processing_machine.png");
     private static final Identifier PROGRESS_SPRITE = Identifier.withDefaultNamespace("container/furnace/burn_progress");
     private static final Identifier FUEL_SPRITE = Identifier.withDefaultNamespace("container/furnace/lit_progress");
-    private static final int VANILLA_TEXT = 0xFF404040;
-    private static final int MUTED = 0xFF606060;
-    private static final int WARNING = 0xFFAA3322;
-    private static final int STATUS_X = 92;
-    private static final int STATUS_Y = 66;
-    private static final int STATUS_SIZE = 5;
-    private static final int SIDE_BUTTON_SIZE = 10;
+
+    private static final int REDSTONE_X = 7;
+    private static final int SIDE_X = 23;
+    private static final int ROUTE_X = 72;
+    private static final int CONTROLS_Y = 56;
+    private static final int ICON_BUTTON_SIZE = 14;
+    private static final int STATUS_X = 100;
+    private static final int STATUS_Y = 62;
+    private static final int STATUS_W = 69;
+    private static final int STATUS_H = 11;
 
     private Button redstoneButton;
     private Button routeButton;
-    private final Map<Direction, Button> sideButtons = new EnumMap<>(Direction.class);
+    private Button sideConfigButton;
 
     public ProcessingMachineScreen(ProcessingMachineMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -52,45 +53,46 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
     @Override
     protected void init() {
         super.init();
-        this.titleLabelX = 57 + Math.max(0, (74 - this.font.width(trimmedTitle())) / 2);
-        redstoneButton = addRenderableWidget(Button.builder(redstoneButtonLabel(), b -> cycleRedstoneMode())
-                .bounds(this.leftPos + 7, this.topPos + 65, 18, 14)
+        redstoneButton = addRenderableWidget(Button.builder(Component.empty(), b -> cycleRedstoneMode())
+                .bounds(leftPos + REDSTONE_X, topPos + CONTROLS_Y, ICON_BUTTON_SIZE, ICON_BUTTON_SIZE)
                 .build());
-        routeButton = addRenderableWidget(Button.builder(routeButtonLabel(), b -> cycleRoute())
-                .bounds(this.leftPos + 58, this.topPos + 64, 30, 14)
-                .build());
-        sideButtons.clear();
+
         if (!isMultiblockMachine()) {
-            for (Direction side : Direction.values()) {
-                Button button = addRenderableWidget(Button.builder(Component.empty(), b -> cycleSideMode(side))
-                        .bounds(sideButtonX(side), sideButtonY(side), SIDE_BUTTON_SIZE, SIDE_BUTTON_SIZE)
-                        .build());
-                sideButtons.put(side, button);
-            }
+            sideConfigButton = addRenderableWidget(Button.builder(Component.empty(), b ->
+                            Minecraft.getInstance().gui.pushScreenLayer(new MachineSideConfigScreen(menu)))
+                    .bounds(leftPos + SIDE_X, topPos + CONTROLS_Y, ICON_BUTTON_SIZE, ICON_BUTTON_SIZE)
+                    .tooltip(Tooltip.create(Component.translatable("screen.earth_on_minecraft.side.config.open.tooltip")))
+                    .build());
         }
 
-        addRenderableWidget(Button.builder(Component.translatable("screen.earth_on_minecraft.button.notebook"), button -> {
+        routeButton = addRenderableWidget(Button.builder(routeButtonLabel(), b -> cycleRoute())
+                .bounds(leftPos + ROUTE_X, topPos + CONTROLS_Y, 26, ICON_BUTTON_SIZE)
+                .build());
+
+        addRenderableWidget(Button.builder(Component.empty(), button -> {
                     this.onClose();
                     EarthOnMinecraftClient.openNotebook();
                 })
-                .bounds(this.leftPos + this.imageWidth - 42, this.topPos + 4, 34, 14)
+                .bounds(leftPos + 155, topPos + 4, ICON_BUTTON_SIZE, ICON_BUTTON_SIZE)
+                .tooltip(Tooltip.create(Component.translatable("screen.earth_on_minecraft.button.notebook.tooltip")))
                 .build());
-        syncRedstoneButtons();
-        syncRouteButton();
+
+        syncButtons();
     }
 
     @Override
     protected void containerTick() {
         super.containerTick();
-        syncRedstoneButtons();
-        syncRouteButton();
+        syncButtons();
     }
 
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         super.extractBackground(g, mouseX, mouseY, delta);
-        g.blit(RenderPipelines.GUI_TEXTURED, BG_LOCATION, this.leftPos, this.topPos, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
-        drawMachineChrome(g);
+        g.blit(RenderPipelines.GUI_TEXTURED, BG_LOCATION, leftPos, topPos,
+                0.0F, 0.0F, imageWidth, imageHeight, 256, 256);
+        drawMachineIdentity(g);
+        drawGridOnlyPowerSlot(g);
         drawFuel(g);
         drawProgress(g);
     }
@@ -98,286 +100,192 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         super.extractRenderState(g, mouseX, mouseY, delta);
-        drawSideConfig(g);
-        drawRedstoneIcon(g);
-        drawStatusDot(g);
+        drawControlGlyphs(g);
+        drawStatus(g);
         drawTooltips(g, mouseX, mouseY);
     }
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        g.text(this.font, trimmedTitle(), this.titleLabelX, this.titleLabelY, VANILLA_TEXT, false);
-        g.text(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, VANILLA_TEXT, false);
+        g.text(font, trimmedTitle(), titleLabelX, titleLabelY, EarthGuiSupport.TEXT, false);
+        g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, EarthGuiSupport.TEXT, false);
+    }
+
+    private void drawMachineIdentity(GuiGraphicsExtractor g) {
+        int accent = menu.processFamily().accentColor();
+        int x = leftPos + 8;
+        int y = topPos + 21;
+        g.fill(x - 2, y - 2, x + 20, y, accent);
+        Item machineItem = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(
+                "earth_on_minecraft", menu.kind().blockId()));
+        ItemStack icon = new ItemStack(machineItem);
+        if (!icon.isEmpty()) {
+            g.item(icon, x, y + 1);
+        }
+        String family = localized(menu.processFamily().labelKey());
+        g.text(font, EarthGuiSupport.fit(font, family, 31), x - 1, y + 20, accent, false);
+    }
+
+    private void drawGridOnlyPowerSlot(GuiGraphicsExtractor g) {
+        if (menu.acceptsLocalFuel()) {
+            return;
+        }
+        int x = leftPos + 39;
+        int y = topPos + 58;
+        g.fill(x, y, x + 16, y + 16, 0xFF20282D);
+        drawPowerGlyph(g, x + 3, y + 2, menu.processFamily().accentColor());
     }
 
     private void drawFuel(GuiGraphicsExtractor g) {
-        if (!this.menu.acceptsLocalFuel() || this.menu.burnTimeTotal() <= 0) {
+        if (!menu.acceptsLocalFuel() || menu.burnTimeTotal() <= 0) {
             return;
         }
-        int lit = Math.min(14, 14 * this.menu.burnTime() / this.menu.burnTimeTotal());
+        int lit = Math.min(14, 14 * menu.burnTime() / menu.burnTimeTotal());
         if (lit > 0) {
             g.blitSprite(RenderPipelines.GUI_TEXTURED, FUEL_SPRITE, 14, 14, 0, 14 - lit,
-                    this.leftPos + 59, this.topPos + 59 + 14 - lit, 14, lit);
+                    leftPos + 59, topPos + 59 + 14 - lit, 14, lit);
         }
     }
 
     private void drawProgress(GuiGraphicsExtractor g) {
-        int maxProgress = this.menu.maxProgress();
+        int maxProgress = menu.maxProgress();
         if (maxProgress <= 0) {
             return;
         }
-        int progress = Math.min(24, 24 * this.menu.progress() / maxProgress);
+        int progress = Math.min(24, 24 * menu.progress() / maxProgress);
         if (progress > 0) {
-            g.blitSprite(RenderPipelines.GUI_TEXTURED, PROGRESS_SPRITE, 24, 16, 0, 0, this.leftPos + 64, this.topPos + 38, progress, 16);
+            g.blitSprite(RenderPipelines.GUI_TEXTURED, PROGRESS_SPRITE, 24, 16, 0, 0,
+                    leftPos + 64, topPos + 38, progress, 16);
         }
+    }
+
+    private void drawControlGlyphs(GuiGraphicsExtractor g) {
+        EarthGuiSupport.drawRedstoneGlyph(g, leftPos + REDSTONE_X + 2, topPos + CONTROLS_Y + 2,
+                menu.redstoneMode());
+        if (sideConfigButton != null) {
+            EarthGuiSupport.drawIoGlyph(g, leftPos + SIDE_X + 2, topPos + CONTROLS_Y + 2);
+        }
+        EarthGuiSupport.drawNotebookGlyph(g, leftPos + 157, topPos + 6);
+    }
+
+    private void drawStatus(GuiGraphicsExtractor g) {
+        int x = leftPos + STATUS_X;
+        int y = topPos + STATUS_Y;
+        EarthGuiSupport.drawInset(g, x, y, STATUS_W, STATUS_H);
+        int color = statusColor();
+        g.fill(x + 3, y + 3, x + 8, y + 8, color);
+        String line = EarthGuiSupport.fit(font, statusLine(), STATUS_W - 15);
+        g.text(font, line, x + 11, y + 1, color, false);
     }
 
     private String statusLine() {
-        if (!this.menu.structureValid()) {
-            MachineMultiblock.Pattern pattern = MachineMultiblock.patternFor(this.menu.kind());
-            return fit(localized("screen.earth_on_minecraft.machine.structure_missing") + " " + localized(pattern.screenKey()), 132);
+        if (!menu.structureValid()) {
+            return localized("screen.earth_on_minecraft.machine.structure_missing_short");
         }
-
-        ItemStack input = this.menu.getSlot(ProcessingMachineBlockEntity.SLOT_INPUT).getItem();
+        ItemStack input = menu.getSlot(ProcessingMachineBlockEntity.SLOT_INPUT).getItem();
         if (input.isEmpty()) {
-            String key = this.menu.acceptsLocalFuel()
-                    ? "screen.earth_on_minecraft.machine.empty_input_fuel"
-                    : "screen.earth_on_minecraft.machine.empty_input_grid";
-            return fit(localized(key), 92);
+            return localized("screen.earth_on_minecraft.machine.empty_input_short");
         }
+        return menu.selectedRecipe().map(recipe -> {
+            if (redstonePaused()) {
+                return localized("screen.earth_on_minecraft.machine.redstone_paused_short");
+            }
+            if (menu.outputsBlocked()) {
+                return localized("screen.earth_on_minecraft.machine.outputs_full_short");
+            }
+            if (menu.active()) {
+                return localized("screen.earth_on_minecraft.machine.running");
+            }
+            if (!menu.gridPowered() && !menu.hasBurningFuel() && !fuelSlotHasFuel()) {
+                return localized(menu.acceptsLocalFuel()
+                        ? "screen.earth_on_minecraft.machine.missing_power_short"
+                        : "screen.earth_on_minecraft.machine.missing_grid_power_short");
+            }
+            return localized("screen.earth_on_minecraft.machine.recipe_ready");
+        }).orElseGet(() -> localized("screen.earth_on_minecraft.machine.unsupported_input_short"));
+    }
 
-        return this.menu.selectedRecipe().map(recipe -> {
-            if (this.menu.gridPowered()) {
-                return fit(localized("screen.earth_on_minecraft.machine.grid_powered") + " " + recipeSummary(recipe), 92);
+    private String detailedStatusLine() {
+        if (!menu.structureValid()) {
+            return localized("screen.earth_on_minecraft.machine.structure_missing");
+        }
+        ItemStack input = menu.getSlot(ProcessingMachineBlockEntity.SLOT_INPUT).getItem();
+        if (input.isEmpty()) {
+            return localized(menu.acceptsLocalFuel()
+                    ? "screen.earth_on_minecraft.machine.empty_input_fuel"
+                    : "screen.earth_on_minecraft.machine.empty_input_grid");
+        }
+        return menu.selectedRecipe().map(recipe -> {
+            if (redstonePaused()) {
+                return localized("screen.earth_on_minecraft.machine.redstone_paused");
             }
-            if (!this.menu.hasBurningFuel() && !fuelSlotHasFuel()) {
-                String key = this.menu.acceptsLocalFuel()
+            if (menu.outputsBlocked()) {
+                return localized("screen.earth_on_minecraft.machine.outputs_full");
+            }
+            if (!menu.gridPowered() && !menu.hasBurningFuel() && !fuelSlotHasFuel()) {
+                return localized(menu.acceptsLocalFuel()
                         ? "screen.earth_on_minecraft.machine.missing_power"
-                        : "screen.earth_on_minecraft.machine.missing_grid_power";
-                return fit(localized(key), 92);
+                        : "screen.earth_on_minecraft.machine.missing_grid_power");
             }
-            String note = recipeSummary(recipe);
-            return fit(note, 92);
-        }).orElseGet(() -> fit(localized("screen.earth_on_minecraft.machine.unsupported_input"), 92));
+            return recipeSummary(recipe);
+        }).orElseGet(() -> localized("screen.earth_on_minecraft.machine.unsupported_input"));
     }
 
     private int statusColor() {
-        if (!this.menu.structureValid()) {
-            return WARNING;
+        if (!menu.structureValid()) {
+            return EarthGuiSupport.WARNING;
         }
-        ItemStack input = this.menu.getSlot(ProcessingMachineBlockEntity.SLOT_INPUT).getItem();
-        if (!input.isEmpty() && ProcessingMachineBlock.findRecipe(this.menu.kind(), input).isEmpty()) {
-            return WARNING;
+        ItemStack input = menu.getSlot(ProcessingMachineBlockEntity.SLOT_INPUT).getItem();
+        if (!input.isEmpty() && ProcessingMachineBlock.findRecipe(menu.kind(), input).isEmpty()) {
+            return EarthGuiSupport.WARNING;
         }
-        if (!input.isEmpty() && !this.menu.gridPowered() && !this.menu.hasBurningFuel() && !fuelSlotHasFuel()) {
-            return WARNING;
+        if (!input.isEmpty() && (redstonePaused() || menu.outputsBlocked())) {
+            return EarthGuiSupport.WARNING;
         }
-        return this.menu.active() ? 0xFF207030 : MUTED;
-    }
-
-    private void drawStatusDot(GuiGraphicsExtractor g) {
-        int x = this.leftPos + STATUS_X;
-        int y = this.topPos + STATUS_Y;
-        int color = statusColor();
-        g.fill(x - 1, y - 1, x + STATUS_SIZE + 1, y + STATUS_SIZE + 1, 0xFF3B3B3B);
-        g.fill(x, y, x + STATUS_SIZE, y + STATUS_SIZE, color);
-        g.text(this.font, Component.literal(visibleStatusLine()), x + 8, y - 2, color, false);
-    }
-
-    private void drawMachineChrome(GuiGraphicsExtractor g) {
-        int accent = this.menu.processFamily().accentColor();
-        int x = this.leftPos + 58;
-        int y = this.topPos + 20;
-        g.fill(x - 2, y - 2, x + 41, y + 15, 0x66303030);
-        g.fill(x - 2, y - 2, x + 41, y, accent);
-        Item machineItem = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(
-                "earth_on_minecraft", this.menu.kind().blockId()));
-        ItemStack machineIcon = new ItemStack(machineItem);
-        if (!machineIcon.isEmpty()) {
-            g.item(machineIcon, x, y - 1);
-        } else {
-            drawProcessGlyph(g, x + 1, y + 1, accent);
+        if (menu.active()) {
+            return 0xFF207030;
         }
-        String family = fit(localized(this.menu.processFamily().labelKey()), 23);
-        g.text(this.font, family, x + 17, y + 2, accent, false);
-
-        if (!this.menu.acceptsLocalFuel()) {
-            int slotX = this.leftPos + 39;
-            int slotY = this.topPos + 58;
-            g.fill(slotX, slotY, slotX + 16, slotY + 16, 0xDD20282D);
-            drawPowerGlyph(g, slotX + 4, slotY + 2, accent);
+        if (!input.isEmpty() && !menu.gridPowered() && !menu.hasBurningFuel() && !fuelSlotHasFuel()) {
+            return EarthGuiSupport.WARNING;
         }
-    }
-
-    private void drawProcessGlyph(GuiGraphicsExtractor g, int x, int y, int color) {
-        switch (this.menu.processFamily()) {
-            case COMMINUTION -> {
-                g.fill(x, y + 1, x + 4, y + 4, color);
-                g.fill(x + 8, y + 1, x + 12, y + 4, color);
-                g.fill(x + 3, y + 4, x + 9, y + 7, color);
-                g.fill(x + 5, y + 7, x + 7, y + 11, color);
-            }
-            case CLASSIFICATION -> {
-                g.fill(x, y + 2, x + 12, y + 3, color);
-                g.fill(x + 2, y + 5, x + 10, y + 6, color);
-                g.fill(x + 4, y + 8, x + 8, y + 9, color);
-            }
-            case WET_PROCESS -> {
-                g.fill(x, y + 1, x + 12, y + 2, color);
-                g.fill(x, y + 2, x + 2, y + 11, color);
-                g.fill(x + 10, y + 2, x + 12, y + 11, color);
-                g.fill(x + 2, y + 7, x + 10, y + 11, color);
-            }
-            case THERMAL -> {
-                g.fill(x + 5, y, x + 8, y + 4, color);
-                g.fill(x + 3, y + 3, x + 9, y + 8, color);
-                g.fill(x + 1, y + 7, x + 11, y + 11, color);
-            }
-            case ELECTROCHEMICAL -> {
-                g.fill(x + 6, y, x + 9, y + 4, color);
-                g.fill(x + 3, y + 3, x + 8, y + 7, color);
-                g.fill(x + 5, y + 6, x + 8, y + 9, color);
-                g.fill(x + 2, y + 8, x + 7, y + 11, color);
-            }
-            case FORMING -> {
-                g.fill(x + 1, y + 1, x + 11, y + 3, color);
-                g.fill(x + 5, y + 3, x + 7, y + 8, color);
-                g.fill(x + 2, y + 8, x + 10, y + 11, color);
-            }
-            case REACTION -> {
-                g.fill(x + 2, y + 1, x + 10, y + 3, color);
-                g.fill(x + 1, y + 3, x + 11, y + 10, color);
-                g.fill(x + 4, y + 5, x + 6, y + 7, 0xFFE5F4F3);
-                g.fill(x + 7, y + 3, x + 9, y + 5, 0xFFE5F4F3);
-            }
-            case COLUMN -> {
-                g.fill(x + 3, y, x + 9, y + 11, color);
-                g.fill(x + 1, y + 2, x + 11, y + 3, color);
-                g.fill(x + 1, y + 7, x + 11, y + 8, color);
-            }
-            case MIXING -> {
-                g.fill(x + 5, y, x + 7, y + 7, color);
-                g.fill(x + 1, y + 6, x + 11, y + 8, color);
-                g.fill(x + 3, y + 8, x + 5, y + 11, color);
-                g.fill(x + 7, y + 8, x + 9, y + 11, color);
-            }
-            case CRYSTALLIZATION -> {
-                g.fill(x + 5, y, x + 7, y + 2, color);
-                g.fill(x + 3, y + 2, x + 9, y + 5, color);
-                g.fill(x + 1, y + 5, x + 11, y + 7, color);
-                g.fill(x + 3, y + 7, x + 9, y + 9, color);
-                g.fill(x + 5, y + 9, x + 7, y + 11, color);
-            }
-        }
-    }
-
-    private void drawPowerGlyph(GuiGraphicsExtractor g, int x, int y, int color) {
-        g.fill(x + 5, y, x + 9, y + 5, color);
-        g.fill(x + 2, y + 4, x + 8, y + 8, color);
-        g.fill(x + 4, y + 7, x + 7, y + 12, color);
-    }
-
-    private void drawRedstoneIcon(GuiGraphicsExtractor g) {
-        int x = this.leftPos + 8;
-        int y = this.topPos + 64;
-        ProcessingMachineBlockEntity.RedstoneMode redstone = this.menu.redstoneMode();
-        g.item(new ItemStack(redstoneIcon(redstone)), x, y);
-        if (redstone == ProcessingMachineBlockEntity.RedstoneMode.REQUIRE_NO_SIGNAL) {
-            g.fill(x, y, x + 16, y + 16, 0x99000000);
-        }
-    }
-
-    private void drawSideConfig(GuiGraphicsExtractor g) {
-        if (isMultiblockMachine()) {
-            drawInterfaceGuide(g);
-            return;
-        }
-        g.text(this.font, Component.translatable("screen.earth_on_minecraft.side.panel"), this.leftPos + 5, this.topPos + 6, MUTED, false);
-        for (Direction side : Direction.values()) {
-            int x = sideButtonX(side);
-            int y = sideButtonY(side);
-            int color = sideModeColor(this.menu.sideMode(side));
-            g.fill(x - 1, y - 1, x + SIDE_BUTTON_SIZE + 1, y + SIDE_BUTTON_SIZE + 1, 0xFF383838);
-            g.fill(x, y, x + SIDE_BUTTON_SIZE, y + SIDE_BUTTON_SIZE, color);
-            g.text(this.font, faceShort(side), x + 2, y + 1, 0xFFFFFFFF, false);
-        }
-    }
-
-    private void drawInterfaceGuide(GuiGraphicsExtractor g) {
-        int x = this.leftPos + 6;
-        int y = this.topPos + 18;
-        g.text(this.font, Component.translatable("screen.earth_on_minecraft.machine.interface_panel"), x, y, MUTED, false);
-        g.text(this.font, Component.translatable("screen.earth_on_minecraft.machine.interface_input"), x, y + 11, 0xFF2D74C4, false);
-        g.text(this.font, Component.translatable("screen.earth_on_minecraft.machine.interface_output"), x, y + 22, 0xFFC46A22, false);
-        g.text(this.font, Component.translatable("screen.earth_on_minecraft.machine.interface_conveyor"), x, y + 33, 0xFF2E8B57, false);
-    }
-
-    private Item redstoneIcon(ProcessingMachineBlockEntity.RedstoneMode redstone) {
-        return switch (redstone) {
-            case ALWAYS -> Items.BARRIER;
-            case REQUIRE_SIGNAL, REQUIRE_NO_SIGNAL -> Items.REDSTONE_TORCH;
-        };
+        return EarthGuiSupport.MUTED;
     }
 
     private void drawTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        if (isHovering(7, 65, 18, 14, mouseX, mouseY)) {
-            ProcessingMachineBlockEntity.RedstoneMode redstone = this.menu.redstoneMode();
-            g.setComponentTooltipForNextFrame(this.font, List.of(
-                    Component.translatable("screen.earth_on_minecraft.redstone.current", Component.translatable(redstone.labelKey())),
+        if (isHovering(REDSTONE_X, CONTROLS_Y, ICON_BUTTON_SIZE, ICON_BUTTON_SIZE, mouseX, mouseY)) {
+            ProcessingMachineBlockEntity.RedstoneMode redstone = menu.redstoneMode();
+            g.setComponentTooltipForNextFrame(font, List.of(
+                    Component.translatable("screen.earth_on_minecraft.redstone.current",
+                            Component.translatable(redstone.labelKey())),
                     Component.translatable(redstone.descriptionKey()),
                     Component.translatable("screen.earth_on_minecraft.redstone.tooltip")
             ), mouseX, mouseY);
         }
-        if (isMultiblockMachine()) {
-            if (isHovering(5, 16, 42, 45, mouseX, mouseY)) {
-                g.setComponentTooltipForNextFrame(this.font, List.of(
-                        Component.translatable("screen.earth_on_minecraft.machine.interface.tooltip.1"),
-                        Component.translatable("screen.earth_on_minecraft.machine.interface.tooltip.2"),
-                        Component.translatable("screen.earth_on_minecraft.machine.interface.tooltip.3")
-                ), mouseX, mouseY);
-            }
-        } else {
-            for (Direction side : Direction.values()) {
-                if (isHovering(sideButtonX(side) - this.leftPos, sideButtonY(side) - this.topPos,
-                        SIDE_BUTTON_SIZE, SIDE_BUTTON_SIZE, mouseX, mouseY)) {
-                    ProcessingMachineBlockEntity.SideMode mode = this.menu.sideMode(side);
-                    g.setComponentTooltipForNextFrame(this.font, List.of(
-                            Component.translatable("screen.earth_on_minecraft.side.current",
-                                    Component.translatable(faceKey(side)), Component.translatable(mode.labelKey())),
-                            Component.translatable(mode.tooltipKey()),
-                            Component.translatable("screen.earth_on_minecraft.side.tooltip")
-                    ), mouseX, mouseY);
-                }
-            }
-        }
-        if (!this.menu.structureValid() && isHovering(34, 55, 134, 20, mouseX, mouseY)) {
-            MachineMultiblock.Pattern pattern = MachineMultiblock.patternFor(this.menu.kind());
-            g.setComponentTooltipForNextFrame(this.font, List.of(
-                    Component.translatable("screen.earth_on_minecraft.machine.structure_missing"),
-                    Component.translatable(pattern.screenKey()),
-                    Component.translatable("tooltip.earth_on_minecraft.multiblock.legend")
-            ), mouseX, mouseY);
+        if (isHovering(7, 18, 32, 39, mouseX, mouseY)) {
+            g.setComponentTooltipForNextFrame(font, machineSpecTooltip(), mouseX, mouseY);
         }
         if (isHovering(38, 57, 18, 18, mouseX, mouseY)) {
-            g.setComponentTooltipForNextFrame(this.font, powerTooltip(), mouseX, mouseY);
+            g.setComponentTooltipForNextFrame(font, powerTooltip(), mouseX, mouseY);
         }
-        if (isHovering(56, 18, 44, 18, mouseX, mouseY)) {
-            g.setComponentTooltipForNextFrame(this.font, machineSpecTooltip(), mouseX, mouseY);
-        }
-        if (isHovering(STATUS_X - 2, STATUS_Y - 2, STATUS_SIZE + 4, STATUS_SIZE + 4, mouseX, mouseY)
-                || isHovering(64, 38, 36, 18, mouseX, mouseY)) {
+        if (isHovering(STATUS_X, STATUS_Y, STATUS_W, STATUS_H, mouseX, mouseY)
+                || isHovering(64, 38, 24, 16, mouseX, mouseY)) {
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(stateTooltip());
-            tooltip.add(Component.literal(statusLine()));
+            tooltip.add(Component.literal(detailedStatusLine()));
             tooltip.add(Component.translatable("screen.earth_on_minecraft.machine.spec",
-                    secondsPerOperation(), this.menu.energyPerTick()));
-            tooltip.add(Component.translatable(this.menu.powerMode().labelKey()));
-            g.setComponentTooltipForNextFrame(this.font, tooltip, mouseX, mouseY);
+                    secondsPerOperation(), menu.energyPerTick()));
+            tooltip.add(Component.translatable(menu.powerMode().labelKey()));
+            if (!menu.structureValid()) {
+                MachineMultiblock.Pattern pattern = MachineMultiblock.patternFor(menu.kind());
+                tooltip.add(Component.translatable(pattern.screenKey()));
+            }
+            g.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
         }
-        if (this.menu.routeCount() > 1 && isHovering(58, 64, 30, 14, mouseX, mouseY)) {
-            g.setComponentTooltipForNextFrame(this.font, List.of(
-                    Component.translatable("screen.earth_on_minecraft.machine.route.current", this.menu.selectedRouteIndex() + 1, this.menu.routeCount()),
-                    this.menu.selectedRecipe().map(recipe -> Component.literal(recipe.note()))
+        if (menu.routeCount() > 1 && isHovering(ROUTE_X, CONTROLS_Y, 26, ICON_BUTTON_SIZE, mouseX, mouseY)) {
+            g.setComponentTooltipForNextFrame(font, List.of(
+                    Component.translatable("screen.earth_on_minecraft.machine.route.current",
+                            menu.selectedRouteIndex() + 1, menu.routeCount()),
+                    menu.selectedRecipe().map(recipe -> Component.literal(recipe.note()))
                             .orElse(Component.translatable("screen.earth_on_minecraft.machine.empty_input")),
                     Component.translatable("screen.earth_on_minecraft.machine.route.tooltip")
             ), mouseX, mouseY);
@@ -389,145 +297,71 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
         if (mc.gameMode == null) {
             return;
         }
-        int id = switch (this.menu.redstoneMode()) {
+        int id = switch (menu.redstoneMode()) {
             case ALWAYS -> ProcessingMachineMenu.BUTTON_REDSTONE_REQUIRE_SIGNAL;
             case REQUIRE_SIGNAL -> ProcessingMachineMenu.BUTTON_REDSTONE_REQUIRE_NO_SIGNAL;
             case REQUIRE_NO_SIGNAL -> ProcessingMachineMenu.BUTTON_REDSTONE_ALWAYS;
         };
-        mc.gameMode.handleInventoryButtonClick(this.menu.containerId, id);
-    }
-
-    private void cycleSideMode(Direction side) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.gameMode == null) {
-            return;
-        }
-        mc.gameMode.handleInventoryButtonClick(this.menu.containerId, ProcessingMachineMenu.BUTTON_SIDE_BASE + side.ordinal());
+        mc.gameMode.handleInventoryButtonClick(menu.containerId, id);
     }
 
     private void cycleRoute() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.gameMode == null || this.menu.routeCount() <= 1) {
-            return;
+        if (mc.gameMode != null && menu.routeCount() > 1) {
+            mc.gameMode.handleInventoryButtonClick(menu.containerId, ProcessingMachineMenu.BUTTON_ROUTE_NEXT);
         }
-        mc.gameMode.handleInventoryButtonClick(this.menu.containerId, ProcessingMachineMenu.BUTTON_ROUTE_NEXT);
     }
 
-    private void syncRedstoneButtons() {
+    private void syncButtons() {
         if (redstoneButton != null) {
-            redstoneButton.setMessage(redstoneButtonLabel());
+            redstoneButton.setMessage(Component.empty());
         }
-    }
-
-    private void syncRouteButton() {
         if (routeButton != null) {
-            routeButton.visible = this.menu.routeCount() > 1;
-            routeButton.active = this.menu.routeCount() > 1;
+            routeButton.visible = menu.routeCount() > 1;
+            routeButton.active = menu.routeCount() > 1;
             routeButton.setMessage(routeButtonLabel());
         }
     }
 
-    private Component redstoneButtonLabel() {
-        return Component.empty();
-    }
-
     private Component routeButtonLabel() {
-        if (this.menu.routeCount() <= 1) {
+        if (menu.routeCount() <= 1) {
             return Component.empty();
         }
-        return Component.literal((this.menu.selectedRouteIndex() + 1) + "/" + this.menu.routeCount());
-    }
-
-    private int sideButtonX(Direction side) {
-        return this.leftPos + switch (relativeFace(side)) {
-            case LEFT -> 7;
-            case RIGHT -> 29;
-            default -> 18;
-        };
-    }
-
-    private int sideButtonY(Direction side) {
-        return this.topPos + switch (relativeFace(side)) {
-            case TOP -> 17;
-            case LEFT, FRONT, RIGHT -> 28;
-            case BOTTOM -> 39;
-            case BACK -> 50;
-        };
-    }
-
-    private int sideModeColor(ProcessingMachineBlockEntity.SideMode mode) {
-        return switch (mode) {
-            case INPUT -> 0xFF2D74C4;
-            case OUTPUT -> 0xFFC46A22;
-            case BOTH -> 0xFF2E8B57;
-            case OFF -> 0xFF555555;
-        };
-    }
-
-    private Component faceShort(Direction side) {
-        return Component.translatable("screen.earth_on_minecraft.side.relative.short." + relativeFace(side).key);
-    }
-
-    private String faceKey(Direction side) {
-        return "screen.earth_on_minecraft.side.relative." + relativeFace(side).key;
-    }
-
-    private Component stateLabel() {
-        return Component.translatable(this.menu.active()
-                ? "screen.earth_on_minecraft.machine.running"
-                : "screen.earth_on_minecraft.machine.idle");
-    }
-
-    private Component stateTooltip() {
-        return Component.translatable(this.menu.active()
-                ? "screen.earth_on_minecraft.machine.state.running.tooltip"
-                : "screen.earth_on_minecraft.machine.state.idle.tooltip");
-    }
-
-    private String visibleStatusLine() {
-        return fit(statusLine(), 68);
+        return Component.literal((menu.selectedRouteIndex() + 1) + "/" + menu.routeCount());
     }
 
     private Component trimmedTitle() {
-        String text = this.title.getString();
-        if (this.font.width(text) > 72) {
-            return Component.literal(this.font.plainSubstrByWidth(text, 69) + "...");
-        }
-        return this.title;
+        return EarthGuiSupport.trim(font, title, 140);
     }
 
     private String recipeSummary(ProcessingMachineBlock.Recipe recipe) {
-        if (Minecraft.getInstance().getLanguageManager().getSelected().toLowerCase(java.util.Locale.ROOT).startsWith("zh")) {
+        if (Minecraft.getInstance().getLanguageManager().getSelected()
+                .toLowerCase(java.util.Locale.ROOT).startsWith("zh")) {
             return recipe.note();
         }
-        return localized("screen.earth_on_minecraft.machine.recipe_ready") + ": " + RouteGuide.describeOutputs(recipe);
-    }
-
-    private String fit(String text, int width) {
-        if (this.font.width(text) <= width) {
-            return text;
-        }
-        return this.font.plainSubstrByWidth(text, Math.max(0, width - this.font.width("..."))) + "...";
-    }
-
-    private static String localized(String key) {
-        return Language.getInstance().getOrDefault(key);
+        return localized("screen.earth_on_minecraft.machine.recipe_ready") + ": "
+                + RouteGuide.describeOutputs(recipe);
     }
 
     private boolean fuelSlotHasFuel() {
-        if (!this.menu.acceptsLocalFuel()) {
+        if (!menu.acceptsLocalFuel()) {
             return false;
         }
-        ItemStack fuel = this.menu.getSlot(ProcessingMachineBlockEntity.SLOT_FUEL).getItem();
+        ItemStack fuel = menu.getSlot(ProcessingMachineBlockEntity.SLOT_FUEL).getItem();
         return ProcessingMachineBlockEntity.getFuelTicks(fuel) > 0;
+    }
+
+    private boolean redstonePaused() {
+        var level = Minecraft.getInstance().level;
+        return level != null && !menu.redstoneMode().allows(level.hasNeighborSignal(menu.pos()));
     }
 
     private List<Component> powerTooltip() {
         List<Component> tooltip = new ArrayList<>();
-        tooltip.add(Component.translatable(this.menu.powerMode().labelKey()));
+        tooltip.add(Component.translatable(menu.powerMode().labelKey()));
         tooltip.add(Component.translatable("screen.earth_on_minecraft.machine.spec",
-                secondsPerOperation(), this.menu.energyPerTick()));
-        if (this.menu.acceptsLocalFuel()) {
+                secondsPerOperation(), menu.energyPerTick()));
+        if (menu.acceptsLocalFuel()) {
             tooltip.add(Component.translatable("screen.earth_on_minecraft.machine.fuel.tooltip"));
             tooltip.add(Component.translatable("screen.earth_on_minecraft.machine.fuel.examples"));
         } else {
@@ -537,66 +371,40 @@ public class ProcessingMachineScreen extends AbstractContainerScreen<ProcessingM
     }
 
     private List<Component> machineSpecTooltip() {
-        return List.of(
-                Component.translatable(this.menu.processFamily().labelKey()),
-                Component.translatable(this.menu.kind().setpointKey()),
-                Component.translatable("screen.earth_on_minecraft.machine.spec",
-                        secondsPerOperation(), this.menu.energyPerTick()),
-                Component.translatable(this.menu.powerMode().labelKey())
-        );
+        List<Component> result = new ArrayList<>();
+        result.add(Component.translatable(menu.processFamily().labelKey()));
+        result.add(Component.translatable(menu.kind().setpointKey()));
+        result.add(Component.translatable("screen.earth_on_minecraft.machine.spec",
+                secondsPerOperation(), menu.energyPerTick()));
+        result.add(Component.translatable(menu.powerMode().labelKey()));
+        if (isMultiblockMachine()) {
+            result.add(Component.translatable(MachineMultiblock.patternFor(menu.kind()).screenKey()));
+            result.add(Component.translatable("screen.earth_on_minecraft.machine.interface.tooltip.2"));
+        }
+        return result;
+    }
+
+    private Component stateTooltip() {
+        return Component.translatable(menu.active()
+                ? "screen.earth_on_minecraft.machine.state.running.tooltip"
+                : "screen.earth_on_minecraft.machine.state.idle.tooltip");
     }
 
     private int secondsPerOperation() {
-        return Math.max(1, (this.menu.maxProgress() + 19) / 20);
-    }
-
-    private Direction machineFront() {
-        var level = Minecraft.getInstance().level;
-        if (level != null) {
-            var state = level.getBlockState(this.menu.pos());
-            if (state.hasProperty(ProcessingMachineBlock.FACING)) {
-                return state.getValue(ProcessingMachineBlock.FACING);
-            }
-        }
-        return Direction.NORTH;
-    }
-
-    private RelativeFace relativeFace(Direction side) {
-        if (side == Direction.UP) {
-            return RelativeFace.TOP;
-        }
-        if (side == Direction.DOWN) {
-            return RelativeFace.BOTTOM;
-        }
-        Direction front = machineFront();
-        if (side == front) {
-            return RelativeFace.FRONT;
-        }
-        if (side == front.getOpposite()) {
-            return RelativeFace.BACK;
-        }
-        if (side == front.getClockWise()) {
-            return RelativeFace.RIGHT;
-        }
-        return RelativeFace.LEFT;
+        return Math.max(1, (menu.maxProgress() + 19) / 20);
     }
 
     private boolean isMultiblockMachine() {
-        return MachineMultiblock.patternFor(this.menu.kind()) != MachineMultiblock.Pattern.NONE;
+        return MachineMultiblock.patternFor(menu.kind()) != MachineMultiblock.Pattern.NONE;
     }
 
-    private enum RelativeFace {
-        TOP("top"),
-        BOTTOM("bottom"),
-        FRONT("front"),
-        BACK("back"),
-        LEFT("left"),
-        RIGHT("right");
+    private static String localized(String key) {
+        return Language.getInstance().getOrDefault(key);
+    }
 
-        private final String key;
-
-        RelativeFace(String key) {
-            this.key = key;
-        }
+    private void drawPowerGlyph(GuiGraphicsExtractor g, int x, int y, int color) {
+        g.fill(x + 5, y, x + 9, y + 5, color);
+        g.fill(x + 2, y + 4, x + 8, y + 8, color);
+        g.fill(x + 4, y + 7, x + 7, y + 12, color);
     }
 }
